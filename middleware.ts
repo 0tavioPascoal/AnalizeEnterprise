@@ -21,7 +21,6 @@ export async function middleware(req: NextRequest) {
     }
   );
 
-  // 🔥 IMPORTANTE: garante leitura correta da sessão
   const {
     data: { session },
   } = await supabase.auth.getSession();
@@ -33,14 +32,12 @@ export async function middleware(req: NextRequest) {
   const isLoginPage = path === "/login";
   const isProtectedRoute = path.startsWith("/dashboard");
 
-  // 🔒 Não autenticado tentando acessar área protegida
   if (isProtectedRoute && !isLoggedIn) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = "/login";
     return NextResponse.redirect(redirectUrl);
   }
 
-  // 🔁 Já logado tentando acessar login
   if (isLoginPage && isLoggedIn) {
     const redirectUrl = req.nextUrl.clone();
     redirectUrl.pathname = "/dashboard";
