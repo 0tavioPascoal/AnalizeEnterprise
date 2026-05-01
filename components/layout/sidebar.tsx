@@ -1,7 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useTransition } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import {
   Home,
   User,
@@ -12,15 +13,16 @@ import {
   Brain,
   List,
 } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { useRouter } from "next/navigation";
 
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import { logout } from "@/actions/logout";
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
+  const [isPending, startTransition] = useTransition();
   const router = useRouter();
 
   const user = {
@@ -28,21 +30,21 @@ export function Sidebar() {
     email: "otavio@email.com",
   };
 
-  async function handleLogout() {
-    await supabaseBrowser.auth.signOut();
-
-    // 🔥 garante estado limpo + middleware correto
-    window.location.href = "/login";
+  function handleLogout() {
+    startTransition(async () => {
+      await logout();
+      router.push("/login");
+      router.refresh();
+    });
   }
 
   return (
     <aside
       className={cn(
         "h-screen border-r bg-background transition-all duration-300 flex flex-col",
-        collapsed ? "w-16" : "w-64",
+        collapsed ? "w-16" : "w-64"
       )}
     >
-      {/* HEADER */}
       <div className="flex items-center justify-between p-4">
         {!collapsed && (
           <span className="font-semibold text-lg">RH Analyzer</span>
@@ -57,56 +59,28 @@ export function Sidebar() {
         </Button>
       </div>
 
-      {/* MENU */}
       <nav className="flex-1 px-2 space-y-1">
-        <NavItem
-          href="/dashboard"
-          icon={<Home size={18} />}
-          label="Dashboard"
-          collapsed={collapsed}
-        />
-        <NavItem
-          href="/dashboard/analyses"
-          icon={<List size={18} />}
-          label="Análises"
-          collapsed={collapsed}
-        />
-        <NavItem
-          href="/dashboard/analyze"
-          icon={<Brain size={18} />}
-          label="Análise"
-          collapsed={collapsed}
-        />
-        <NavItem
-          href="/dashboard/jobs"
-          icon={<Briefcase size={18} />}
-          label="Vagas"
-          collapsed={collapsed}
-        />
-        <NavItem
-          href="/dashboard/profile"
-          icon={<User size={18} />}
-          label="Perfil"
-          collapsed={collapsed}
-        />
-        <NavItem
-          href="/dashboard/settings"
-          icon={<Settings size={18} />}
-          label="Configurações"
-          collapsed={collapsed}
-        />
+        <NavItem href="/dashboard" icon={<Home size={18} />} label="Dashboard" collapsed={collapsed} />
+        <NavItem href="/dashboard/analyses" icon={<List size={18} />} label="Análises" collapsed={collapsed} />
+        <NavItem href="/dashboard/analyze" icon={<Brain size={18} />} label="Análise" collapsed={collapsed} />
+        <NavItem href="/dashboard/jobs" icon={<Briefcase size={18} />} label="Vagas" collapsed={collapsed} />
+        <NavItem href="/dashboard/profile" icon={<User size={18} />} label="Perfil" collapsed={collapsed} />
+        <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Configurações" collapsed={collapsed} />
       </nav>
 
-      {/* THEME */}
       <div className="px-2 pb-2">
         <ThemeToggle collapsed={collapsed} />
       </div>
 
-      {/* USER FOOTER */}
       <div className="border-t p-3">
         {collapsed ? (
           <div className="flex justify-center">
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              disabled={isPending}
+            >
               <LogOut size={18} />
             </Button>
           </div>
@@ -125,7 +99,12 @@ export function Sidebar() {
               </div>
             </div>
 
-            <Button variant="ghost" size="icon" onClick={handleLogout}>
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={handleLogout}
+              disabled={isPending}
+            >
               <LogOut size={18} />
             </Button>
           </div>
