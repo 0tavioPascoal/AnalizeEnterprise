@@ -23,19 +23,15 @@ export default function AnalyzePage() {
 
   return (
     <div className="w-full space-y-6">
-      
       {/* HEADER */}
       <div>
-        <h1 className="text-2xl font-semibold">
-          Análise de Currículo
-        </h1>
+        <h1 className="text-2xl font-semibold">Análise de Currículo</h1>
         <p className="text-muted-foreground text-sm">
           Compare candidatos com suas vagas automaticamente
         </p>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-3">
-        
         {/* FORM */}
         <Card className="lg:col-span-2">
           <CardHeader>
@@ -44,7 +40,6 @@ export default function AnalyzePage() {
 
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-6">
-              
               {/* SELECT VAGA */}
               <div className="space-y-2">
                 <Label>Vaga</Label>
@@ -61,7 +56,7 @@ export default function AnalyzePage() {
 
                 <label className="flex flex-col items-center justify-center border-2 border-dashed rounded-lg h-40 cursor-pointer hover:bg-muted/40 transition">
                   <UploadCloud className="mb-2" size={28} />
-                  
+
                   <span className="text-sm text-muted-foreground">
                     Clique ou arraste um PDF aqui
                   </span>
@@ -70,9 +65,7 @@ export default function AnalyzePage() {
                     type="file"
                     accept=".pdf"
                     className="hidden"
-                    onChange={(e) =>
-                      setFile(e.target.files?.[0] || null)
-                    }
+                    onChange={(e) => setFile(e.target.files?.[0] || null)}
                   />
                 </label>
               </div>
@@ -81,9 +74,7 @@ export default function AnalyzePage() {
               {file && (
                 <div className="flex items-center gap-3 p-3 border rounded-md bg-muted/30">
                   <FileText size={18} />
-                  <span className="text-sm truncate">
-                    {file.name}
-                  </span>
+                  <span className="text-sm truncate">{file.name}</span>
                 </div>
               )}
 
@@ -93,7 +84,6 @@ export default function AnalyzePage() {
                   {loading ? "Analisando..." : "Iniciar análise"}
                 </Button>
               </div>
-
             </form>
           </CardContent>
         </Card>
@@ -117,7 +107,6 @@ export default function AnalyzePage() {
             </div>
           </CardContent>
         </Card>
-
       </div>
     </div>
   );

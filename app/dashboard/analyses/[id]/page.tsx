@@ -21,43 +21,30 @@ export default function AnalysisDetailPage() {
 
   return (
     <div className="h-full flex flex-col gap-6 overflow-hidden">
-      
       {/* HEADER */}
       <div className="flex items-center justify-between shrink-0">
         <div>
-          <h1 className="text-2xl font-semibold">
-            {data.name}
-          </h1>
-          <p className="text-muted-foreground text-sm">
-            {data.job}
-          </p>
+          <h1 className="text-2xl font-semibold">{data.name}</h1>
+          <p className="text-muted-foreground text-sm">{data.job}</p>
         </div>
 
         <div className="text-right">
-          <p className="text-2xl font-bold">
-            {data.score}%
-          </p>
-          <p className="text-sm text-muted-foreground">
-            {data.status}
-          </p>
+          <p className="text-2xl font-bold">{data.score}%</p>
+          <p className="text-sm text-muted-foreground">{data.status}</p>
         </div>
       </div>
 
       {/* GRID */}
       <div className="grid gap-6 lg:grid-cols-3 flex-1 overflow-hidden">
-        
         {/* COLUNA ESQUERDA */}
         <div className="lg:col-span-2 space-y-6 overflow-auto pr-2">
-
           {/* RESUMO */}
           <Card>
             <CardHeader>
               <CardTitle>Resumo do candidato</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {data.summary}
-              </p>
+              <p className="text-sm text-muted-foreground">{data.summary}</p>
             </CardContent>
           </Card>
 
@@ -79,17 +66,13 @@ export default function AnalysisDetailPage() {
               <CardTitle>Entrevista</CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="text-sm text-muted-foreground">
-                {data.interview}
-              </p>
+              <p className="text-sm text-muted-foreground">{data.interview}</p>
             </CardContent>
           </Card>
-
         </div>
 
         {/* COLUNA DIREITA */}
         <div className="space-y-6">
-
           {/* PONTOS FORTES */}
           <Card>
             <CardHeader>
@@ -121,18 +104,14 @@ export default function AnalysisDetailPage() {
           {/* AÇÕES */}
           <Card>
             <CardContent className="space-y-3 pt-6">
-              <Button className="w-full">
-                Aprovar candidato
-              </Button>
+              <Button className="w-full">Aprovar candidato</Button>
 
               <Button variant="outline" className="w-full">
                 Reprovar
               </Button>
             </CardContent>
           </Card>
-
         </div>
-
       </div>
     </div>
   );

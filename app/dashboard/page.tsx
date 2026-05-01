@@ -5,7 +5,6 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 export default function DashboardPage() {
   return (
     <div className="h-full flex flex-col gap-6 overflow-hidden">
-      
       {/* HEADER */}
       <div className="shrink-0">
         <h1 className="text-2xl font-semibold">Dashboard</h1>
@@ -24,7 +23,6 @@ export default function DashboardPage() {
 
       {/* CONTEÚDO PRINCIPAL */}
       <div className="flex-1 grid gap-6 lg:grid-cols-3 overflow-hidden">
-        
         {/* GRÁFICO */}
         <Card className="lg:col-span-2 flex flex-col">
           <CardHeader className="shrink-0">
@@ -64,7 +62,6 @@ export default function DashboardPage() {
           <Row name="Ana Costa" job="Backend" score={60} />
         </CardContent>
       </Card>
-
     </div>
   );
 }
@@ -112,8 +109,8 @@ function Row({
           score > 80
             ? "text-green-500"
             : score > 60
-            ? "text-yellow-500"
-            : "text-red-500"
+              ? "text-yellow-500"
+              : "text-red-500"
         }`}
       >
         {score}%

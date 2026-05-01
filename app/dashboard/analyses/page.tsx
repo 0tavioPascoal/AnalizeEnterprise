@@ -23,18 +23,15 @@ export default function AnalysesPage() {
   ];
 
   const filtered = data.filter((item) =>
-    item.name.toLowerCase().includes(search.toLowerCase())
+    item.name.toLowerCase().includes(search.toLowerCase()),
   );
 
   return (
     <div className="h-full flex flex-col gap-6 overflow-hidden">
-      
       {/* HEADER */}
       <div className="shrink-0 flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-semibold">
-            Análises
-          </h1>
+          <h1 className="text-2xl font-semibold">Análises</h1>
           <p className="text-sm text-muted-foreground">
             Gerencie os currículos analisados
           </p>
@@ -55,7 +52,6 @@ export default function AnalysesPage() {
         </CardHeader>
 
         <CardContent className="flex-1 overflow-auto space-y-2">
-          
           {filtered.length === 0 && (
             <p className="text-sm text-muted-foreground">
               Nenhum candidato encontrado.
@@ -63,14 +59,10 @@ export default function AnalysesPage() {
           )}
 
           {filtered.map((item) => (
-            <Link
-              key={item.id}
-              href={`/dashboard/analyses/${item.id}`}
-            >
+            <Link key={item.id} href={`/dashboard/analyses/${item.id}`}>
               <Row {...item} />
             </Link>
           ))}
-
         </CardContent>
       </Card>
     </div>
@@ -90,7 +82,6 @@ function Row({
 }) {
   return (
     <div className="flex items-center justify-between border p-4 mb-2 rounded-lg hover:bg-muted/40 transition cursor-pointer">
-      
       {/* INFO */}
       <div>
         <p className="font-medium">{name}</p>
@@ -99,19 +90,17 @@ function Row({
 
       {/* SCORE */}
       <div className="flex items-center gap-4">
-
         <span
           className={`text-sm font-semibold ${
             score > 80
               ? "text-green-500"
               : score > 60
-              ? "text-yellow-500"
-              : "text-red-500"
+                ? "text-yellow-500"
+                : "text-red-500"
           }`}
         >
           {score}%
         </span>
-
       </div>
     </div>
   );

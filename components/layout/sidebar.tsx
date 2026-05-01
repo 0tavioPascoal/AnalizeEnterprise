@@ -2,15 +2,22 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Home, User, Settings, Menu, LogOut } from "lucide-react";
-import { useRouter } from "next/navigation";
+import {
+  Home,
+  User,
+  Settings,
+  Menu,
+  LogOut,
+  Briefcase,
+  Brain,
+  List,
+} from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Briefcase } from "lucide-react";
-import { Brain } from "lucide-react";
-import { List } from "lucide-react";
+import { useRouter } from "next/navigation";
 
+import { supabaseBrowser } from "@/lib/supabase/browser";
 
 export function Sidebar() {
   const [collapsed, setCollapsed] = useState(false);
@@ -21,8 +28,11 @@ export function Sidebar() {
     email: "otavio@email.com",
   };
 
-  function handleLogout() {
-    router.push("/login");
+  async function handleLogout() {
+    await supabaseBrowser.auth.signOut();
+
+    // 🔥 garante estado limpo + middleware correto
+    window.location.href = "/login";
   }
 
   return (
@@ -55,35 +65,30 @@ export function Sidebar() {
           label="Dashboard"
           collapsed={collapsed}
         />
-
         <NavItem
           href="/dashboard/analyses"
           icon={<List size={18} />}
           label="Análises"
           collapsed={collapsed}
         />
-
         <NavItem
           href="/dashboard/analyze"
           icon={<Brain size={18} />}
           label="Análise"
           collapsed={collapsed}
         />
-
         <NavItem
           href="/dashboard/jobs"
           icon={<Briefcase size={18} />}
           label="Vagas"
           collapsed={collapsed}
         />
-
         <NavItem
           href="/dashboard/profile"
           icon={<User size={18} />}
           label="Perfil"
           collapsed={collapsed}
         />
-
         <NavItem
           href="/dashboard/settings"
           icon={<Settings size={18} />}
@@ -100,17 +105,14 @@ export function Sidebar() {
       {/* USER FOOTER */}
       <div className="border-t p-3">
         {collapsed ? (
-          // 🔒 COLAPSADO → só logout
           <div className="flex justify-center">
             <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut size={18} />
             </Button>
           </div>
         ) : (
-          // 🔓 EXPANDIDO → tudo
           <div className="flex items-center justify-between gap-2">
             <div className="flex items-center gap-3 min-w-0">
-              {/* Avatar */}
               <div className="h-9 w-9 rounded-full bg-primary/10 flex items-center justify-center text-sm font-medium">
                 {user.name.charAt(0)}
               </div>
@@ -123,7 +125,6 @@ export function Sidebar() {
               </div>
             </div>
 
-            {/* Logout */}
             <Button variant="ghost" size="icon" onClick={handleLogout}>
               <LogOut size={18} />
             </Button>
