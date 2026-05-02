@@ -11,7 +11,8 @@ import {
   ClipboardList,
   Users,
   ChevronLeft,
-  Sparkles
+  Sparkles,
+  GitMerge
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -42,7 +43,7 @@ export function Sidebar() {
     <aside
       className={cn(
         "h-screen border-r bg-zinc-50/50 dark:bg-zinc-950/50 backdrop-blur-xl transition-all duration-300 flex flex-col relative",
-        collapsed ? "w-[70px]" : "w-64",
+        collapsed ? "w-17.5" : "w-64",
       )}
     >
       {/* Botão de Collapse Flutuante - Mais moderno que o no topo */}
@@ -60,7 +61,7 @@ export function Sidebar() {
             <Sparkles className="text-white h-5 w-5" />
           </div>
           {!collapsed && (
-            <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400">
+            <span className="font-bold text-xl tracking-tight bg-clip-text text-transparent bg-linear-to-r from-zinc-900 to-zinc-500 dark:from-white dark:to-zinc-400">
               Analyzer
             </span>
           )}
@@ -86,6 +87,13 @@ export function Sidebar() {
           label="Histórico"
           collapsed={collapsed}
           active={pathname === "/dashboard/analyses"}
+        />
+         <NavItem
+          href="/dashboard/pipeline"
+          icon={<GitMerge size={20} />}
+          label="Pipeline"
+          collapsed={collapsed}
+          active={pathname === "/dashboard/pipeline"}
         />
         <NavItem
           href="/dashboard/analyze"
@@ -125,7 +133,7 @@ export function Sidebar() {
           "flex items-center gap-2 p-2 rounded-xl border bg-white/50 dark:bg-zinc-900/50 transition-all",
           collapsed ? "justify-center" : "px-3"
         )}>
-          <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
+          <div className="h-8 w-8 rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white text-xs font-bold shrink-0">
             {user.name.charAt(0)}
           </div>
 
