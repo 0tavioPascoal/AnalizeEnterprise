@@ -4,14 +4,12 @@ import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import {
-  Home,
-  User,
-  Settings,
-  Menu,
+  Home, Menu,
   LogOut,
   Briefcase,
   Brain,
   List,
+  Users
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -42,7 +40,7 @@ export function Sidebar() {
     <aside
       className={cn(
         "h-screen border-r bg-background transition-all duration-300 flex flex-col",
-        collapsed ? "w-16" : "w-64"
+        collapsed ? "w-16" : "w-64",
       )}
     >
       <div className="flex items-center justify-between p-4">
@@ -60,12 +58,36 @@ export function Sidebar() {
       </div>
 
       <nav className="flex-1 px-2 space-y-1">
-        <NavItem href="/dashboard" icon={<Home size={18} />} label="Dashboard" collapsed={collapsed} />
-        <NavItem href="/dashboard/analyses" icon={<List size={18} />} label="Análises" collapsed={collapsed} />
-        <NavItem href="/dashboard/analyze" icon={<Brain size={18} />} label="Análise" collapsed={collapsed} />
-        <NavItem href="/dashboard/jobs" icon={<Briefcase size={18} />} label="Vagas" collapsed={collapsed} />
-        <NavItem href="/dashboard/profile" icon={<User size={18} />} label="Perfil" collapsed={collapsed} />
-        <NavItem href="/dashboard/settings" icon={<Settings size={18} />} label="Configurações" collapsed={collapsed} />
+        <NavItem
+          href="/dashboard"
+          icon={<Home size={18} />}
+          label="Dashboard"
+          collapsed={collapsed}
+        />
+        <NavItem
+          href="/dashboard/analyses"
+          icon={<List size={18} />}
+          label="Análises"
+          collapsed={collapsed}
+        />
+        <NavItem
+          href="/dashboard/analyze"
+          icon={<Brain size={18} />}
+          label="Análise"
+          collapsed={collapsed}
+        />
+        <NavItem
+          href="/dashboard/jobs"
+          icon={<Briefcase size={18} />}
+          label="Vagas"
+          collapsed={collapsed}
+        />
+        <NavItem
+          href="/dashboard/users"
+          icon={<Users size={18} />}
+          label="Usuários"
+          collapsed={collapsed}
+        />
       </nav>
 
       <div className="px-2 pb-2">

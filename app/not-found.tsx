@@ -22,10 +22,6 @@ export default function NotFound() {
               Ir para dashboard
             </Button>
           </Link>
-
-          <Link href="/">
-            <Button variant="outline">Início</Button>
-          </Link>
         </div>
       </div>
     </div>

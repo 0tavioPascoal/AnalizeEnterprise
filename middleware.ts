@@ -1,4 +1,5 @@
-import { NextRequest, NextResponse } from "next/server";
+import { NextResponse } from "next/server";
+import type { NextRequest } from "next/server";
 import { createServerClient } from "@supabase/ssr";
 
 export async function middleware(req: NextRequest) {
@@ -22,31 +23,28 @@ export async function middleware(req: NextRequest) {
   );
 
   const {
-    data: { session },
-  } = await supabase.auth.getSession();
+    data: { user },
+  } = await supabase.auth.getUser();
 
-  const isLoggedIn = !!session;
+  const isLoginPage = req.nextUrl.pathname === "/login";
 
-  const path = req.nextUrl.pathname;
-
-  const isLoginPage = path === "/login";
-  const isProtectedRoute = path.startsWith("/dashboard");
-
-  if (isProtectedRoute && !isLoggedIn) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = "/login";
-    return NextResponse.redirect(redirectUrl);
+  // ❌ Se não tiver usuário e não estiver na login → manda pra login
+  if (!user && !isLoginPage) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/login";
+    return NextResponse.redirect(url);
   }
 
-  if (isLoginPage && isLoggedIn) {
-    const redirectUrl = req.nextUrl.clone();
-    redirectUrl.pathname = "/dashboard";
-    return NextResponse.redirect(redirectUrl);
+  // ❌ Se já está logado e tenta ir pra login → manda pra home
+  if (user && isLoginPage) {
+    const url = req.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
   }
 
   return res;
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/login"],
+  matcher: ["/((?!_next/static|_next/image|favicon.ico).*)"],
 };

@@ -6,7 +6,7 @@ import type { CreateJobDTO, Job } from "@/types/database";
 export async function createJob(data: CreateJobDTO): Promise<Job> {
   const supabase = createServerClient();
 
-  const { data: inserted, error } = await supabase
+  const { data: job, error } = await supabase
     .from("jobs")
     .insert({
       title: data.title,
@@ -20,5 +20,9 @@ export async function createJob(data: CreateJobDTO): Promise<Job> {
     throw new Error(error.message);
   }
 
-  return inserted as Job;
+  if (!job) {
+    throw new Error("Job não retornado pelo Supabase");
+  }
+
+  return job;
 }
