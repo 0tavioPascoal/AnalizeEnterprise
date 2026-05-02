@@ -25,7 +25,7 @@ interface Props {
   isEdit?: boolean;
 }
 
-export function JobForm({ initialData, onSubmit, isEdit }: Props) {
+export function JobForm({ initialData, onSubmit }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -110,7 +110,7 @@ export function JobForm({ initialData, onSubmit, isEdit }: Props) {
           <Textarea
             value={form.skills}
             onChange={(e) => setForm({ ...form, skills: e.target.value })}
-            className="min-h-[70px] rounded-xl border-zinc-200 dark:border-zinc-800 text-sm resize-none"
+            className="min-h-17.5 rounded-xl border-zinc-200 dark:border-zinc-800 text-sm resize-none"
           />
         </div>
 
@@ -122,7 +122,7 @@ export function JobForm({ initialData, onSubmit, isEdit }: Props) {
             value={form.context}
             onChange={(e) => setForm({ ...form, context: e.target.value })}
             required
-            className="min-h-[90px] rounded-xl border-zinc-200 dark:border-zinc-800 text-sm resize-none"
+            className="min-h-22.5 rounded-xl border-zinc-200 dark:border-zinc-800 text-sm resize-none"
           />
         </div>
       </div>

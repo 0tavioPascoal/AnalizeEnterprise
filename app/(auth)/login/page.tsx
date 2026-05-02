@@ -37,7 +37,7 @@ export default function LoginPage() {
 
   return (
     /* Ajustado border e bg para serem adaptativos ao dark mode */
-    <Card className="w-full max-w-[420px] border-zinc-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900/90 backdrop-blur-sm">
+    <Card className="w-full max-w-105 border-zinc-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900/90 backdrop-blur-sm">
       <CardHeader className="space-y-1 pb-8 text-center">
         <CardTitle className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
           Entrar na conta

@@ -41,7 +41,7 @@ export function FileUpload({ file, setFile }: FileUploadProps) {
               <FileText className="text-indigo-600" size={32} />
             </div>
             <div className="text-center px-4 w-full">
-              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate mx-auto max-w-[200px]">
+              <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100 truncate mx-auto max-w-50">
                 {file.name}
               </p>
               <p className="text-[10px] text-zinc-500 uppercase font-medium">

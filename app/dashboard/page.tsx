@@ -1,13 +1,10 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
 import { useRouter } from "next/navigation";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { 
-  FileText, CheckCircle2, XCircle, TrendingUp, 
-  Sparkles, Zap, Target, BarChart3 
+import {
+  FileText, XCircle, Sparkles, Zap, Target, BarChart3
 } from "lucide-react";
 import { cn } from "@/lib/utils";
 
@@ -22,7 +19,7 @@ export default function DashboardPage() {
     <div className="h-full w-full overflow-hidden flex flex-col p-6 gap-6 bg-zinc-50/50 dark:bg-zinc-950/50 box-border">
       
       {/* HEADER - ALTURA FIXA */}
-      <header className="flex shrink-0 items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-6 h-[80px]">
+      <header className="flex shrink-0 items-center justify-between border-b border-zinc-200 dark:border-zinc-800 pb-6 h-20">
         <div className="flex items-center gap-4">
           <div className="h-12 w-12 bg-indigo-600 rounded-xl flex items-center justify-center shadow-lg shadow-indigo-500/20">
             <Sparkles className="text-white h-6 w-6" />
@@ -50,7 +47,7 @@ export default function DashboardPage() {
       </header>
 
       {/* KPI GRID - ALTURA FIXA */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 h-[100px]">
+      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 shrink-0 h-25">
         <StatCard title="Total Analisado" value="1,284" trend="+12%" icon={<FileText size={18} />} color="indigo" />
         <StatCard title="Match Alto" value="422" trend="+5.2%" icon={<Target size={18} />} color="emerald" />
         <StatCard title="Abaixo do Perfil" value="862" trend="-2%" icon={<XCircle size={18} />} color="rose" />
