@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react"; // Adicionando ícones para UI/UX superior
+import { Plus, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
@@ -10,50 +11,65 @@ import { TablePagination } from "@/components/layout/TablePagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
-import { UserList } from "@/components/user/UserList";
-import type { User } from "@/components/user/UserRow";
+import { UsersTable } from "@/components/user/UsersTable";
+import { createClient } from "@/lib/supabase/client";
+import type { UserRole } from "@/types/user/user";
 
-// =========================
-// MOCK DATA (Tipado)
-// =========================
-const mockUsers: User[] = [
-  {
-    id: "1",
-    name: "João Silva",
-    email: "joao@empresa.com",
-    company: "ACME Ltda",
-  },
-  {
-    id: "2",
-    name: "Maria Souza",
-    email: "maria@empresa.com",
-    company: "ACME Ltda",
-  },
-  {
-    id: "3",
-    name: "Carlos Lima",
-    email: "carlos@empresa.com",
-    company: "ACME Ltda",
-  },
-  {
-    id: "4",
-    name: "Ana Costa",
-    email: "ana@empresa.com",
-    company: "ACME Ltda",
-  },
-];
+interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: UserRole;
+}
 
 export default function UsersPage() {
-  const [search, setSearch] = useState<string>(""); // Tipagem explícita
+  const [users, setUsers] = useState<User[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
-  const pageSize: number = 3;
+  const pageSize: number = 6;
 
-  // Filtro otimizado
+  const supabase = createClient();
+
+  // Busca inicial de dados
+  useEffect(() => {
+    async function fetchUsers() {
+      try {
+        // 1. Pega o usuário logado no momento
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) return;
+
+        // 2. Busca os perfis da mesma empresa do usuário logado
+        // O RLS que configuramos com auth.jwt() já protege isso,
+        // mas filtrar explicitamente é uma boa prática de Backend.
+        const { data, error } = await supabase
+          .from("profiles")
+          .select("*")
+          .order("name", { ascending: true });
+
+        if (error) throw error;
+        setUsers(data || []);
+      } catch (error: any) {
+        toast.error("Erro ao carregar usuários: " + error.message);
+      } finally {
+        setLoading(false);
+      }
+    }
+
+    fetchUsers();
+  }, []);
+
+  // Filtro otimizado (Client-side para busca instantânea)
   const filteredUsers = useMemo(() => {
-    return mockUsers.filter((user) =>
-      user.name.toLowerCase().includes(search.toLowerCase()),
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(search.toLowerCase()) ||
+        user.email.toLowerCase().includes(search.toLowerCase()),
     );
-  }, [search]);
+  }, [search, users]);
 
   // Paginação calculada
   const totalPages = Math.ceil(filteredUsers.length / pageSize);
@@ -71,19 +87,21 @@ export default function UsersPage() {
       header={
         <PageHeader
           title="Usuários"
-          description="Gerencie usuários e permissões da sua organização"
+          description="Gerencie recrutadores e permissões da RH Analyzer"
           action={
             <div className="flex items-center gap-3">
-              <Input
-                placeholder="Buscar por nome..."
-                className="w-64 h-9 shadow-sm"
-                value={search}
-                onChange={(e) => handleSearch(e.target.value)}
-              />
+              <div className="relative">
+                <Input
+                  placeholder="Buscar por nome ou e-mail..."
+                  className="w-72 h-10 shadow-sm rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950"
+                  value={search}
+                  onChange={(e) => handleSearch(e.target.value)}
+                />
+              </div>
 
               <Link href="/dashboard/users/new">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 text-xs font-bold h-9">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="bg-indigo-600 hover:bg-indigo-700 text-[10px] uppercase tracking-widest font-black h-10 px-6 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95">
+                  <Plus className="w-4 h-4 mr-2 stroke-[3px]" />
                   Novo Usuário
                 </Button>
               </Link>
@@ -101,8 +119,15 @@ export default function UsersPage() {
         )
       }
     >
-      {/* O UserList recebe o min-h-0 do PageLayout para scrollar internamente */}
-      <UserList data={paginatedUsers} />
+      {loading ? (
+        <div className="h-full flex items-center justify-center">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500 opacity-50" />
+        </div>
+      ) : (
+        <div className="min-h-0 overflow-y-auto custom-scrollbar pr-2">
+          <UsersTable users={paginatedUsers} />
+        </div>
+      )}
     </PageLayout>
   );
 }

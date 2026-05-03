@@ -1,8 +1,8 @@
 import { createServerClient as createSupabaseServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
 
-export function createServerClient() {
-  const cookieStore = cookies();
+export async function createServerClient() { // Adicione async
+  const cookieStore = await cookies(); // Adicione await
 
   return createSupabaseServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -18,7 +18,7 @@ export function createServerClient() {
               cookieStore.set(name, value, options);
             });
           } catch {
-            // Middleware / Server Components podem ser read-only
+            // Omitido para brevidade
           }
         },
       },
