@@ -1,66 +1,18 @@
-"use client";
-
-import { useState, useMemo } from "react";
 import Link from "next/link";
 import { Plus, Search, Briefcase, Target, ChevronRight } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
-import { TablePagination } from "@/components/layout/TablePagination";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { RowItem } from "@/components/layout/RowItem";
-import { useRouter } from "next/navigation";
 
-// =========================
-// TYPES (TypeScript Strict)
-// =========================
-export interface Job {
-  id: string;
-  title: string;
-  seniority: string;
-  contract_type: string;
-  score_min: number;
-}
+import { getJobs } from "@/actions/jobs/getJobs";
+import { Job } from "@/types/jobs/job";
 
-// =========================
-// MOCK DATA
-// =========================
-const mockJobs: Job[] = [
-  { id: "1", title: "Desenvolvedor Backend", seniority: "Pleno", contract_type: "CLT", score_min: 75 },
-  { id: "2", title: "Frontend React", seniority: "Sênior", contract_type: "PJ", score_min: 80 },
-  { id: "3", title: "DevOps", seniority: "Pleno", contract_type: "CLT", score_min: 70 },
-  { id: "4", title: "QA", seniority: "Júnior", contract_type: "CLT", score_min: 60 },
-];
-
-export default function JobsPage() {
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
-  const router = useRouter();
-  const pageSize: number = 7;
-
-  // =========================
-  // FILTER LOGIC
-  // =========================
-  const filteredJobs = useMemo(() => {
-    return mockJobs.filter((job) =>
-      job.title.toLowerCase().includes(search.toLowerCase())
-    );
-  }, [search]);
-
-  // =========================
-  // PAGINATION LOGIC
-  // =========================
-  const totalPages = Math.ceil(filteredJobs.length / pageSize);
-  const paginatedJobs = useMemo(() => {
-    return filteredJobs.slice((page - 1) * pageSize, page * pageSize);
-  }, [filteredJobs, page]);
-
-  function handleSearch(value: string) {
-    setSearch(value);
-    setPage(1);
-  }
+export default async function JobsPage() {
+  const jobs: Job[] = await getJobs();
 
   return (
     <PageLayout
@@ -75,13 +27,11 @@ export default function JobsPage() {
                 <Input
                   placeholder="Buscar vaga..."
                   className="w-64 h-9 pl-9 shadow-sm"
-                  value={search}
-                  onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
 
               <Link href="/dashboard/jobs/new">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 h-9 font-bold transition-all shadow-md shadow-indigo-500/10">
+                <Button className="bg-indigo-600 hover:bg-indigo-700 h-9 font-bold shadow-md shadow-indigo-500/10">
                   <Plus className="w-4 h-4 mr-2" />
                   Nova Vaga
                 </Button>
@@ -90,59 +40,74 @@ export default function JobsPage() {
           }
         />
       }
-      pagination={
-        totalPages > 1 && (
-          <TablePagination
-            page={page}
-            totalPages={totalPages}
-            setPage={setPage}
-          />
-        )
-      }
     >
       <div className="flex flex-col gap-3 pb-4">
-        {paginatedJobs.length > 0 ? (
-          paginatedJobs.map((job) => (
+        {jobs.length > 0 ? (
+          jobs.map((job) => (
             <RowItem
               key={job.id}
-              onClick={() => router.push(`/dashboard/jobs/${job.id}/edit`)}
               left={
                 <div className="flex items-center gap-4">
-                  <div className="h-10 w-10 rounded-lg bg-zinc-50 dark:bg-zinc-800 flex items-center justify-center text-zinc-400">
+                  <div className="h-11 w-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600">
                     <Briefcase size={20} />
                   </div>
-                  <div>
-                    <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50">
+
+                  <div className="min-w-0">
+                    <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">
                       {job.title}
                     </p>
-                    <div className="flex items-center gap-2 mt-1">
-                      <Badge variant="secondary" className="text-[10px] font-medium py-0 px-2 bg-zinc-100 dark:bg-zinc-800">
-                        {job.seniority}
-                      </Badge>
-                      <span className="text-[10px] text-zinc-400 font-medium uppercase tracking-tight">
-                        {job.contract_type}
-                      </span>
+
+                    <div className="flex items-center gap-2 mt-1.5">
+                      {job.seniority && (
+                        <Badge
+                          variant="secondary"
+                          className="text-[10px] px-2 py-0 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-300"
+                        >
+                          {job.seniority}
+                        </Badge>
+                      )}
+
+                      {job.contract_type && (
+                        <Badge
+                          variant="outline"
+                          className="text-[10px] px-2 py-0 rounded-md uppercase text-zinc-500 border-zinc-200 dark:border-zinc-700"
+                        >
+                          {job.contract_type}
+                        </Badge>
+                      )}
                     </div>
                   </div>
                 </div>
               }
               right={
-                <div className="flex items-center gap-6">
+                <div className="flex items-center gap-5">
                   <div className="text-right">
-                    <div className="flex items-center gap-1.5 text-xs font-bold text-indigo-600 justify-end">
+                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 text-xs font-bold text-indigo-600">
                       <Target size={14} />
-                      {job.score_min}%
+                      {job.score_min ?? 0}%
                     </div>
-                    <p className="text-[10px] text-zinc-400 font-medium leading-none">Match Mínimo</p>
+
+                    <p className="mt-1 text-[10px] text-zinc-400 font-medium">
+                      Match mínimo
+                    </p>
                   </div>
-                  <ChevronRight size={16} className="text-zinc-300" />
+
+                  <Link
+                    href={`/dashboard/jobs/${job.id}/edit`}
+                    className="h-9 w-9 flex items-center justify-center text-indigo-500 hover:text-indigo-600 transition"
+                    aria-label={`Editar vaga ${job.title}`}
+                  >
+                    <ChevronRight size={18} />
+                  </Link>
                 </div>
               }
             />
           ))
         ) : (
-          <div className="h-32 flex items-center justify-center border-2 border-dashed rounded-xl text-zinc-400 text-sm italic">
-            Nenhuma vaga encontrada.
+          <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-400 text-sm bg-zinc-50/40 dark:bg-zinc-900/40">
+            <Briefcase size={24} className="mb-2 text-zinc-300" />
+            <p className="font-medium">Nenhuma vaga encontrada.</p>
+            <p className="text-xs mt-1">Crie uma nova vaga para começar.</p>
           </div>
         )}
       </div>

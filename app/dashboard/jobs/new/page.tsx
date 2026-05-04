@@ -9,7 +9,7 @@ import { PageHeader } from "@/components/layout/Pageheader";
 import { Button } from "@/components/ui/button";
 import { JobForm, JobFormData } from "@/components/jobs/JobForm";
 import { JobTips } from "@/components/jobs/JobTips";
-import { createJob } from "@/actions/jobs";
+import { createJob } from "@/actions/jobs/createjob";
 
 export default function NewJobPage() {
   const router = useRouter();
@@ -52,7 +52,7 @@ export default function NewJobPage() {
         <div className="lg:col-span-2">
           <JobForm onSubmit={handleSubmit} isEdit={false} />
         </div>
-        
+
         <div className="hidden lg:block lg:col-span-1">
           <JobTips />
         </div>

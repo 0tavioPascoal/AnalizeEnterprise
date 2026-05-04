@@ -10,7 +10,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { createUser } from "@/actions/user/createUser";
-import { updateUser } from "@/actions/user/updateUser"; 
+import { updateUser } from "@/actions/user/updateUser";
 import { UserRole, type UserFormData } from "@/types/user/user";
 
 interface UserFormProps {
@@ -73,23 +73,26 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
     >
       <div className="space-y-6">
         {/* ORGANIZAÇÃO (Somente leitura) */}
-        <div className="space-y-2 opacity-70">
-          <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+        <div className="space-y-2 opacity-80">
+          <Label className="text-[10px] font-black uppercase tracking-widest text-zinc-950 dark:text-zinc-50 ml-1">
             Organização Vinculada
           </Label>
           <div className="relative">
-            <Building2 className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+            <Building2 className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
             <Input
               value={COMPANY_NAME}
               disabled
-              className="pl-10 h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/50 cursor-not-allowed font-medium text-zinc-600 dark:text-zinc-400"
+              className="pl-10 h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-800/50 cursor-not-allowed font-bold text-zinc-500 dark:text-zinc-500"
             />
           </div>
         </div>
 
         {/* NOME COMPLETO */}
         <div className="space-y-2">
-          <Label htmlFor="name" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+          <Label
+            htmlFor="name"
+            className="text-[10px] font-black uppercase tracking-widest text-zinc-950 dark:text-zinc-50 ml-1"
+          >
             Nome Completo
           </Label>
           <Input
@@ -98,14 +101,17 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
             defaultValue={initialData?.name}
             placeholder="Ex: Otávio Augusto Pascoal"
             disabled={loading}
-            className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-bold text-zinc-500 dark:text-zinc-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
             required
           />
         </div>
 
-        {/* E-MAIL (Desabilitado na edição por ser chave do Auth) */}
+        {/* E-MAIL */}
         <div className="space-y-2">
-          <Label htmlFor="email" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+          <Label
+            htmlFor="email"
+            className="text-[10px] font-black uppercase tracking-widest text-zinc-950 dark:text-zinc-50 ml-1"
+          >
             E-mail Institucional
           </Label>
           <Input
@@ -115,7 +121,7 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
             defaultValue={initialData?.email}
             disabled={loading || isEdit}
             placeholder="usuario@empresa.com"
-            className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+            className="h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-bold text-zinc-500 dark:text-zinc-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
             required
           />
         </div>
@@ -123,18 +129,21 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
         {/* SENHA (Apenas na criação) */}
         {!isEdit && (
           <div className="space-y-2">
-            <Label htmlFor="password" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+            <Label
+              htmlFor="password"
+              className="text-[10px] font-black uppercase tracking-widest text-zinc-950 dark:text-zinc-50 ml-1"
+            >
               Senha de Acesso
             </Label>
             <div className="relative">
-              <Lock className="absolute left-3 top-3 h-4 w-4 text-zinc-400" />
+              <Lock className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
               <Input
                 id="password"
                 name="password"
                 type="password"
                 placeholder="••••••••"
                 disabled={loading}
-                className="pl-10 h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 focus:ring-2 focus:ring-indigo-500/20 transition-all"
+                className="pl-10 h-11 rounded-xl border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 font-bold text-zinc-500 dark:text-zinc-400 focus:ring-2 focus:ring-indigo-500/20 transition-all"
                 required
               />
             </div>
@@ -143,7 +152,10 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
 
         {/* NÍVEL DE ACESSO */}
         <div className="space-y-2">
-          <Label htmlFor="role" className="text-[10px] font-black uppercase tracking-widest text-zinc-400 ml-1">
+          <Label
+            htmlFor="role"
+            className="text-[10px] font-black uppercase tracking-widest text-zinc-950 dark:text-zinc-50 ml-1"
+          >
             Nível de Acesso
           </Label>
           <select
@@ -151,7 +163,7 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
             name="role"
             defaultValue={initialData?.role || "recruiter"}
             disabled={loading}
-            className="w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 bg-white dark:bg-zinc-950 text-sm font-medium focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none appearance-none cursor-pointer"
+            className="w-full h-11 border border-zinc-200 dark:border-zinc-800 rounded-xl px-4 bg-white dark:bg-zinc-950 text-sm font-bold text-zinc-500 dark:text-zinc-400 focus:ring-2 focus:ring-indigo-500/20 transition-all outline-none appearance-none cursor-pointer"
           >
             <option value="admin">Administrador</option>
             <option value="recruiter">Recrutador</option>
@@ -166,7 +178,7 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
           variant="outline"
           disabled={loading}
           onClick={() => router.push("/dashboard/users")}
-          className="h-11 px-6 rounded-xl text-zinc-500 border-zinc-200 dark:border-zinc-800 font-bold uppercase text-[10px] tracking-widest"
+          className="h-11 px-6 rounded-xl text-zinc-500 border-zinc-200 dark:border-zinc-800 font-bold uppercase text-[10px] tracking-widest transition-all active:scale-95"
         >
           Cancelar
         </Button>
@@ -174,7 +186,7 @@ export function UserForm({ initialData, isEdit = false }: UserFormProps) {
         <Button
           type="submit"
           disabled={loading}
-          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all uppercase text-[10px] tracking-widest gap-2"
+          className="bg-indigo-600 hover:bg-indigo-700 text-white font-bold h-11 px-8 rounded-xl shadow-lg shadow-indigo-500/20 transition-all active:scale-95 uppercase text-[10px] tracking-widest gap-2"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} />

@@ -2,9 +2,8 @@ import { PageHeader } from "@/components/layout/Pageheader";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { UserForm } from "@/components/user/UserForm";
 import { UserTips } from "@/components/user/UserTips";
-import { createServerClient } from "@/lib/supabase/server"; // Verifique se o nome exportado é este
+import { createServerClient } from "@/lib/supabase/server"; 
 import { notFound } from "next/navigation";
-// ... outros imports
 
 export default async function EditUserPage({ 
   params 
