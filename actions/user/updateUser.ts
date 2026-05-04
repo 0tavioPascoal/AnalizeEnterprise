@@ -1,22 +1,52 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/client";
-import { UserFormData, ActionResponse } from "@/types/user/user";
 import { revalidatePath } from "next/cache";
+import { createServerClient } from "@/lib/supabase/server";
+import type { ActionResponse, UserFormData } from "@/types/user/user";
 
-export async function updateUser(id: string, data: UserFormData): Promise<ActionResponse> {
-  const supabase = createClient();
+export async function updateUser(
+  id: string,
+  data: UserFormData,
+): Promise<ActionResponse> {
+  const supabase = await createServerClient();
 
-  const { error } = await supabase
+  if (!id) {
+    return {
+      success: false,
+      message: "ID do usuário não informado.",
+    };
+  }
+
+  const { data: updatedUser, error } = await supabase
     .from("profiles")
     .update({
       name: data.name,
-      role: data.role
+      role: data.role,
     })
-    .eq("id", id);
+    .eq("id", id)
+    .select("id, name, role")
+    .single();
 
-  if (error) return { success: false, message: error.message };
+  if (error) {
+    console.error("Erro ao atualizar usuário:", error);
+
+    return {
+      success: false,
+      message: error.message,
+    };
+  }
+
+  if (!updatedUser) {
+    return {
+      success: false,
+      message: "Nenhum usuário foi atualizado.",
+    };
+  }
 
   revalidatePath("/dashboard/users");
-  return { success: true, message: "Usuário atualizado com sucesso!" };
+
+  return {
+    success: true,
+    message: "Usuário atualizado com sucesso!",
+  };
 }

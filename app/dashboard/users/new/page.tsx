@@ -1,7 +1,5 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { toast } from "sonner";
 import { UserPlus } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -10,14 +8,6 @@ import { UserForm } from "@/components/user/UserForm";
 import { UserTips } from "@/components/user/UserTips";
 
 export default function NewUserPage() {
-  const router = useRouter();
-
-  async function handleCreate(data: any) {
-    console.log("CREATE:", data);
-    toast.success("Usuário criado com sucesso!");
-    router.push("/dashboard/users");
-  }
-
   return (
     <PageLayout
       header={
@@ -35,12 +25,11 @@ export default function NewUserPage() {
         />
       }
     >
-      {/* items-stretch garante que UserForm e UserTips tenham a mesma altura vertical */}
       <div className="grid gap-6 lg:grid-cols-3 items-stretch h-full">
         <div className="lg:col-span-2">
-          <UserForm onSubmit={handleCreate} />
+          <UserForm />
         </div>
-        
+
         <div className="hidden lg:block lg:col-span-1">
           <UserTips />
         </div>

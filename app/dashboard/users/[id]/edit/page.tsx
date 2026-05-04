@@ -10,7 +10,6 @@ export default async function EditUserPage({
 }: { 
   params: Promise<{ id: string }> 
 }) {
-  // ✅ CORREÇÃO: Aguarde a criação do cliente
   const supabase = await createServerClient();
   
   const { id } = await params;
