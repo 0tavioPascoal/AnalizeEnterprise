@@ -2,6 +2,8 @@
 
 import { createServerClient } from "@/lib/supabase/server";
 
+export type AnalysisStatus = "pending" | "approved" | "rejected";
+
 export interface AnalysisDetail {
   id: string;
   company_id: string;
@@ -16,6 +18,7 @@ export interface AnalysisDetail {
   match: boolean;
   recommendation: string;
   summary: string;
+  status: AnalysisStatus;
 
   strengths: string[];
   weaknesses: string[];
@@ -117,6 +120,7 @@ export async function getAnalysisById(
     match: analysis.match,
     recommendation: analysis.recommendation,
     summary: analysis.summary,
+    status: analysis.status ?? "pending",
 
     strengths: fallbackArray(analysis.strengths, aiFeedback, "strengths"),
     weaknesses: fallbackArray(analysis.weaknesses, aiFeedback, "weaknesses"),
