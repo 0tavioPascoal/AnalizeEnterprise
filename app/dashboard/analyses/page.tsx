@@ -1,5 +1,5 @@
 import { getAnalyses } from "@/actions/analyzes/getAnalyzes";
-import { AnalysesClient } from "./AnalysesClient";
+import { AnalysesClient } from "@/components/analyses/AnalysesClient";
 
 export const dynamic = "force-dynamic";
 

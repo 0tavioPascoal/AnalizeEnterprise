@@ -1,8 +1,12 @@
 "use server";
 
-import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
-import type { ActionResponse, UserFormData } from "@/types/user/user";
+import type { UserFormData, UserRole } from "@/types/user/user";
+
+export interface ActionResponse {
+  success: boolean;
+  message: string;
+}
 
 export async function updateUser(
   id: string,
@@ -10,43 +14,85 @@ export async function updateUser(
 ): Promise<ActionResponse> {
   const supabase = await createServerClient();
 
-  if (!id) {
+  const {
+    data: { user: authUser },
+    error: authError,
+  } = await supabase.auth.getUser();
+
+  if (authError || !authUser) {
     return {
       success: false,
-      message: "ID do usuário não informado.",
+      message: "Usuário não autenticado.",
     };
   }
 
-  const { data: updatedUser, error } = await supabase
+  const { data: currentProfile, error: currentProfileError } = await supabase
     .from("profiles")
-    .update({
-      name: data.name,
-      role: data.role,
-    })
-    .eq("id", id)
-    .select("id, name, role")
+    .select("id, role")
+    .eq("id", authUser.id)
     .single();
 
-  if (error) {
-    console.error("Erro ao atualizar usuário:", error);
+  if (currentProfileError || !currentProfile) {
+    return {
+      success: false,
+      message: "Perfil do usuário logado não encontrado.",
+    };
+  }
 
+  const { data: targetProfile, error: targetProfileError } = await supabase
+    .from("profiles")
+    .select("id, role")
+    .eq("id", id)
+    .single();
+
+  if (targetProfileError || !targetProfile) {
+    return {
+      success: false,
+      message: "Usuário não encontrado.",
+    };
+  }
+
+  const isCurrentUserAdmin = currentProfile.role === "admin";
+  const isEditingSelf = currentProfile.id === targetProfile.id;
+  const isTargetAdmin = targetProfile.role === "admin";
+
+  if (!isCurrentUserAdmin && isTargetAdmin) {
+    return {
+      success: false,
+      message: "Recrutadores não podem alterar dados de administradores.",
+    };
+  }
+
+  const payload: {
+    name: string;
+    email?: string;
+    role?: UserRole;
+  } = {
+    name: data.name,
+  };
+
+  if (data.email) {
+    payload.email = data.email;
+  }
+
+  if (!isEditingSelf && isCurrentUserAdmin) {
+    payload.role = data.role;
+  }
+
+  const { error } = await supabase
+    .from("profiles")
+    .update(payload)
+    .eq("id", id);
+
+  if (error) {
     return {
       success: false,
       message: error.message,
     };
   }
 
-  if (!updatedUser) {
-    return {
-      success: false,
-      message: "Nenhum usuário foi atualizado.",
-    };
-  }
-
-  revalidatePath("/dashboard/users");
-
   return {
     success: true,
-    message: "Usuário atualizado com sucesso!",
+    message: "Usuário atualizado com sucesso.",
   };
 }

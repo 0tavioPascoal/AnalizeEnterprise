@@ -1,23 +1,31 @@
-import { Sidebar } from "@/components/layout/sidebar";
+import { redirect } from "next/navigation";
 
-export default function DashboardLayout({
+import { Sidebar } from "@/components/layout/sidebar";
+import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+
+export default async function DashboardLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return (
-    /* h-screen: trava a altura na resolução do monitor */
-    /* overflow-hidden: impede que qualquer elemento "empurre" a tela para baixo */
-    <div className="flex h-screen w-full overflow-hidden bg-background">
-      <Sidebar />
+  const currentProfile = await getCurrentProfile();
 
-      {/* 
-         flex-1: ocupa o restante da largura 
-         h-full: garante que o main tenha a altura total disponível
-         relative: importante para posicionamento de componentes internos
-         overflow-hidden: garante que o scroll aconteça apenas nos cards internos, não aqui
-      */}
-      <main className="flex-1 h-full overflow-hidden relative bg-muted/40">
+  if (!currentProfile) {
+    redirect("/login");
+  }
+
+  return (
+    <div className="flex h-screen w-full overflow-hidden bg-background">
+      <Sidebar
+        user={{
+          name: currentProfile.name,
+          email: currentProfile.email,
+          role: currentProfile.role,
+          company_name: currentProfile.company_name,
+        }}
+      />
+
+      <main className="relative h-full flex-1 overflow-hidden bg-muted/40">
         {children}
       </main>
     </div>

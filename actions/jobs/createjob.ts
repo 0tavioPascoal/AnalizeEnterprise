@@ -3,24 +3,29 @@
 import { createClient } from "@/lib/supabase/client";
 import { revalidatePath } from "next/cache";
 import { JobFormData } from "@/components/jobs/JobForm";
+import { getCurrentProfile } from "../auth/getCurrentProfile";
 
 export interface CreateJobResponse {
   success: boolean;
   message?: string;
 }
 
-const COMPANY_ID = "b79b3522-7176-4131-8426-287a26f79e22";
-
 export async function createJob(
   data: JobFormData
 ): Promise<CreateJobResponse> {
   const supabase = await createClient();
 
+  const currentProfile = await getCurrentProfile();
+
+  if (!currentProfile) {
+  throw new Error("Usuário não autenticado.");
+}
+
   const payload = {
     title: data.title,
     context: data.context,
     score_min: Number(data.score_min ?? 0),
-    company_id: COMPANY_ID,
+    company_id: currentProfile.company_id,
     seniority: data.seniority ?? "Pleno",
     contract_type: data.contract_type ?? "CLT",
     skills: data.skills?.trim() || null,

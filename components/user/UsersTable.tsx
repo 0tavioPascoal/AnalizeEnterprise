@@ -1,5 +1,5 @@
 import { UserRole } from "@/types/user/user";
-import { Edit2 } from "lucide-react"; // Ícone de edição
+import { Edit2 } from "lucide-react"; 
 import Link from "next/link";
 
 interface User {
