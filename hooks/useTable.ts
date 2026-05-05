@@ -4,10 +4,13 @@ import { useMemo, useState } from "react";
 
 type SortDirection = "asc" | "desc";
 
+// 🔥 filtro tipado
+type FilterFn<T> = (item: T) => boolean;
+
 interface UseTableProps<T> {
   data: T[];
   itemsPerPage?: number;
-  searchKey?: keyof T; // campo usado na busca (ex: "name")
+  searchKey?: keyof T;
 }
 
 export function useTable<T>({
@@ -22,8 +25,8 @@ export function useTable<T>({
   const [sortDirection, setSortDirection] =
     useState<SortDirection>("asc");
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const [filters, setFilters] = useState<Record<string, any>>({});
+  // 🔥 sem any
+  const [filters, setFilters] = useState<Record<string, FilterFn<T>>>({});
 
   // =========================
   // FILTER
@@ -40,13 +43,9 @@ export function useTable<T>({
       );
     }
 
-    // custom filters
-    Object.entries(filters).forEach(([key, value]) => {
-      if (!value) return;
-
-      result = result.filter(
-        (item) => String(item[key as keyof T]) === String(value)
-      );
+    // filtros
+    Object.values(filters).forEach((fn) => {
+      result = result.filter(fn);
     });
 
     return result;
@@ -94,13 +93,21 @@ export function useTable<T>({
     }
   }
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  function setFilter(key: string, value: any) {
+  function setFilter(key: string, fn: FilterFn<T>) {
     setFilters((prev) => ({
       ...prev,
-      [key]: value,
+      [key]: fn,
     }));
-    setPage(1); // reset page
+    setPage(1);
+  }
+
+  // 🔥 CORREÇÃO PRINCIPAL
+  function removeFilter(key: string) {
+    setFilters((prev) => {
+      const copy = { ...prev };
+      delete copy[key];
+      return copy;
+    });
   }
 
   function clearFilters() {
@@ -109,34 +116,29 @@ export function useTable<T>({
     setPage(1);
   }
 
-  // reset page on search
   function handleSearch(value: string) {
     setSearch(value);
     setPage(1);
   }
 
   return {
-    // data
     data: paginatedData,
     total: sortedData.length,
 
-    // pagination
     page,
     setPage,
     totalPages,
 
-    // search
     search,
     setSearch: handleSearch,
 
-    // sort
     sortKey,
     sortDirection,
     handleSort,
 
-    // filters
     filters,
     setFilter,
+    removeFilter, // 👈 AGORA EXISTE
     clearFilters,
   };
 }
