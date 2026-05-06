@@ -2,13 +2,7 @@
 
 import { useMemo, useState } from "react";
 import Link from "next/link";
-import {
-  Plus,
-  Search,
-  UserRound,
-  Shield,
-  ChevronRight,
-} from "lucide-react";
+import { Plus, Search, UserRound, Shield, ChevronRight } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
@@ -70,20 +64,21 @@ export function UsersClient({ users }: UsersClientProps) {
           title="Usuários"
           description="Gerencie recrutadores e permissões da RH Analyzer"
           action={
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
                 <Input
                   placeholder="Buscar usuário..."
-                  className="w-64 h-9 pl-9 shadow-sm"
+                  className="h-10 w-full rounded-xl border-border bg-card pl-9 pr-3 text-sm shadow-sm transition-all placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 sm:w-72"
                   value={search}
                   onChange={(e) => handleSearch(e.target.value)}
                 />
               </div>
 
               <Link href="/dashboard/users/new">
-                <Button className="bg-indigo-600 hover:bg-indigo-700 h-9 font-bold shadow-md shadow-indigo-500/10">
-                  <Plus className="w-4 h-4 mr-2" />
+                <Button className="h-10 w-full rounded-xl bg-primary px-4 font-semibold text-primary-foreground shadow-sm shadow-primary/20 transition-all hover:bg-primary/90 sm:w-auto">
+                  <Plus className="mr-2 h-4 w-4" />
                   Novo Usuário
                 </Button>
               </Link>
@@ -107,46 +102,45 @@ export function UsersClient({ users }: UsersClientProps) {
             <RowItem
               key={user.id}
               left={
-                <div className="flex items-center gap-4">
-                  <div className="h-11 w-11 rounded-xl bg-indigo-50 dark:bg-indigo-500/10 flex items-center justify-center text-indigo-600">
+                <div className="flex min-w-0 items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm">
                     <UserRound size={20} />
                   </div>
 
                   <div className="min-w-0">
-                    <p className="text-sm font-bold truncate">
+                    <p className="truncate text-sm font-semibold text-foreground">
                       {user.name}
                     </p>
 
-                    <div className="flex items-center gap-2 mt-1.5">
-                      <span className="text-[11px] text-zinc-400 truncate">
+                    <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="max-w-55 truncate text-xs text-muted-foreground">
                         {user.email}
                       </span>
 
-                      <Badge className="text-[10px] px-2 py-0 rounded-md bg-zinc-100 dark:bg-zinc-800">
-                        {user.role === "admin"
-                          ? "Administrador"
-                          : "Recrutador"}
+                      <Badge className="rounded-lg border border-border bg-secondary px-2 py-0.5 text-[10px] font-medium text-secondary-foreground shadow-none hover:bg-secondary">
+                        {user.role === "admin" ? "Administrador" : "Recrutador"}
                       </Badge>
                     </div>
                   </div>
                 </div>
               }
               right={
-                <div className="flex items-center gap-5">
-                  <div className="text-right">
-                    <div className="inline-flex items-center gap-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 px-2.5 py-1 text-xs font-bold text-indigo-600">
+                <div className="flex items-center gap-4">
+                  <div className="hidden text-right sm:block">
+                    <div className="inline-flex items-center gap-1.5 rounded-xl border border-primary/10 bg-primary/10 px-3 py-1.5 text-xs font-semibold text-primary">
                       <Shield size={14} />
-                      {user.role}
+                      {user.role === "admin" ? "Admin" : "Recruiter"}
                     </div>
 
-                    <p className="mt-1 text-[10px] text-zinc-400">
+                    <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                       Nível de acesso
                     </p>
                   </div>
 
                   <Link
                     href={`/dashboard/users/${user.id}/edit`}
-                    className="h-9 w-9 flex items-center justify-center text-indigo-500 hover:text-indigo-600 transition"
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+                    aria-label={`Editar usuário ${user.name}`}
                   >
                     <ChevronRight size={18} />
                   </Link>
@@ -155,9 +149,18 @@ export function UsersClient({ users }: UsersClientProps) {
             />
           ))
         ) : (
-          <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed rounded-2xl text-zinc-400 text-sm">
-            <UserRound size={24} className="mb-2 text-zinc-300" />
-            <p className="font-medium">Nenhum usuário encontrado.</p>
+          <div className="flex h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/60 px-6 text-center shadow-sm">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <UserRound size={22} />
+            </div>
+
+            <p className="text-sm font-semibold text-foreground">
+              Nenhum usuário encontrado.
+            </p>
+
+            <p className="mt-1 text-xs text-muted-foreground">
+              Tente buscar por outro nome, e-mail ou permissão.
+            </p>
           </div>
         )}
       </div>

@@ -2,7 +2,7 @@
 
 interface Props {
   title: string;
-  description?: string;
+  description?: React.ReactNode;
   action?: React.ReactNode;
 }
 

@@ -1,13 +1,12 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { getAnalysisById } from "@/actions/analyzes/getAnalysisById";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
 import { Button } from "@/components/ui/button";
-
 
 // COMPONENTS
 import { AnalysisListCard } from "@/components/analyses/AnalysisListCard";
@@ -36,12 +35,17 @@ export default async function AnalysisDetailPage({ params }: Props) {
       header={
         <PageHeader
           title={analysis.candidate_name ?? "Candidato"}
-          description={`Análise para a vaga de ${
-            analysis.job_title ?? "vaga não identificada"
-          }`}
+          description={
+            <>
+              Análise para a vaga{" "}
+              <span className="font-bold text-primary">
+                {analysis.job_title ?? "não identificada"}
+              </span>
+            </>
+          }
           action={
             <div className="flex items-center gap-3">
-              <Button asChild variant="ghost">
+              <Button asChild variant="outline">
                 <Link href="/dashboard/analyses">
                   <ArrowLeft size={16} />
                   Voltar
@@ -59,17 +63,28 @@ export default async function AnalysisDetailPage({ params }: Props) {
       }
     >
       <div className="grid gap-6 lg:grid-cols-3 h-full overflow-hidden">
-        
         {/* LEFT */}
         <div className="lg:col-span-2 space-y-6 overflow-y-auto pr-2 scrollbar-hide">
           <AnalysisProfileCard analysis={analysis} />
           <AnalysisScoreCard analysis={analysis} />
 
           {/* Parecer final (pode virar componente depois) */}
-          <section className="p-8 border rounded-2xl bg-white dark:bg-zinc-900 shadow-sm">
-            <p className="text-xs uppercase text-zinc-400 mb-4">
-              Parecer Final
-            </p>
+          <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+            <div className="mb-5 flex items-center gap-3">
+              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Sparkles size={18} />
+              </div>
+
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-primary">
+                  Parecer Final
+                </p>
+
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Conclusão consolidada da IA sobre o candidato
+                </p>
+              </div>
+            </div>
 
             <p className="text-sm text-zinc-600 dark:text-zinc-400">
               {analysis.final_opinion ?? "-"}

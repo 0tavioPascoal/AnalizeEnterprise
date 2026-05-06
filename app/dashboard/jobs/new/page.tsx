@@ -2,11 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { Briefcase, ArrowLeft, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
-import { Button } from "@/components/ui/button";
 import { JobForm, JobFormData } from "@/components/jobs/JobForm";
 import { JobTips } from "@/components/jobs/JobTips";
 import { createJob } from "@/actions/jobs/createjob";

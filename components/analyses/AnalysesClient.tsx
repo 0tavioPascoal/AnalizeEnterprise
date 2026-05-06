@@ -89,19 +89,18 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
           title="Análises"
           description="Histórico de currículos analisados pela IA"
           action={
-            <div className="flex items-center gap-3">
-              {/* SEARCH */}
+            <div className="flex flex-col gap-3 lg:flex-row lg:items-center">
               <div className="relative">
-                <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-zinc-400" />
+                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+
                 <Input
                   placeholder="Buscar candidato..."
-                  className="w-64 h-9 pl-9"
+                  className="h-10 w-full rounded-xl border-border bg-card pl-9 pr-3 text-sm shadow-sm transition-all placeholder:text-muted-foreground focus-visible:ring-2 focus-visible:ring-primary/30 lg:w-72"
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
                 />
               </div>
 
-              {/* FILTERS */}
               <AnalysisFilters
                 jobFilter={jobFilter}
                 setJobFilter={setJobFilter}
@@ -131,45 +130,45 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
             <RowItem
               key={analysis.id}
               left={
-                <div className="flex items-center gap-4 min-w-0">
+                <div className="flex min-w-0 items-center gap-4">
                   <div
                     className={cn(
-                      "h-11 w-11 rounded-xl flex items-center justify-center shrink-0",
+                      "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-sm",
                       analysis.match
-                        ? "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400"
-                        : "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
+                        ? "border-emerald-500/20 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
+                        : "border-amber-500/20 bg-amber-500/15 text-amber-700 dark:text-amber-300",
                     )}
                   >
                     <FileText size={20} />
                   </div>
 
                   <div className="min-w-0">
-                    <div className="flex items-center gap-2">
-                      <p className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">
+                    <div className="flex min-w-0 flex-wrap items-center gap-2">
+                      <p className="truncate text-sm font-semibold text-foreground">
                         {analysis.candidate_name ?? "Candidato sem nome"}
                       </p>
 
                       <Badge
                         variant="outline"
                         className={cn(
-                          "text-[10px] px-2 py-0 rounded-md border-none",
+                          "rounded-lg border px-2 py-0.5 text-[10px] font-semibold shadow-none",
                           analysis.match
-                            ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
-                            : "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400",
+                            ? "border-emerald-500/20 bg-emerald-500/15 text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300"
+                            : "border-amber-500/20 bg-amber-500/15 text-amber-700 hover:bg-amber-500/15 dark:text-amber-300",
                         )}
                       >
                         {analysis.match ? "Match" : "Atenção"}
                       </Badge>
                     </div>
 
-                    <div className="flex items-center gap-2 mt-1.5 min-w-0">
-                      <span className="text-[11px] text-zinc-400 truncate">
+                    <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-2">
+                      <span className="max-w-55 truncate text-xs text-muted-foreground">
                         {analysis.candidate_email ?? "E-mail não identificado"}
                       </span>
 
-                      <span className="text-zinc-300">•</span>
+                      <span className="text-muted-foreground/50">•</span>
 
-                      <span className="text-[11px] font-semibold text-zinc-500 dark:text-zinc-400 truncate">
+                      <span className="max-w-55 truncate text-xs font-medium text-muted-foreground">
                         {analysis.job_title ?? "Vaga não identificada"}
                       </span>
                     </div>
@@ -177,31 +176,33 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
                 </div>
               }
               right={
-                <div className="flex items-center gap-5">
-                  <div className="text-right min-w-24">
+                <div className="flex items-center gap-4">
+                  <div className="hidden min-w-24 text-right sm:block">
                     <div
                       className={cn(
-                        "inline-flex items-center gap-1.5 rounded-lg px-3 py-1 text-xs font-black",
+                        "inline-flex items-center gap-1.5 rounded-xl border px-3 py-1.5 text-xs font-black shadow-sm",
                         analysis.score >= 70
-                          ? "bg-emerald-50 text-emerald-700 dark:bg-emerald-500/10 dark:text-emerald-400"
+                          ? "border-emerald-500/20 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                           : analysis.score >= 50
-                            ? "bg-amber-50 text-amber-700 dark:bg-amber-500/10 dark:text-amber-400"
-                            : "bg-red-50 text-red-700 dark:bg-red-500/10 dark:text-red-400",
+                            ? "border-amber-500/20 bg-amber-500/15 text-amber-700 dark:text-amber-300"
+                            : "border-rose-500/20 bg-rose-500/15 text-rose-700 dark:text-rose-300",
                       )}
                     >
                       <Target size={14} />
                       {analysis.score}%
                     </div>
 
-                    <p className="mt-1 text-[10px] text-zinc-400 font-medium uppercase">
+                    <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
                       {analysis.recommendation.replace("_", " ")}
                     </p>
                   </div>
 
                   <Link
                     href={`/dashboard/analyses/${analysis.id}`}
-                    className="h-9 w-9 flex items-center justify-center text-indigo-500 hover:text-indigo-600 transition"
-                    aria-label={`Abrir análise de ${analysis.candidate_name ?? "candidato"}`}
+                    className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+                    aria-label={`Abrir análise de ${
+                      analysis.candidate_name ?? "candidato"
+                    }`}
                   >
                     <ChevronRight size={18} />
                   </Link>
@@ -210,10 +211,16 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
             />
           ))
         ) : (
-          <div className="h-40 flex flex-col items-center justify-center border-2 border-dashed border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-400 text-sm bg-zinc-50/40 dark:bg-zinc-900/40">
-            <FileText size={24} className="mb-2 text-zinc-300" />
-            <p className="font-medium">Nenhuma análise encontrada.</p>
-            <p className="text-xs mt-1">
+          <div className="flex h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/60 px-6 text-center shadow-sm">
+            <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+              <FileText size={22} />
+            </div>
+
+            <p className="text-sm font-semibold text-foreground">
+              Nenhuma análise encontrada.
+            </p>
+
+            <p className="mt-1 text-xs text-muted-foreground">
               Faça uma análise de currículo para começar.
             </p>
           </div>
