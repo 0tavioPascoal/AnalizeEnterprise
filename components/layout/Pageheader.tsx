@@ -8,7 +8,7 @@ interface Props {
 
 export function PageHeader({ title, description, action }: Props) {
   return (
-    <div className="flex items-center justify-between gap-4 flex-wrap">
+    <div className="flex items-center justify-between gap-4 flex-wrap mr-10">
       
       {/* LEFT */}
       <div className="min-w-0">

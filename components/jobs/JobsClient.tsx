@@ -85,7 +85,7 @@ export function JobsClient({ jobs }: JobsClientProps) {
         )
       }
     >
-      <div className="flex flex-col gap-3 pb-4">
+      <div className="flex flex-col gap-3 pb-4 mr-5">
         {paginatedJobs.length > 0 ? (
           paginatedJobs.map((job) => (
             <RowItem

@@ -124,7 +124,7 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
         )
       }
     >
-      <div className="flex flex-col gap-3 pb-4">
+      <div className="flex flex-col gap-3 pb-4 mr-5">
         {tableData.length > 0 ? (
           tableData.map((analysis) => (
             <RowItem

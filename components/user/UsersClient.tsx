@@ -96,7 +96,7 @@ export function UsersClient({ users }: UsersClientProps) {
         )
       }
     >
-      <div className="flex flex-col gap-3 pb-4">
+      <div className="flex flex-col gap-3 pb-4 mr-5">
         {paginatedUsers.length > 0 ? (
           paginatedUsers.map((user) => (
             <RowItem

@@ -65,7 +65,7 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
   ];
 
   return (
-    <Card className="col-span-12 flex min-h-0 flex-col overflow-hidden border-none bg-white shadow-sm dark:bg-zinc-900 xl:col-span-4">
+    <Card className="col-span-12 flex min-h-0 flex-col overflow-hidden border-none bg-white shadow-sm dark:bg-zinc-900 xl:col-span-4 mr-5">
       <CardHeader className="shrink-0 border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">

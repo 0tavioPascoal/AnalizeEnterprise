@@ -3,7 +3,7 @@ import { Sparkles } from "lucide-react";
 
 export function DashboardHeader() {
   return (
-    <header className="flex h-20 shrink-0 items-center justify-between border-b border-zinc-200 pb-6 dark:border-zinc-800">
+    <header className="flex h-20 shrink-0 items-center justify-between border-b border-zinc-200 pb-6 dark:border-zinc-800 mr-5">
       <div className="flex min-w-0 items-center gap-4">
         <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-indigo-600 shadow-lg shadow-indigo-500/20">
           <Sparkles className="h-6 w-6 text-white" />

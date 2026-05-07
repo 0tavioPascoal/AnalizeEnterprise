@@ -27,7 +27,7 @@ export function StatCard({
   color,
 }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-transparent bg-white p-4 shadow-sm transition-all hover:border-zinc-200 dark:bg-zinc-900 dark:hover:border-zinc-800">
+    <div className="flex items-center justify-between rounded-xl border border-transparent bg-white p-4 shadow-sm transition-all hover:border-zinc-200 dark:bg-zinc-900 dark:hover:border-zinc-800 mr-5">
       <div className="min-w-0">
         <p className="mb-2 truncate text-[9px] font-bold uppercase leading-none tracking-widest text-zinc-400">
           {title}

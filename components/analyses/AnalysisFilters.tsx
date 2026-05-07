@@ -31,9 +31,9 @@ export function AnalysisFilters({
   return (
     <div
       className="
-        flex flex-wrap items-center gap-3
+        flex flex-wrap items-center gap-2
 
-        rounded-2xl
+        rounded-xl
         border border-border
 
         bg-card/70
@@ -41,19 +41,19 @@ export function AnalysisFilters({
 
         backdrop-blur-md
 
-        p-2.5
+        p-2
 
         shadow-sm
+        mr-6
       "
     >
       {/* JOB */}
       <div className="relative">
         <BriefcaseBusiness
-          size={14}
+          size={13}
           className="
             pointer-events-none
-            absolute left-3 top-1/2 -translate-y-1/2
-
+            absolute left-2.5 top-1/2 -translate-y-1/2
             text-primary
           "
         />
@@ -64,17 +64,17 @@ export function AnalysisFilters({
             setJobFilter(e.target.value)
           }
           className="
-            h-10 min-w-45
+            h-8 min-w-36
 
-            rounded-xl
+            rounded-lg
             border border-border
 
             bg-background/80
             dark:bg-zinc-950/50
 
-            pl-9 pr-8
+            pl-8 pr-7
 
-            text-xs font-bold
+            text-[11px] font-semibold
             text-foreground
 
             shadow-sm
@@ -109,11 +109,10 @@ export function AnalysisFilters({
       {/* STATUS */}
       <div className="relative">
         <ShieldCheck
-          size={14}
+          size={13}
           className="
             pointer-events-none
-            absolute left-3 top-1/2 -translate-y-1/2
-
+            absolute left-2.5 top-1/2 -translate-y-1/2
             text-emerald-500
           "
         />
@@ -124,17 +123,17 @@ export function AnalysisFilters({
             setStatusFilter(e.target.value)
           }
           className="
-            h-10 min-w-37.5
+            h-8 min-w-30
 
-            rounded-xl
+            rounded-lg
             border border-border
 
             bg-background/80
             dark:bg-zinc-950/50
 
-            pl-9 pr-8
+            pl-8 pr-7
 
-            text-xs font-bold
+            text-[11px] font-semibold
             text-foreground
 
             shadow-sm
@@ -168,11 +167,10 @@ export function AnalysisFilters({
       {/* SCORE */}
       <div className="relative">
         <BarChart3
-          size={14}
+          size={13}
           className="
             pointer-events-none
-            absolute left-3 top-1/2 -translate-y-1/2
-
+            absolute left-2.5 top-1/2 -translate-y-1/2
             text-amber-500
           "
         />
@@ -183,17 +181,17 @@ export function AnalysisFilters({
             setScoreFilter(e.target.value)
           }
           className="
-            h-10 min-w-35
+            h-8 min-w-28
 
-            rounded-xl
+            rounded-lg
             border border-border
 
             bg-background/80
             dark:bg-zinc-950/50
 
-            pl-9 pr-8
+            pl-8 pr-7
 
-            text-xs font-bold
+            text-[11px] font-semibold
             text-foreground
 
             shadow-sm
