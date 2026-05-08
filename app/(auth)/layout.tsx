@@ -1,84 +1,148 @@
-import { Briefcase, CheckCircle2 } from "lucide-react"
+import type { ReactNode } from "react";
+import {
+  BarChart3,
+  Brain,
+  Briefcase,
+  CheckCircle2,
+  ShieldCheck,
+  Sparkles,
+} from "lucide-react";
 
 export default function AuthLayout({
   children,
 }: {
-  children: React.ReactNode
+  children: ReactNode;
 }) {
   return (
-    <div className="min-h-screen grid lg:grid-cols-5">
-      {/* 60% - Branding Section */}
-      <div className="hidden lg:flex col-span-3 bg-zinc-950 relative overflow-hidden flex-col justify-between p-12 text-white">
-        
-        {/* Efeito de Gradiente de Fundo (Aura) */}
-        <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_20%_20%,rgba(39,39,42,1)_0%,rgba(9,9,11,1)_100%)] z-0" />
+    <div className="grid min-h-screen bg-zinc-100 dark:bg-zinc-950 lg:grid-cols-[60%_40%]">
+      <section className="relative hidden overflow-hidden border-r border-zinc-800 bg-zinc-950 text-white lg:flex">
+        <div className="absolute inset-0 bg-[radial-gradient(circle_at_20%_20%,rgba(79,70,229,0.22)_0%,rgba(9,9,11,1)_42%,rgba(9,9,11,1)_100%)]" />
+        <div className="absolute -bottom-32 -right-32 h-96 w-96 rounded-full bg-indigo-600/10 blur-3xl" />
 
-        <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-8">
-            <div className="p-2 bg-indigo-600 rounded-lg">
-              <Briefcase className="w-6 h-6 text-white" />
+        <div className="relative z-10 flex w-full flex-col justify-between p-14">
+          <div>
+            <div className="mb-10 flex items-center gap-4">
+              <div className="flex h-14 w-14 items-center justify-center rounded-2xl border border-indigo-500/20 bg-indigo-500/10 shadow-lg shadow-indigo-500/10">
+                <Briefcase className="h-7 w-7 text-indigo-400" />
+              </div>
+
+              <div>
+                <h1 className="text-3xl font-black tracking-tight">
+                  RH Analyzer
+                </h1>
+                <p className="text-sm text-zinc-400">
+                  Inteligência aplicada ao recrutamento
+                </p>
+              </div>
             </div>
-            <span className="text-2xl font-bold tracking-tight">RH Analyzer</span>
-          </div>
 
-          <h2 className="text-4xl font-extrabold leading-tight tracking-tight lg:text-5xl max-w-xl">
-            A nova era do recrutamento <span className="text-indigo-500">inteligente.</span>
-          </h2>
-          <p className="mt-6 text-zinc-400 text-lg max-w-md leading-relaxed">
-            Poupe horas de triagem manual. Deixe nossa IA identificar os talentos que realmente importam para o seu time.
-          </p>
-        </div>
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-300">
+              <Sparkles className="h-3.5 w-3.5" />
+              Plataforma Enterprise
+            </div>
 
-        <div className="relative z-10 space-y-8">
-          {/* Social Proof / Quote Area */}
-          <blockquote className="border-l-2 border-indigo-500 pl-6 py-2">
-            <p className="text-zinc-300 italic text-lg">
-              Reduzimos nosso tempo de contratação em 40% no primeiro mês de uso.
+            <h2 className="max-w-2xl text-5xl font-black leading-tight tracking-tight">
+              A nova era do recrutamento{" "}
+              <span className="text-indigo-400">inteligente.</span>
+            </h2>
+
+            <p className="mt-6 max-w-2xl text-lg leading-relaxed text-zinc-400">
+              Poupe horas de triagem manual. Deixe nossa IA analisar currículos,
+              comparar requisitos e organizar seu pipeline de talentos.
             </p>
-            <footer className="mt-2 text-sm font-medium text-zinc-500">
-              — Diretor de Operações, Tech Corp
-            </footer>
-          </blockquote>
+          </div>
 
-          <div className="grid grid-cols-2 gap-4 text-sm font-medium text-zinc-400">
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500" /> Análise de CVs
+          <div className="grid max-w-4xl grid-cols-2 gap-5">
+            <FeatureCard
+              icon={Brain}
+              title="Análise de CVs"
+              description="Score automático de aderência técnica com IA."
+            />
+
+            <FeatureCard
+              icon={Sparkles}
+              title="IA Generativa"
+              description="Resumo, riscos e perguntas de entrevista."
+            />
+
+            <FeatureCard
+              icon={ShieldCheck}
+              title="Controle de Acesso"
+              description="Usuários, permissões e empresas com segurança."
+            />
+
+            <FeatureCard
+              icon={BarChart3}
+              title="Pipeline e KPIs"
+              description="Histórico de decisões e gestão de candidatos."
+            />
+          </div>
+
+          <div className="flex items-center justify-between border-t border-zinc-800 pt-6 mt-2">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.2em] text-zinc-500">
+                RH Analyzer Enterprise
+              </p>
+              <p className="mt-1 text-sm text-zinc-400">
+                Desenvolvido por Otávio Pascoal
+              </p>
             </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500" /> IA Generativa
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500" /> Matching Real-time
-            </div>
-            <div className="flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 text-indigo-500" /> Dashboard de KPIs
+
+            <div className="grid grid-cols-2 gap-x-5 gap-y-2 text-sm font-medium text-zinc-400">
+              <FeatureCheck label="Matching real-time" />
+              <FeatureCheck label="Dashboard de KPIs" />
+              <FeatureCheck label="Multi-tenant" />
+              <FeatureCheck label="Automação n8n" />
             </div>
           </div>
         </div>
+      </section>
 
-        <div className="relative z-10 flex items-center justify-between pt-8 border-t border-zinc-800">
-          <p className="text-xs text-zinc-500">
-            © {new Date().getFullYear()} RH Analyzer. Todos os direitos reservados.
-          </p>
-          <div className="flex gap-4 text-xs text-zinc-500">
-            <button className="hover:text-zinc-300 transition-colors">Suporte</button>
-            <button className="hover:text-zinc-300 transition-colors">Privacidade</button>
+      <section className="col-span-full flex min-h-screen items-center justify-center bg-zinc-50 p-6 dark:bg-zinc-950 lg:col-auto">
+        <div className="w-full max-w-md">
+          <div className="mb-8 flex items-center justify-center gap-3 lg:hidden">
+            <div className="flex h-11 w-11 items-center justify-center rounded-2xl bg-indigo-600 text-white">
+              <Briefcase className="h-6 w-6" />
+            </div>
+            <span className="text-2xl font-black tracking-tight">
+              RH Analyzer
+            </span>
           </div>
-        </div>
-      </div>
 
-      {/* 40% - Form Section */}
-      <div className="col-span-5 lg:col-span-2 flex flex-col items-center justify-center p-8 bg-zinc-50 dark:bg-zinc-950">
-        <div className="w-full max-w-100 space-y-6">
-          {/* Logo mobile-only */}
-          <div className="lg:hidden flex items-center gap-2 mb-8 justify-center">
-            <Briefcase className="w-8 h-8 text-indigo-600" />
-            <span className="text-2xl font-bold">RH Analyzer</span>
-          </div>
-          
           {children}
         </div>
-      </div>
+      </section>
     </div>
-  )
+  );
+}
+
+interface FeatureCardProps {
+  icon: React.ElementType;
+  title: string;
+  description: string;
+}
+
+function FeatureCard({ icon: Icon, title, description }: FeatureCardProps) {
+  return (
+    <div className="rounded-2xl border border-zinc-800 bg-white/3 p-5 shadow-sm backdrop-blur-sm">
+      <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-400">
+        <Icon className="h-5 w-5" />
+      </div>
+
+      <h3 className="text-sm font-bold text-zinc-100">{title}</h3>
+
+      <p className="mt-2 text-sm leading-relaxed text-zinc-400">
+        {description}
+      </p>
+    </div>
+  );
+}
+
+function FeatureCheck({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2">
+      <CheckCircle2 className="h-4 w-4 text-indigo-400" />
+      {label}
+    </div>
+  );
 }

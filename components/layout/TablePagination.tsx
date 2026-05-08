@@ -1,57 +1,137 @@
 "use client";
 
-interface Props {
+import { ChevronLeft, ChevronRight } from "lucide-react";
+
+import { cn } from "@/lib/utils";
+
+interface TablePaginationProps {
   page: number;
   totalPages: number;
-  setPage: (page: number) => void; // 👈 IMPORTANTE
+  setPage: (page: number) => void;
 }
 
 export function TablePagination({
   page,
   totalPages,
   setPage,
-}: Props) {
+}: TablePaginationProps) {
+  if (totalPages <= 1) {
+    return null;
+  }
+
+  const pages = generatePages(page, totalPages);
+
   return (
     <div className="flex items-center justify-center gap-2">
-      
-      {/* PREV */}
-      <button
+      <PaginationButton
         disabled={page === 1}
         onClick={() => setPage(page - 1)}
-        className="px-3 py-1 text-sm border rounded-md disabled:opacity-50"
+        ariaLabel="Página anterior"
       >
-        ←
-      </button>
+        <ChevronLeft size={16} />
+      </PaginationButton>
 
-      {/* PÁGINAS */}
       <div className="flex items-center gap-1">
-        {Array.from({ length: totalPages }).map((_, i) => {
-          const p = i + 1;
+        {pages.map((item, index) => {
+          if (item === "...") {
+            return (
+              <div
+                key={`ellipsis-${index}`}
+                className="flex h-9 min-w-9 items-center justify-center px-1 text-sm text-muted-foreground"
+              >
+                ...
+              </div>
+            );
+          }
+
+          const isActive = item === page;
 
           return (
             <button
-              key={p}
-              onClick={() => setPage(p)}
-              className={`px-3 py-1 text-sm rounded-md ${
-                p === page
-                  ? "bg-primary text-white"
-                  : "border hover:bg-muted"
-              }`}
+              key={item}
+              onClick={() => setPage(item)}
+              className={cn(
+                "flex h-9 min-w-9 items-center justify-center rounded-xl border px-3 text-sm font-medium transition-all",
+                isActive
+                  ? "border-primary bg-primary text-primary-foreground shadow-sm"
+                  : "border-border bg-background text-foreground hover:bg-muted",
+              )}
             >
-              {p}
+              {item}
             </button>
           );
         })}
       </div>
 
-      {/* NEXT */}
-      <button
+      <PaginationButton
         disabled={page === totalPages}
         onClick={() => setPage(page + 1)}
-        className="px-3 py-1 text-sm border rounded-md disabled:opacity-50"
+        ariaLabel="Próxima página"
       >
-        →
-      </button>
+        <ChevronRight size={16} />
+      </PaginationButton>
     </div>
   );
+}
+
+interface PaginationButtonProps {
+  children: React.ReactNode;
+  disabled?: boolean;
+  onClick: () => void;
+  ariaLabel: string;
+}
+
+function PaginationButton({
+  children,
+  disabled,
+  onClick,
+  ariaLabel,
+}: PaginationButtonProps) {
+  return (
+    <button
+      type="button"
+      disabled={disabled}
+      onClick={onClick}
+      aria-label={ariaLabel}
+      className={cn(
+        "flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background transition-all",
+        "hover:bg-muted",
+        "disabled:pointer-events-none disabled:opacity-40",
+      )}
+    >
+      {children}
+    </button>
+  );
+}
+
+function generatePages(
+  currentPage: number,
+  totalPages: number,
+): Array<number | "..."> {
+  if (totalPages <= 7) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const pages: Array<number | "..."> = [];
+
+  pages.push(1);
+
+  if (currentPage > 3) {
+    pages.push("...");
+  }
+
+  const start = Math.max(2, currentPage - 1);
+  const end = Math.min(totalPages - 1, currentPage + 1);
+
+  for (let i = start; i <= end; i++) {
+    pages.push(i);
+  }
+
+  if (currentPage < totalPages - 2) {
+    pages.push("...");
+  }
+
+  pages.push(totalPages);
+
+  return pages;
 }
