@@ -1,117 +1,182 @@
 "use client";
 
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+
+import {
+  LockKeyhole,
+  Mail,
+  Loader2,
+  ArrowRight,
+} from "lucide-react";
+
 import { toast } from "sonner";
-import { LockKeyhole, Mail, Loader2 } from "lucide-react";
 
 import { login, LoginError } from "@/actions/auth/login";
 
-export default function LoginPage() {
-  const [loading, setLoading] = useState<boolean>(false);
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
-  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
+export default function LoginPage() {
+  const [loading, setLoading] =
+    useState<boolean>(false);
+
+  async function handleLogin(
+    e: React.FormEvent<HTMLFormElement>,
+  ) {
     e.preventDefault();
+
     setLoading(true);
 
-    const formData = new FormData(e.currentTarget);
+    const formData = new FormData(
+      e.currentTarget,
+    );
+
     const payload = {
-      email: String(formData.get("email") ?? ""),
-      password: String(formData.get("password") ?? ""),
+      email: String(
+        formData.get("email") ?? "",
+      ),
+      password: String(
+        formData.get("password") ?? "",
+      ),
     };
 
     try {
       await login(payload);
-      toast.success("Login realizado com sucesso");
+
+      toast.success(
+        "Login realizado com sucesso",
+      );
+
       window.location.href = "/dashboard";
     } catch (err: unknown) {
       const error = err as LoginError;
-      toast.error(error.message || "Erro ao fazer login");
+
+      toast.error(
+        error.message ||
+          "Erro ao fazer login",
+      );
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    /* Ajustado border e bg para serem adaptativos ao dark mode */
-    <Card className="w-full max-w-105 border-zinc-200 dark:border-zinc-800 shadow-2xl bg-white dark:bg-zinc-900/90 backdrop-blur-sm">
-      <CardHeader className="space-y-1 pb-8 text-center">
-        <CardTitle className="text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-zinc-100">
-          Entrar na conta
-        </CardTitle>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400">
-          Digite suas credenciais para acessar o painel
-        </p>
-      </CardHeader>
+    <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-2xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+      
+      {/* GLOW */}
+      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-indigo-500/10 via-indigo-500/5 to-transparent" />
 
-      <CardContent>
-        <form onSubmit={handleLogin} className="space-y-6">
+      <div className="relative z-10 p-8 sm:p-10">
+        
+        {/* HEADER */}
+        <div className="mb-10 text-center">
+          <div className="mb-4 inline-flex items-center rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
+            RH Analyzer Enterprise
+          </div>
+
+          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+            Bem-vindo de volta
+          </h1>
+
+          <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+            Entre com suas credenciais para acessar
+            sua central inteligente de recrutamento.
+          </p>
+        </div>
+
+        {/* FORM */}
+        <form
+          onSubmit={handleLogin}
+          className="space-y-5"
+        >
+          {/* EMAIL */}
           <div className="space-y-2">
-            <Label htmlFor="email" className="text-zinc-700 dark:text-zinc-300 font-medium ml-1 text-xs uppercase tracking-widest">
-              E-mail
+            <Label
+              htmlFor="email"
+              className="ml-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400"
+            >
+              E-mail corporativo
             </Label>
-            <div className="relative">
-              <Mail className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
+
+            <div className="group relative">
+              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-indigo-500" />
+
               <Input
                 id="email"
                 name="email"
                 type="email"
                 placeholder="nome@empresa.com"
                 required
-                className="pl-10 h-11 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all placeholder:text-zinc-400"
+                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 pl-10 text-sm shadow-sm transition-all placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-indigo-500/20 dark:border-zinc-800 dark:bg-zinc-950"
               />
             </div>
           </div>
 
+          {/* PASSWORD */}
           <div className="space-y-2">
-            <div className="flex items-center justify-between ml-1">
-              <Label htmlFor="password" className="text-zinc-700 dark:text-zinc-300 font-medium text-xs uppercase tracking-widest">
+            <div className="ml-1 flex items-center justify-between">
+              <Label
+                htmlFor="password"
+                className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400"
+              >
                 Senha
               </Label>
-              <button type="button" className="text-[10px] text-indigo-600 dark:text-indigo-400 hover:underline font-bold uppercase tracking-tighter">
-                Esqueceu a senha?
+
+              <button
+                type="button"
+                className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400"
+              >
+                Recuperar acesso
               </button>
             </div>
-            <div className="relative">
-              <LockKeyhole className="absolute left-3 top-3.5 h-4 w-4 text-zinc-400" />
+
+            <div className="group relative">
+              <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-indigo-500" />
+
               <Input
                 id="password"
                 name="password"
                 type="password"
                 placeholder="••••••••"
                 required
-                className="pl-10 h-11 bg-zinc-50 dark:bg-zinc-950 border-zinc-200 dark:border-zinc-800 focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 pl-10 text-sm shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/20 dark:border-zinc-800 dark:bg-zinc-950"
               />
             </div>
           </div>
 
-          <Button 
-            className="w-full h-11 bg-zinc-900 dark:bg-indigo-600 hover:bg-zinc-800 dark:hover:bg-indigo-700 text-white font-bold uppercase text-[10px] tracking-widest rounded-xl transition-all shadow-lg shadow-indigo-500/10 active:scale-[0.98]" 
+          {/* BUTTON */}
+          <Button
             disabled={loading}
+            className="mt-2 h-12 w-full rounded-2xl bg-zinc-900 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-zinc-900/10 transition-all hover:bg-zinc-800 active:scale-[0.99] dark:bg-indigo-600 dark:shadow-indigo-500/20 dark:hover:bg-indigo-700"
           >
             {loading ? (
               <div className="flex items-center gap-2">
                 <Loader2 className="h-4 w-4 animate-spin" />
-                Validando...
+                Validando acesso
               </div>
             ) : (
-              "Acessar Sistema"
+              <div className="flex items-center gap-2">
+                Acessar plataforma
+                <ArrowRight className="h-4 w-4" />
+              </div>
             )}
           </Button>
 
-          <div className="relative py-2">
+          {/* FOOTER */}
+          <div className="relative pt-6">
             <div className="absolute inset-0 flex items-center">
               <span className="w-full border-t border-zinc-200 dark:border-zinc-800" />
             </div>
-            <div className="relative flex justify-center text-[10px] uppercase font-black tracking-[0.2em]">
-              <span className="bg-white dark:bg-zinc-900 px-3 text-zinc-400 dark:text-zinc-600">RH Analyzer</span>
+
+            <div className="relative flex justify-center">
+              <span className="bg-white px-4 text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 dark:bg-zinc-900 dark:text-zinc-600">
+                RH Analyzer
+              </span>
             </div>
           </div>
         </form>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

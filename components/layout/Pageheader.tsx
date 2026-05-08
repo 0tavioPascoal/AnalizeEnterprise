@@ -1,31 +1,44 @@
-"use client";
+import { cn } from "@/lib/utils";
+import { PageHeaderProps } from "@/types/layout/pageHeaderProps";
 
-import type { LucideIcon } from "lucide-react";
-
-interface Props {
-  title: string;
-  description?: React.ReactNode;
-  action?: React.ReactNode;
-  icon?: LucideIcon
-}
-
-export function PageHeader({ title, description, action }: Props) {
+export function PageHeader({
+  title,
+  description,
+  action,
+  icon: Icon,
+  className,
+}: PageHeaderProps) {
   return (
-    <div className="flex items-center justify-between gap-4 flex-wrap mr-10">
-      
-      {/* LEFT */}
+    <div
+      className={cn(
+        "flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between",
+        className,
+      )}
+    >
       <div className="min-w-0">
-        <h1 className="text-2xl font-semibold">{title}</h1>
-        {description && (
-          <p className="text-sm text-muted-foreground">
-            {description}
-          </p>
-        )}
+        <div className="flex items-center gap-3">
+          {Icon && (
+            <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm">
+              <Icon size={22} />
+            </div>
+          )}
+
+          <div className="min-w-0">
+            <h1 className="truncate text-2xl font-bold tracking-tight text-foreground">
+              {title}
+            </h1>
+
+            {description && (
+              <p className="mt-1 text-sm text-muted-foreground">
+                {description}
+              </p>
+            )}
+          </div>
+        </div>
       </div>
 
-      {/* RIGHT (ACTIONS) */}
       {action && (
-        <div className="flex items-center gap-3 flex-wrap">
+        <div className="flex flex-wrap items-center gap-3">
           {action}
         </div>
       )}

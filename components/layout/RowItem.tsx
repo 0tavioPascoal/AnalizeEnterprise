@@ -1,36 +1,42 @@
 "use client";
 
-import * as React from "react";
 import { Slot } from "@radix-ui/react-slot";
-
-interface RowItemProps {
-  left?: React.ReactNode;
-  right?: React.ReactNode;
-  children?: React.ReactNode;
-  onClick?: () => void;
-  asChild?: boolean;
-}
+import { cn } from "@/lib/utils";
+import type { RowItemProps } from "@/types/layout/rowItemProps";
 
 export function RowItem({
   left,
   right,
   children,
   onClick,
-  asChild,
+  asChild = false,
+  className,
+  contentClassName,
 }: RowItemProps) {
   const Comp = asChild ? Slot : "div";
+  const isClickable = Boolean(onClick || asChild);
 
   return (
     <Comp
       onClick={onClick}
-      className="flex items-center justify-between border rounded-lg p-4 hover:bg-muted/40 transition cursor-pointer"
+      className={cn(
+        "group flex w-full items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all",
+        "hover:border-primary/20 hover:bg-muted/40",
+        isClickable && "cursor-pointer active:scale-[0.995]",
+        className,
+      )}
     >
       {children ? (
         children
       ) : (
         <>
-          <div>{left}</div>
-          {right && <div>{right}</div>}
+          <div className={cn("min-w-0 flex-1", contentClassName)}>{left}</div>
+
+          {right && (
+            <div className="flex shrink-0 items-center justify-end">
+              {right}
+            </div>
+          )}
         </>
       )}
     </Comp>

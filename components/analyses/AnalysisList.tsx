@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { AnalysisRow } from "./AnalysisRow";
+import { AnalysisRow } from "./listing/AnalysisRow";
 
 interface Analysis {
   id: string;

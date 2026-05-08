@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { Sidebar } from "@/components/layout/sidebar";
+import { Sidebar } from "@/components/layout/sidebar/sidebar";
 import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
 
 export default async function DashboardLayout({
