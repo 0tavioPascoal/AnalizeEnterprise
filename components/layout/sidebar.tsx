@@ -11,14 +11,17 @@ import {
   ClipboardList,
   Users,
   ChevronLeft,
+  ChevronDown,
   Sparkles,
   GitMerge,
+  Settings,
+  Mail,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { logout } from "@/actions/logout";
+import { logout } from "@/actions/auth/logout";
 
 export interface SidebarUser {
   name: string | null;
@@ -33,6 +36,7 @@ interface SidebarProps {
 
 export function Sidebar({ user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState<boolean>(false);
+  const [settingsOpen, setSettingsOpen] = useState<boolean>(true);
   const [isPending, startTransition] = useTransition();
 
   const router = useRouter();
@@ -64,7 +68,7 @@ export function Sidebar({ user }: SidebarProps) {
       >
         <ChevronLeft
           className={cn(
-            "h-4 w-4 transition-transform",
+            "h-5 w-5 transition-transform",
             collapsed && "rotate-180",
           )}
         />
@@ -99,10 +103,34 @@ export function Sidebar({ user }: SidebarProps) {
           {collapsed ? "•••" : "Menu Principal"}
         </p>
 
-        <NavItem href="/dashboard" icon={<LayoutDashboard size={20} />} label="Dashboard" collapsed={collapsed} active={pathname === "/dashboard"} />
-        <NavItem href="/dashboard/analyses" icon={<ClipboardList size={20} />} label="Histórico" collapsed={collapsed} active={pathname === "/dashboard/analyses"} />
-        <NavItem href="/dashboard/pipeline" icon={<GitMerge size={20} />} label="Pipeline" collapsed={collapsed} active={pathname === "/dashboard/pipeline"} />
-        <NavItem href="/dashboard/analyze" icon={<Brain size={20} />} label="IA Scanner" collapsed={collapsed} active={pathname === "/dashboard/analyze"} />
+        <NavItem
+          href="/dashboard"
+          icon={<LayoutDashboard size={20} />}
+          label="Dashboard"
+          collapsed={collapsed}
+          active={pathname === "/dashboard"}
+        />
+        <NavItem
+          href="/dashboard/analyses"
+          icon={<ClipboardList size={20} />}
+          label="Análises Internas"
+          collapsed={collapsed}
+          active={pathname === "/dashboard/analyses"}
+        />
+        <NavItem
+          href="/dashboard/pipeline"
+          icon={<GitMerge size={20} />}
+          label="Pipeline"
+          collapsed={collapsed}
+          active={pathname === "/dashboard/pipeline"}
+        />
+        <NavItem
+          href="/dashboard/analyze"
+          icon={<Brain size={20} />}
+          label="IA Scanner"
+          collapsed={collapsed}
+          active={pathname === "/dashboard/analyze"}
+        />
 
         <div className="mx-2 my-6 border-t border-zinc-200/50 dark:border-zinc-800/50" />
 
@@ -115,8 +143,61 @@ export function Sidebar({ user }: SidebarProps) {
           {collapsed ? "•••" : "Gerenciamento"}
         </p>
 
-        <NavItem href="/dashboard/jobs" icon={<Briefcase size={20} />} label="Vagas" collapsed={collapsed} active={pathname === "/dashboard/jobs"} />
-        <NavItem href="/dashboard/users" icon={<Users size={20} />} label="Equipe" collapsed={collapsed} active={pathname === "/dashboard/users"} />
+        <NavItem
+          href="/dashboard/jobs"
+          icon={<Briefcase size={20} />}
+          label="Vagas"
+          collapsed={collapsed}
+          active={pathname.startsWith("/dashboard/jobs")}
+        />
+
+        <button
+          type="button"
+          onClick={() => {
+            if (!collapsed) setSettingsOpen((value) => !value);
+          }}
+          className={cn(
+            "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all",
+            "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
+            collapsed && "justify-center px-0",
+          )}
+        >
+          <Settings size={20} className="shrink-0" />
+
+          {!collapsed && (
+            <>
+              <span className="flex-1 text-left">Configurações</span>
+              <ChevronDown
+                size={16}
+                className={cn(
+                  "transition-transform",
+                  settingsOpen && "rotate-180",
+                )}
+              />
+            </>
+          )}
+        </button>
+
+        {!collapsed && settingsOpen && (
+          <div className="ml-4 mt-1 space-y-1 border-l border-zinc-200 pl-3 dark:border-zinc-800">
+            <NavItem
+              href="/dashboard/users"
+              icon={<Users size={17} />}
+              label="Equipe"
+              collapsed={false}
+              active={pathname.startsWith("/dashboard/users")}
+            />
+            <NavItem
+              href="/dashboard/settings/email-templates"
+              icon={<Mail size={17} />}
+              label="Templates de e-mail"
+              collapsed={false}
+              active={pathname.startsWith(
+                "/dashboard/settings/email-templates",
+              )}
+            />
+          </div>
+        )}
       </nav>
 
       <div className="mt-auto flex flex-col gap-2 p-3">
@@ -187,31 +268,18 @@ interface NavItemProps {
   active: boolean;
 }
 
-function NavItem({ href, icon, label, collapsed, active }: NavItemProps) {
+function NavItem({ href, icon, label, collapsed }: NavItemProps) {
   return (
     <Link
       href={href}
       className={cn(
-        "group relative flex items-center gap-3 rounded-lg px-3 py-2.5 transition-all duration-200",
-        active
-          ? "bg-indigo-50 font-semibold text-indigo-700 dark:bg-indigo-500/10 dark:text-indigo-400"
-          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:hover:bg-zinc-900 dark:hover:text-zinc-100",
+        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all",
+        "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
+        collapsed && "justify-center px-0",
       )}
     >
-      <span
-        className={cn(
-          "transition-transform duration-200 group-hover:scale-110",
-          active && "text-indigo-600 dark:text-indigo-400",
-        )}
-      >
-        {icon}
-      </span>
-
-      {!collapsed && <span className="text-sm">{label}</span>}
-
-      {active && (
-        <div className="absolute left-0 h-6 w-1 rounded-r-full bg-indigo-600" />
-      )}
+      <span className="shrink-0">{icon}</span>
+      {!collapsed && <span className="truncate">{label}</span>}
     </Link>
   );
 }
