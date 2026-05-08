@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import Router from "next/router";
 
 // 👇 IMPORTA SUA SERVER ACTION REAL
-import { registerCompany } from "@/actions/register";
+import { registerCompany } from "@/actions/auth/register";
 
 // =========================
 // TYPES

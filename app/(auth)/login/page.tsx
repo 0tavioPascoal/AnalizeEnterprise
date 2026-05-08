@@ -8,7 +8,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { toast } from "sonner";
 import { LockKeyhole, Mail, Loader2 } from "lucide-react";
 
-import { login, LoginError } from "@/actions/login";
+import { login, LoginError } from "@/actions/auth/login";
 
 export default function LoginPage() {
   const [loading, setLoading] = useState<boolean>(false);

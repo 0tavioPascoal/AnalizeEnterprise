@@ -3,18 +3,32 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Loader2, UserPlus, Save, Lock, Building2 } from "lucide-react";
+import {
+  Loader2,
+  UserPlus,
+  Save,
+  Lock,
+  Building2,
+  UserX,
+  UserCheck,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import { createUser } from "@/actions/user/createUser";
-import { updateUser } from "@/actions/user/updateUser";
-import type { UserRole, UserFormData, ActionResponse } from "@/types/user/user";
+import { updateUser, updateUserStatus } from "@/actions/user/updateUser";
+import type {
+  UserRole,
+  UserFormData,
+  UserProfile,
+  UserStatus,
+  ActionResponse,
+} from "@/types/user/user";
 
 interface UserFormProps {
-  initialData?: UserFormData & { id?: string };
+  initialData?: Partial<UserProfile> & Partial<UserFormData>;
   isEdit?: boolean;
   currentUserId?: string;
   currentUserRole?: UserRole;
@@ -29,7 +43,11 @@ export function UserForm({
   companyName = "Organização não identificada",
 }: UserFormProps) {
   const router = useRouter();
+
   const [loading, setLoading] = useState<boolean>(false);
+  const [statusLoading, setStatusLoading] = useState<boolean>(false);
+
+  const currentStatus: UserStatus = initialData?.status ?? "active";
 
   const isEditingSelf = Boolean(
     isEdit && initialData?.id && currentUserId === initialData.id,
@@ -40,6 +58,7 @@ export function UserForm({
 
   const canEditRole = isCurrentUserAdmin && !isEditingSelf;
   const canEditForm = isCurrentUserAdmin || !isTargetAdmin;
+  const canChangeStatus = isEdit && isCurrentUserAdmin && !isEditingSelf;
 
   async function handleSubmit(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -58,8 +77,8 @@ export function UserForm({
       name: String(formData.get("name") ?? ""),
       email: String(formData.get("email") ?? initialData?.email ?? ""),
       role: canEditRole
-        ? selectedRole ?? initialData?.role ?? "recruiter"
-        : initialData?.role ?? "recruiter",
+        ? (selectedRole ?? initialData?.role ?? "recruiter")
+        : (initialData?.role ?? "recruiter"),
     };
 
     try {
@@ -74,23 +93,52 @@ export function UserForm({
         });
       }
 
-      if (result.success) {
-        toast.success(result.message);
-        router.push("/dashboard/users");
-        router.refresh();
+      if (!result.success) {
+        toast.error(result.message);
         return;
       }
 
-      toast.error(result.message);
+      toast.success(result.message);
+      router.push("/dashboard/users");
+      router.refresh();
     } catch (error) {
-      const message =
+      toast.error(
         error instanceof Error
           ? error.message
-          : "Erro crítico ao processar requisição.";
-
-      toast.error(message);
+          : "Erro crítico ao processar requisição.",
+      );
     } finally {
       setLoading(false);
+    }
+  }
+
+  async function handleToggleStatus(): Promise<void> {
+    if (!initialData?.id) return;
+
+    const nextStatus: UserStatus =
+      currentStatus === "active" ? "inactive" : "active";
+
+    setStatusLoading(true);
+
+    try {
+      const result = await updateUserStatus(initialData.id, nextStatus);
+
+      if (!result.success) {
+        toast.error(result.message);
+        return;
+      }
+
+      toast.success(result.message);
+      router.push("/dashboard/users");
+      router.refresh();
+    } catch (error) {
+      toast.error(
+        error instanceof Error
+          ? error.message
+          : "Erro ao atualizar status do usuário.",
+      );
+    } finally {
+      setStatusLoading(false);
     }
   }
 
@@ -100,6 +148,52 @@ export function UserForm({
       className="flex h-full flex-col justify-between rounded-2xl border border-border bg-card p-8 shadow-sm transition-all"
     >
       <div className="space-y-6">
+        {isEdit && (
+          <div className="rounded-2xl border border-border bg-muted/30 p-4">
+            <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+              <div>
+                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                  Status do usuário
+                </p>
+
+                <p
+                  className={
+                    currentStatus === "active"
+                      ? "mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-300"
+                      : "mt-1 text-sm font-bold text-amber-600 dark:text-amber-300"
+                  }
+                >
+                  {currentStatus === "active" ? "Ativo" : "Inativo"}
+                </p>
+              </div>
+
+              {canChangeStatus && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  disabled={statusLoading || loading}
+                  onClick={handleToggleStatus}
+                  className={
+                    currentStatus === "active"
+                      ? "h-10 rounded-xl border-amber-500/20 bg-amber-500/10 px-4 text-[10px] font-black uppercase tracking-widest text-amber-700 hover:bg-amber-500/15 dark:text-amber-300"
+                      : "h-10 rounded-xl border-emerald-500/20 bg-emerald-500/10 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300"
+                  }
+                >
+                  {statusLoading ? (
+                    <Loader2 className="mr-2 animate-spin" size={15} />
+                  ) : currentStatus === "active" ? (
+                    <UserX className="mr-2" size={15} />
+                  ) : (
+                    <UserCheck className="mr-2" size={15} />
+                  )}
+
+                  {currentStatus === "active" ? "Inativar" : "Reativar"}
+                </Button>
+              )}
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
           <Label className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground">
             Organização Vinculada
@@ -127,7 +221,7 @@ export function UserForm({
           <Input
             id="name"
             name="name"
-            defaultValue={initialData?.name}
+            defaultValue={initialData?.name ?? ""}
             placeholder="Ex: Otávio Augusto Pascoal"
             disabled={loading || !canEditForm}
             className="h-11 rounded-xl border-border bg-zinc-50 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-zinc-900/60 dark:text-zinc-100"
@@ -147,10 +241,10 @@ export function UserForm({
             id="email"
             name="email"
             type="email"
-            defaultValue={initialData?.email}
+            defaultValue={initialData?.email ?? ""}
             disabled={loading || isEdit || !canEditForm}
             placeholder="usuario@empresa.com"
-            className="h-11 rounded-xl border-border bg-zinc-50 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-zinc-900/60 dark:text-zinc-100"
+            className="h-11 rounded-xl border-border bg-zinc-50 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-zinc-900/60 dark:text-zinc-100"
             required
           />
         </div>
@@ -191,23 +285,12 @@ export function UserForm({
           <select
             id="role"
             name="role"
-            defaultValue={initialData?.role || "recruiter"}
+            defaultValue={initialData?.role ?? "recruiter"}
             disabled={loading || !canEditRole}
             className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-border bg-zinc-50 px-4 text-sm font-semibold text-zinc-900 shadow-sm outline-none transition-all hover:border-primary/20 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-900 dark:text-zinc-100"
           >
-            <option
-              value="admin"
-              className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-            >
-              Administrador
-            </option>
-
-            <option
-              value="recruiter"
-              className="bg-white text-zinc-900 dark:bg-zinc-900 dark:text-zinc-100"
-            >
-              Recrutador
-            </option>
+            <option value="admin">Administrador</option>
+            <option value="recruiter">Recrutador</option>
           </select>
 
           {!canEditRole && (
@@ -224,7 +307,7 @@ export function UserForm({
         <Button
           type="button"
           variant="outline"
-          disabled={loading}
+          disabled={loading || statusLoading}
           onClick={() => router.push("/dashboard/users")}
           className="h-11 rounded-xl border-border bg-card px-6 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
         >
@@ -233,7 +316,7 @@ export function UserForm({
 
         <Button
           type="submit"
-          disabled={loading || !canEditForm}
+          disabled={loading || statusLoading || !canEditForm}
           className="h-11 gap-2 rounded-xl bg-primary px-8 text-[10px] font-black uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
         >
           {loading ? (

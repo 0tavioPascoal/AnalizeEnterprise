@@ -21,7 +21,7 @@ import {
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { logout } from "@/actions/logout";
+import { logout } from "@/actions/auth/logout";
 
 export interface SidebarUser {
   name: string | null;

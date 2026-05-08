@@ -1,3 +1,5 @@
+import { notFound, redirect } from "next/navigation";
+
 import { PageHeader } from "@/components/layout/Pageheader";
 import { PageLayout } from "@/components/layout/PageLayout";
 import { UserForm } from "@/components/user/UserForm";
@@ -6,15 +8,16 @@ import { UserTips } from "@/components/user/UserTips";
 import { createServerClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
 
-import { notFound, redirect } from "next/navigation";
+interface EditUserPageProps {
+  params: Promise<{
+    id: string;
+  }>;
+}
 
-export default async function EditUserPage({
-  params,
-}: {
-  params: Promise<{ id: string }>;
-}) {
-  const supabase = await createServerClient();
+export default async function EditUserPage({ params }: EditUserPageProps) {
   const { id } = await params;
+
+  const supabase = await createServerClient();
 
   const currentProfile = await getCurrentProfile();
 
@@ -22,10 +25,15 @@ export default async function EditUserPage({
     redirect("/login");
   }
 
+  if (!currentProfile.company_id) {
+    redirect("/dashboard");
+  }
+
   const { data: user, error } = await supabase
     .from("profiles")
-    .select("*")
+    .select("id, name, email, role, company_id, status")
     .eq("id", id)
+    .eq("company_id", currentProfile.company_id)
     .single();
 
   if (error || !user) {
@@ -37,7 +45,7 @@ export default async function EditUserPage({
       header={
         <PageHeader
           title="Editar Usuário"
-          description={`Editando: ${user.name}`}
+          description={`Editando: ${user.name ?? "Usuário sem nome"}`}
         />
       }
     >
@@ -48,7 +56,9 @@ export default async function EditUserPage({
             isEdit
             currentUserId={currentProfile.id}
             currentUserRole={currentProfile.role}
-            companyName={currentProfile.company_name ?? "Minha Empresa"}
+            companyName={
+              currentProfile.company_name ?? "Organização não identificada"
+            }
           />
         </div>
 

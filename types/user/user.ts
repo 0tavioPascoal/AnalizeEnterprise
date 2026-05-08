@@ -1,4 +1,5 @@
 export type UserRole = "admin" | "recruiter";
+export type UserStatus = "active" | "inactive";
 
 export interface UserFormData {
   name: string;
@@ -13,6 +14,7 @@ export interface UserProfile {
   email: string | null;
   role: UserRole;
   company_id: string;
+  status: UserStatus;
 }
 
 export interface ActionResponse {
