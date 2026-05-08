@@ -3,20 +3,15 @@
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
-import { CheckCircle2, XCircle } from "lucide-react";
+import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
-import {
-  approveAnalysis,
-  rejectAnalysis,
-} from "@/actions/analyzes/action";
+import { approveAnalysis } from "@/actions/analyzes/aproveAnalizys";
+import { rejectAnalysis } from "@/actions/analyzes/rejectAnalizys";
 
-type AnalysisStatus =
-  | "pending"
-  | "approved"
-  | "rejected";
+type AnalysisStatus = "pending" | "approved" | "rejected";
 
 interface AnalysisResultCardProps {
   analysis: {
@@ -28,77 +23,50 @@ interface AnalysisResultCardProps {
   };
 }
 
-export function AnalysisResultCard({
-  analysis,
-}: AnalysisResultCardProps) {
+export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
   const router = useRouter();
+  const [loading, startTransition] = useTransition();
 
-  const [loading, startTransition] =
-    useTransition();
+  const [status, setStatus] = useState<AnalysisStatus>(
+    analysis.status ?? "pending",
+  );
 
-  const [status, setStatus] =
-    useState<AnalysisStatus>(
-      analysis.status ?? "pending",
-    );
-
-  const isApproved =
-    status === "approved";
-
-  const isRejected =
-    status === "rejected";
-
-  const isDecided =
-    isApproved || isRejected;
+  const isApproved = status === "approved";
+  const isRejected = status === "rejected";
+  const isDecided = isApproved || isRejected;
 
   function handleApprove(): void {
     startTransition(async () => {
-      const result =
-        await approveAnalysis(
-          analysis.id,
-        );
+      const result = await approveAnalysis(analysis.id);
 
-      if (
-        !result.success ||
-        !result.status
-      ) {
+      if (!result.success || !result.status) {
         toast.error(result.message);
         return;
       }
 
       setStatus(result.status);
-
       toast.success(result.message);
-
       router.refresh();
     });
   }
 
   function handleReject(): void {
     startTransition(async () => {
-      const result =
-        await rejectAnalysis(
-          analysis.id,
-        );
+      const result = await rejectAnalysis(analysis.id);
 
-      if (
-        !result.success ||
-        !result.status
-      ) {
+      if (!result.success || !result.status) {
         toast.error(result.message);
         return;
       }
 
       setStatus(result.status);
-
-      toast.success(result.message);
-
+      toast.info(result.message);
       router.refresh();
     });
   }
 
   return (
     <div className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
-      {/* STATUS */}
       <div className="flex items-center justify-between py-1">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Status
@@ -107,26 +75,16 @@ export function AnalysisResultCard({
         <span
           className={cn(
             "rounded-lg px-2.5 py-1 text-sm font-black",
-
             isApproved &&
               "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-
-            isRejected &&
-              "bg-red-500/10 text-red-700 dark:text-red-300",
-
-            !isDecided &&
-              "bg-muted text-muted-foreground",
+            isRejected && "bg-red-500/10 text-red-700 dark:text-red-300",
+            !isDecided && "bg-muted text-muted-foreground",
           )}
         >
-          {isApproved
-            ? "Aprovado"
-            : isRejected
-              ? "Reprovado"
-              : "Pendente"}
+          {isApproved ? "Aprovado" : isRejected ? "Reprovado" : "Pendente"}
         </span>
       </div>
 
-      {/* MATCH */}
       <div className="flex items-center justify-between py-1">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Match IA
@@ -135,19 +93,15 @@ export function AnalysisResultCard({
         <span
           className={cn(
             "text-sm font-black",
-
             analysis.match
               ? "text-emerald-600 dark:text-emerald-300"
               : "text-amber-600 dark:text-amber-300",
           )}
         >
-          {analysis.match
-            ? "Compatível"
-            : "Parcial / Fraco"}
+          {analysis.match ? "Compatível" : "Parcial / Fraco"}
         </span>
       </div>
 
-      {/* SCORE */}
       <div className="flex items-center justify-between py-1">
         <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
           Score
@@ -156,7 +110,6 @@ export function AnalysisResultCard({
         <span
           className={cn(
             "text-sm font-black",
-
             analysis.score >= 70
               ? "text-emerald-600 dark:text-emerald-300"
               : analysis.score >= 50
@@ -168,24 +121,14 @@ export function AnalysisResultCard({
         </span>
       </div>
 
-      {/* ACTIONS */}
       <div className="flex flex-col gap-3 pt-2">
         {isApproved && (
           <Button
             type="button"
             disabled
-            className="
-              h-11 w-full rounded-xl
-              bg-emerald-600 text-white
-              text-[10px] font-black uppercase tracking-widest
-              opacity-100
-            "
+            className="h-11 w-full rounded-xl bg-emerald-600 text-[10px] font-black uppercase tracking-widest text-white opacity-100"
           >
-            <CheckCircle2
-              size={16}
-              className="mr-2"
-            />
-
+            <CheckCircle2 size={16} className="mr-2" />
             Candidato aprovado
           </Button>
         )}
@@ -195,24 +138,9 @@ export function AnalysisResultCard({
             type="button"
             disabled
             variant="outline"
-            className="
-              h-11 w-full rounded-xl
-              border-red-500/20
-              bg-red-500/10
-              text-red-600
-              dark:text-red-400
-              text-[10px]
-              font-black
-              uppercase
-              tracking-widest
-              opacity-100
-            "
+            className="h-11 w-full rounded-xl border-red-500/20 bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-600 opacity-100 dark:text-red-400"
           >
-            <XCircle
-              size={16}
-              className="mr-2"
-            />
-
+            <XCircle size={16} className="mr-2" />
             Candidato reprovado
           </Button>
         )}
@@ -223,24 +151,15 @@ export function AnalysisResultCard({
               type="button"
               disabled={loading}
               onClick={handleApprove}
-              className="
-                h-11 w-full rounded-xl
-                bg-emerald-600 hover:bg-emerald-700
-                text-white
-                text-[10px]
-                font-black
-                uppercase
-                tracking-widest
-                shadow-lg
-                shadow-emerald-500/20
-              "
+              className="h-11 w-full rounded-xl bg-emerald-600 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700"
             >
-              <CheckCircle2
-                size={16}
-                className="mr-2"
-              />
+              {loading ? (
+                <Loader2 size={16} className="mr-2 animate-spin" />
+              ) : (
+                <CheckCircle2 size={16} className="mr-2" />
+              )}
 
-              Aprovar candidato
+              {loading ? "Aprovando..." : "Aprovar e enviar e-mail"}
             </Button>
 
             <Button
@@ -249,26 +168,29 @@ export function AnalysisResultCard({
               variant="outline"
               onClick={handleReject}
               className="
-                h-11 w-full rounded-xl
-                border-red-500/20
-                bg-red-500/10
-                text-red-600
-                dark:text-red-400
-                text-[10px]
-                font-black
-                uppercase
-                tracking-widest
-                transition-all
-                hover:bg-red-500/15
-                hover:text-red-700
-              "
+    h-11
+    w-full
+    rounded-xl
+    border-red-500/20
+    bg-red-500/10
+    text-[10px]
+    font-black
+    uppercase
+    tracking-widest
+    text-red-600
+    transition-all
+    hover:bg-red-500/15
+    hover:text-red-700
+    dark:text-red-400
+  "
             >
-              <XCircle
-                size={16}
-                className="mr-2"
-              />
+              {loading ? (
+                <Loader2 size={16} className="mr-2 animate-spin" />
+              ) : (
+                <XCircle size={16} className="mr-2" />
+              )}
 
-              Reprovar
+              {loading ? "Reprovando..." : "Reprovar e enviar e-mail"}
             </Button>
           </>
         )}

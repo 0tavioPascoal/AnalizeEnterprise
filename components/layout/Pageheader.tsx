@@ -1,9 +1,12 @@
 "use client";
 
+import type { LucideIcon } from "lucide-react";
+
 interface Props {
   title: string;
   description?: React.ReactNode;
   action?: React.ReactNode;
+  icon?: LucideIcon
 }
 
 export function PageHeader({ title, description, action }: Props) {

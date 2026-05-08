@@ -13,6 +13,7 @@ import {
   ChevronLeft,
   Sparkles,
   GitMerge,
+  Settings,
 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -117,6 +118,7 @@ export function Sidebar({ user }: SidebarProps) {
 
         <NavItem href="/dashboard/jobs" icon={<Briefcase size={20} />} label="Vagas" collapsed={collapsed} active={pathname === "/dashboard/jobs"} />
         <NavItem href="/dashboard/users" icon={<Users size={20} />} label="Equipe" collapsed={collapsed} active={pathname === "/dashboard/users"} />
+        <NavItem href="/dashboard/settings/email-templates" icon={<Settings size={20} />} label="Email" collapsed={collapsed} active={pathname === "/dashboard/settings/email-templates"} />
       </nav>
 
       <div className="mt-auto flex flex-col gap-2 p-3">
