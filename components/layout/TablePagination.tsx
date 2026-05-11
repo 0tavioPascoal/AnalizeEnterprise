@@ -2,7 +2,7 @@
 
 import { ChevronLeft, ChevronRight } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 interface TablePaginationProps {
   page: number;
@@ -28,16 +28,16 @@ export function TablePagination({
         onClick={() => setPage(page - 1)}
         ariaLabel="Página anterior"
       >
-        <ChevronLeft size={16} />
+        <ChevronLeft size={18} />
       </PaginationButton>
 
-      <div className="flex items-center gap-1">
+      <div className="flex items-center gap-1.5">
         {pages.map((item, index) => {
           if (item === "...") {
             return (
               <div
                 key={`ellipsis-${index}`}
-                className="flex h-9 min-w-9 items-center justify-center px-1 text-sm text-muted-foreground"
+                className="flex h-10 min-w-10 items-center justify-center px-1 text-base font-bold text-muted-foreground"
               >
                 ...
               </div>
@@ -49,9 +49,10 @@ export function TablePagination({
           return (
             <button
               key={item}
+              type="button"
               onClick={() => setPage(item)}
               className={cn(
-                "flex h-9 min-w-9 items-center justify-center rounded-xl border px-3 text-sm font-medium transition-all",
+                "flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-bold transition-all",
                 isActive
                   ? "border-primary bg-primary text-primary-foreground shadow-sm"
                   : "border-border bg-background text-foreground hover:bg-muted",
@@ -68,7 +69,7 @@ export function TablePagination({
         onClick={() => setPage(page + 1)}
         ariaLabel="Próxima página"
       >
-        <ChevronRight size={16} />
+        <ChevronRight size={18} />
       </PaginationButton>
     </div>
   );
@@ -94,7 +95,7 @@ function PaginationButton({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background transition-all",
+        "flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground transition-all",
         "hover:bg-muted",
         "disabled:pointer-events-none disabled:opacity-40",
       )}

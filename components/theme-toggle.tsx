@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { Sun, Moon } from "lucide-react";
+
 import { Button } from "@/components/ui/button";
 
 export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
@@ -14,21 +15,34 @@ export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
     setMounted(true);
   }, []);
 
-  if (!mounted) {
-    return null; // ⛔ evita hydration error
-  }
+  if (!mounted) return null;
 
   const isDark = theme === "dark";
 
   return (
     <Button
+      type="button"
       variant="ghost"
-      className="w-full justify-start gap-2"
       onClick={() => setTheme(isDark ? "light" : "dark")}
+      className={`
+        h-11 w-full rounded-xl
+
+        ${collapsed ? "justify-center px-0" : "justify-start gap-3 px-3"}
+
+        text-sm font-bold
+        text-muted-foreground
+
+        transition-all
+
+        hover:bg-muted
+        hover:text-foreground
+      `}
+      aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
     >
-      {isDark ? <Sun size={18} /> : <Moon size={18} />}
+      {isDark ? <Sun size={20} /> : <Moon size={20} />}
+
       {!collapsed && (
-        <span className="text-sm">{isDark ? "Modo claro" : "Modo escuro"}</span>
+        <span>{isDark ? "Modo claro" : "Modo escuro"}</span>
       )}
     </Button>
   );

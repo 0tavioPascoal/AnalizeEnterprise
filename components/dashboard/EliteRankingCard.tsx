@@ -2,7 +2,7 @@ import { AlertTriangle, CheckCircle2, Clock, Target } from "lucide-react";
 
 import type { DashboardAnalysisItem } from "@/actions/dashboard/getDashboadOverview";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 interface DecisionQueueCardProps {
   candidates: DashboardAnalysisItem[];
@@ -17,7 +17,9 @@ interface ScoreRange {
 }
 
 export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
-  const pending = candidates.filter((candidate) => candidate.status === "pending");
+  const pending = candidates.filter(
+    (candidate) => candidate.status === "pending",
+  );
 
   const totalPending = pending.length;
 
@@ -45,40 +47,44 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
       label: "Alto potencial",
       description: "Score acima de 70%",
       total: highScore,
-      percentage: totalPending > 0 ? Math.round((highScore / totalPending) * 100) : 0,
+      percentage:
+        totalPending > 0 ? Math.round((highScore / totalPending) * 100) : 0,
       className: "bg-emerald-500",
     },
     {
       label: "Avaliação média",
       description: "Score entre 50% e 69%",
       total: mediumScore,
-      percentage: totalPending > 0 ? Math.round((mediumScore / totalPending) * 100) : 0,
+      percentage:
+        totalPending > 0 ? Math.round((mediumScore / totalPending) * 100) : 0,
       className: "bg-amber-500",
     },
     {
       label: "Baixa aderência",
       description: "Score abaixo de 50%",
       total: lowScore,
-      percentage: totalPending > 0 ? Math.round((lowScore / totalPending) * 100) : 0,
+      percentage:
+        totalPending > 0 ? Math.round((lowScore / totalPending) * 100) : 0,
       className: "bg-red-500",
     },
   ];
 
   return (
-    <Card className="col-span-12 flex min-h-0 flex-col overflow-hidden border-none bg-white shadow-sm dark:bg-zinc-900 xl:col-span-4 mr-5">
+    <Card className="col-span-12 mr-5 flex min-h-0 flex-col overflow-hidden border-none bg-white shadow-sm dark:bg-zinc-900 xl:col-span-4">
       <CardHeader className="shrink-0 border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <CardTitle className="text-xs font-bold uppercase tracking-widest text-zinc-400">
+            <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
               Fila Pendente
             </CardTitle>
-            <p className="mt-1 text-[11px] text-zinc-500">
+
+            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
               Resumo das análises que ainda aguardam decisão
             </p>
           </div>
 
-          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
-            <Clock size={18} />
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+            <Clock size={20} />
           </div>
         </div>
       </CardHeader>
@@ -87,11 +93,7 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
         {totalPending > 0 ? (
           <>
             <div className="grid grid-cols-3 gap-3">
-              <MetricBox
-                label="Pendentes"
-                value={totalPending}
-                icon={Clock}
-              />
+              <MetricBox label="Pendentes" value={totalPending} icon={Clock} />
               <MetricBox
                 label="Média"
                 value={`${averageScore}%`}
@@ -109,25 +111,27 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
                 <div key={range.label}>
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-xs font-bold text-zinc-900 dark:text-zinc-100">
+                      <p className="truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
                         {range.label}
                       </p>
-                      <p className="truncate text-[10px] text-zinc-500">
+
+                      <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
                         {range.description}
                       </p>
                     </div>
 
                     <div className="shrink-0 text-right">
-                      <p className="text-xs font-black text-zinc-900 dark:text-zinc-100">
+                      <p className="text-sm font-black text-zinc-900 dark:text-zinc-100">
                         {range.total}
                       </p>
-                      <p className="text-[10px] text-zinc-400">
+
+                      <p className="text-xs font-medium text-zinc-400">
                         {range.percentage}%
                       </p>
                     </div>
                   </div>
 
-                  <div className="h-2 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                  <div className="h-2.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
                     <div
                       className={cn("h-full rounded-full", range.className)}
                       style={{ width: `${range.percentage}%` }}
@@ -139,14 +143,15 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
 
             <div className="mt-auto pt-6">
               <div className="rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-800/50">
-                <div className="mb-2 flex items-center gap-2 text-zinc-500">
-                  <AlertTriangle size={14} />
-                  <span className="text-[10px] font-black uppercase tracking-widest">
+                <div className="mb-2 flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+                  <AlertTriangle size={16} />
+
+                  <span className="text-xs font-extrabold uppercase tracking-wide">
                     Leitura rápida
                   </span>
                 </div>
 
-                <p className="text-xs leading-relaxed text-zinc-600 dark:text-zinc-400">
+                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
                   {highScore > 0
                     ? `${highScore} candidato(s) pendente(s) estão acima de 70% de aderência.`
                     : "Nenhum candidato pendente está acima de 70% de aderência no momento."}
@@ -160,11 +165,11 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
               <CheckCircle2 size={22} />
             </div>
 
-            <p className="text-sm font-bold text-zinc-900 dark:text-zinc-100">
+            <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">
               Fila limpa
             </p>
 
-            <p className="mt-1 max-w-48 text-xs text-zinc-500">
+            <p className="mt-1 max-w-48 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
               Nenhuma análise pendente aguardando decisão.
             </p>
           </div>
@@ -184,13 +189,14 @@ function MetricBox({ label, value, icon: Icon }: MetricBoxProps) {
   return (
     <div className="rounded-2xl bg-zinc-50 p-3 dark:bg-zinc-800/50">
       <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="truncate text-[9px] font-black uppercase tracking-widest text-zinc-400">
+        <span className="truncate text-xs font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           {label}
         </span>
-        <Icon size={13} className="shrink-0 text-zinc-400" />
+
+        <Icon size={15} className="shrink-0 text-zinc-400" />
       </div>
 
-      <p className="text-lg font-black text-zinc-900 dark:text-zinc-100">
+      <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">
         {value}
       </p>
     </div>

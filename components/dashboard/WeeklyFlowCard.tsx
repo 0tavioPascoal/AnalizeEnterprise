@@ -47,23 +47,23 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
 
   return (
     <Card className="flex min-h-0 flex-[0.45] flex-col overflow-hidden border border-border bg-card shadow-sm">
-      <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border px-4 py-3">
+      <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border px-5 py-4">
         <div>
-          <CardTitle className="text-[10px] font-bold uppercase tracking-widest text-muted-foreground">
+          <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
             Fluxo Semanal
           </CardTitle>
 
-          <p className="mt-1 text-xs text-muted-foreground">
+          <p className="mt-1 text-sm text-muted-foreground">
             {total} análises nos últimos 7 dias
           </p>
         </div>
 
-        <div className="flex h-9 w-9 items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
-          <TrendingUp size={16} />
+        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
+          <TrendingUp size={20} />
         </div>
       </CardHeader>
 
-      <CardContent className="min-h-0 flex-1 p-4">
+      <CardContent className="min-h-0 flex-1 p-5">
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
@@ -88,9 +88,10 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
                 dataKey="day"
                 axisLine={false}
                 tickLine={false}
-                tickMargin={8}
+                tickMargin={10}
                 tick={{
-                  fontSize: 10,
+                  fontSize: 12,
+                  fontWeight: 600,
                   fill: "currentColor",
                 }}
                 className="text-muted-foreground"
@@ -107,7 +108,8 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
                   background: "hsl(var(--card))",
                   color: "hsl(var(--foreground))",
                   boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
-                  fontSize: 12,
+                  fontSize: 13,
+                  fontWeight: 600,
                 }}
                 formatter={(value) => [`${Number(value)} análises`, "Total"]}
                 labelFormatter={(label) => `Dia: ${label}`}
@@ -120,13 +122,13 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
                 strokeWidth={3}
                 fill={`url(#${gradientId})`}
                 dot={{
-                  r: 3,
+                  r: 4,
                   strokeWidth: 2,
                   fill: "hsl(var(--card))",
                   stroke: "#6366f1",
                 }}
                 activeDot={{
-                  r: 5,
+                  r: 6,
                   strokeWidth: 2,
                   fill: "#6366f1",
                   stroke: "hsl(var(--card))",
@@ -135,12 +137,12 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 text-center">
-            <p className="text-sm font-semibold text-foreground">
+          <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 text-center">
+            <p className="text-base font-bold text-foreground">
               Sem análises nesta semana
             </p>
 
-            <p className="mt-1 text-xs text-muted-foreground">
+            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
               O fluxo será exibido conforme novas análises forem criadas.
             </p>
           </div>

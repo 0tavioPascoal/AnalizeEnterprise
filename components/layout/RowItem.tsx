@@ -1,7 +1,7 @@
 "use client";
 
 import { Slot } from "@radix-ui/react-slot";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 import type { RowItemProps } from "@/types/layout/rowItemProps";
 
 export function RowItem({
@@ -20,7 +20,7 @@ export function RowItem({
     <Comp
       onClick={onClick}
       className={cn(
-        "group flex w-full items-center justify-between gap-4 rounded-2xl border border-border bg-card p-4 shadow-sm transition-all",
+        "group flex w-full items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm transition-all",
         "hover:border-primary/20 hover:bg-muted/40",
         isClickable && "cursor-pointer active:scale-[0.995]",
         className,

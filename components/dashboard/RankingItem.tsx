@@ -10,25 +10,26 @@ export function RankingItem({ rank, candidate }: RankingItemProps) {
 
   return (
     <div className="flex items-center gap-4">
-      <span className="w-6 shrink-0 text-xl font-black text-zinc-700">
+      <span className="w-7 shrink-0 text-2xl font-black text-zinc-700 dark:text-zinc-500">
         {formattedRank}
       </span>
 
       <div className="min-w-0 flex-1">
-        <p className="truncate text-xs font-bold text-zinc-100">
+        <p className="truncate text-sm font-bold text-zinc-100">
           {candidate.candidate_name ?? "Candidato sem nome"}
         </p>
-        <p className="truncate text-[9px] uppercase tracking-tighter text-zinc-500">
+
+        <p className="truncate text-xs font-semibold uppercase tracking-wide text-zinc-500">
           {candidate.job_title ?? "Vaga não encontrada"}
         </p>
       </div>
 
       <div className="flex shrink-0 flex-col items-end">
-        <span className="text-xs font-black text-indigo-400">
+        <span className="text-sm font-black text-indigo-400">
           {candidate.score}%
         </span>
 
-        <div className="mt-1 h-1 w-10 overflow-hidden rounded-full bg-zinc-800">
+        <div className="mt-1.5 h-1.5 w-12 overflow-hidden rounded-full bg-zinc-800">
           <div
             className="h-full bg-indigo-500"
             style={{ width: `${candidate.score}%` }}

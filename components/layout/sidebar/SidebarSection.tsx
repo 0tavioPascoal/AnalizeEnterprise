@@ -1,6 +1,6 @@
 "use client";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 interface SidebarSectionProps {
   title: string;
@@ -14,17 +14,17 @@ export function SidebarSection({
   children,
 }: SidebarSectionProps) {
   return (
-    <div className="space-y-1.5">
+    <div className="space-y-2">
       <p
         className={cn(
-          "mb-4 px-3 text-[10px] font-bold uppercase tracking-wider text-zinc-400",
+          "px-3 text-[11px] font-black uppercase tracking-[0.18em] text-zinc-400",
           collapsed && "text-center",
         )}
       >
         {collapsed ? "•••" : title}
       </p>
 
-      {children}
+      <div className="space-y-1">{children}</div>
     </div>
   );
 }

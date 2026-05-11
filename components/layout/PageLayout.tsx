@@ -1,4 +1,4 @@
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 import { PageLayoutProps } from "@/types/layout/pageLayoutProps";
 
 export function PageLayout({
@@ -16,9 +16,7 @@ export function PageLayout({
         className,
       )}
     >
-      <div className="shrink-0">
-        {header}
-      </div>
+      <div className="shrink-0">{header}</div>
 
       {filters && (
         <div className="shrink-0 border-b border-border pb-4">
@@ -26,7 +24,7 @@ export function PageLayout({
         </div>
       )}
 
-      <div className="min-h-0 flex-1 overflow-y-auto overflow-x-hidden custom-scrollbar">
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
         <div
           className={cn(
             "h-full w-full animate-in fade-in slide-in-from-bottom-2 duration-500",
@@ -38,9 +36,7 @@ export function PageLayout({
       </div>
 
       {pagination && (
-        <div className="shrink-0 border-t border-border pt-4">
-          {pagination}
-        </div>
+        <div className="shrink-0 border-t border-border pt-4">{pagination}</div>
       )}
     </div>
   );

@@ -1,5 +1,5 @@
 import { CheckCircle2, AlertTriangle, MessageCircle } from "lucide-react";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 interface AnalysisListCardProps {
   title: string;
@@ -45,8 +45,7 @@ export function AnalysisListCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-5 shadow-sm transition-all",
-        "hover:-translate-y-0.5 hover:shadow-md",
+        "rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
         style.card,
       )}
     >
@@ -54,24 +53,24 @@ export function AnalysisListCard({
         <div className="flex items-center gap-3">
           <div
             className={cn(
-              "flex h-10 w-10 items-center justify-center rounded-xl",
+              "flex h-11 w-11 items-center justify-center rounded-xl",
               style.iconBox,
             )}
           >
-            <Icon size={18} />
+            <Icon size={20} />
           </div>
 
           <div>
             <p
               className={cn(
-                "text-[10px] font-black uppercase tracking-widest",
+                "text-sm font-extrabold uppercase tracking-wide",
                 style.title,
               )}
             >
               {title}
             </p>
 
-            <p className="mt-0.5 text-xs text-muted-foreground">
+            <p className="mt-1 text-sm text-muted-foreground">
               {items.length} {items.length === 1 ? "item" : "itens"}
             </p>
           </div>
@@ -85,14 +84,18 @@ export function AnalysisListCard({
               key={i}
               className="flex gap-3 rounded-xl border border-border/60 bg-card/70 p-3 text-sm text-foreground"
             >
-              <Icon size={16} className={cn("mt-0.5 shrink-0", style.itemIcon)} />
+              <Icon
+                size={17}
+                className={cn("mt-0.5 shrink-0", style.itemIcon)}
+              />
+
               <span className="leading-relaxed">{item}</span>
             </div>
           ))}
         </div>
       ) : (
         <div className="rounded-xl border border-dashed border-border bg-card/60 p-4 text-center">
-          <p className="text-xs font-medium text-muted-foreground">
+          <p className="text-sm font-medium text-muted-foreground">
             Nenhum item encontrado.
           </p>
         </div>

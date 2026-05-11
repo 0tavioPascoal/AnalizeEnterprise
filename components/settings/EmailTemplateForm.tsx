@@ -2,15 +2,27 @@
 
 import { useMemo, useState, useTransition } from "react";
 import { toast } from "sonner";
-import { Save, Eye, MailCheck, MailX } from "lucide-react";
+import {
+  Save,
+  Eye,
+  MailCheck,
+  MailX,
+  Loader2,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 
 import { upsertEmailTemplate } from "@/actions/email/mail-templates";
+
 import type {
   CandidateEmailTemplate,
   CandidateEmailTemplateType,
@@ -63,7 +75,9 @@ export function EmailTemplateForm({
     useState<CandidateEmailTemplateType>("approved");
 
   const currentTemplate = useMemo(() => {
-    return initialTemplates.find((template) => template.type === selectedType);
+    return initialTemplates.find(
+      (template) => template.type === selectedType,
+    );
   }, [initialTemplates, selectedType]);
 
   const [subject, setSubject] = useState<string>(
@@ -74,13 +88,20 @@ export function EmailTemplateForm({
     currentTemplate?.body ?? DEFAULT_APPROVED_BODY,
   );
 
-  const [showPreview, setShowPreview] = useState<boolean>(true);
-  const [isPending, startTransition] = useTransition();
+  const [showPreview, setShowPreview] =
+    useState<boolean>(true);
 
-  function handleChangeType(type: CandidateEmailTemplateType): void {
+  const [isPending, startTransition] =
+    useTransition();
+
+  function handleChangeType(
+    type: CandidateEmailTemplateType,
+  ): void {
     setSelectedType(type);
 
-    const template = initialTemplates.find((item) => item.type === type);
+    const template = initialTemplates.find(
+      (item) => item.type === type,
+    );
 
     if (template) {
       setSubject(template.subject);
@@ -101,14 +122,24 @@ export function EmailTemplateForm({
   function getPreviewText(value: string): string {
     return value
       .replaceAll("{{candidate_name}}", "Exemplo")
-      .replaceAll("{{candidate_email}}", "Exemplo@email.com")
+      .replaceAll(
+        "{{candidate_email}}",
+        "exemplo@email.com",
+      )
       .replaceAll("{{job_title}}", "Vaga teste")
       .replaceAll("{{company_name}}", "Empresa 01")
       .replaceAll("{{score}}", "50");
   }
 
-  function handleInsertVariable(variable: string): void {
-    setBody((current) => `${current}${current.endsWith(" ") ? "" : " "}${variable}`);
+  function handleInsertVariable(
+    variable: string,
+  ): void {
+    setBody(
+      (current) =>
+        `${current}${
+          current.endsWith(" ") ? "" : " "
+        }${variable}`,
+    );
   }
 
   function handleSubmit(): void {
@@ -120,7 +151,9 @@ export function EmailTemplateForm({
           body,
         });
 
-        toast.success("Template salvo com sucesso.")
+        toast.success(
+          "Template salvo com sucesso.",
+        );
       } catch (error) {
         const message =
           error instanceof Error
@@ -133,132 +166,181 @@ export function EmailTemplateForm({
   }
 
   return (
-    <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_420px]">
-      <Card className="border-border bg-card text-card-foreground shadow-sm">
-        <CardHeader>
-          <CardTitle className="flex items-center gap-2 text-lg font-semibold">
+    <div className="grid h-full max-h-full grid-cols-1 gap-6 overflow-hidden xl:grid-cols-[minmax(0,1fr)_380px]">
+      {/* LEFT */}
+      <Card className="flex h-full max-h-full flex-col overflow-hidden border-border bg-card text-card-foreground shadow-sm">
+        <CardHeader className="shrink-0 border-b border-border">
+          <CardTitle className="flex items-center gap-3 text-lg font-bold">
             {selectedType === "approved" ? (
               <MailCheck className="h-5 w-5 text-emerald-500" />
             ) : (
               <MailX className="h-5 w-5 text-red-500" />
             )}
+
             Template de e-mail
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="space-y-6">
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <Button
-              type="button"
-              variant={selectedType === "approved" ? "default" : "outline"}
-              onClick={() => handleChangeType("approved")}
-              className="justify-start gap-2"
-            >
-              <MailCheck className="h-4 w-4" />
-              Aprovação
-            </Button>
+        <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-6">
+          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden">
+            {/* TYPE */}
+            <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
+              <Button
+                type="button"
+                variant={
+                  selectedType === "approved"
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() =>
+                  handleChangeType("approved")
+                }
+                className="h-10 justify-start gap-2 rounded-xl text-sm font-bold"
+              >
+                <MailCheck className="h-4 w-4" />
+                Aprovação
+              </Button>
 
-            <Button
-              type="button"
-              variant={selectedType === "rejected" ? "default" : "outline"}
-              onClick={() => handleChangeType("rejected")}
-              className="justify-start gap-2"
-            >
-              <MailX className="h-4 w-4" />
-              Reprovação
-            </Button>
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="subject">Assunto do e-mail</Label>
-            <Input
-              id="subject"
-              value={subject}
-              onChange={(event) => setSubject(event.target.value)}
-              placeholder="Digite o assunto do e-mail"
-              className="bg-background text-foreground"
-            />
-          </div>
-
-          <div className="space-y-2">
-            <Label htmlFor="body">Mensagem</Label>
-            <Textarea
-              id="body"
-              value={body}
-              onChange={(event) => setBody(event.target.value)}
-              placeholder="Digite a mensagem do e-mail"
-              className="min-h-80 resize-none bg-background text-foreground"
-            />
-          </div>
-
-          <div className="space-y-3">
-            <Label>Variáveis disponíveis</Label>
-
-            <div className="flex flex-wrap gap-2">
-              {VARIABLES.map((variable) => (
-                <Button
-                  key={variable}
-                  type="button"
-                  variant="secondary"
-                  size="sm"
-                  onClick={() => handleInsertVariable(variable)}
-                  className="font-mono text-xs"
-                >
-                  {variable}
-                </Button>
-              ))}
+              <Button
+                type="button"
+                variant={
+                  selectedType === "rejected"
+                    ? "default"
+                    : "outline"
+                }
+                onClick={() =>
+                  handleChangeType("rejected")
+                }
+                className="h-10 justify-start gap-2 rounded-xl text-sm font-bold"
+              >
+                <MailX className="h-4 w-4" />
+                Reprovação
+              </Button>
             </div>
-          </div>
 
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-            <Button
-              type="button"
-              variant="outline"
-              onClick={() => setShowPreview((current) => !current)}
-              className="gap-2"
-            >
-              <Eye className="h-4 w-4" />
-              {showPreview ? "Ocultar preview" : "Mostrar preview"}
-            </Button>
+            {/* SUBJECT */}
+            <div className="shrink-0 space-y-2">
+              <Label className="text-xs font-extrabold uppercase tracking-wide">
+                Assunto
+              </Label>
 
-            <Button
-              type="button"
-              onClick={handleSubmit}
-              disabled={isPending}
-              className="gap-2"
-            >
-              <Save className="h-4 w-4" />
-              {isPending ? "Salvando..." : "Salvar template"}
-            </Button>
+              <Input
+                value={subject}
+                onChange={(event) =>
+                  setSubject(event.target.value)
+                }
+                className="h-10 rounded-xl text-sm font-medium"
+              />
+            </div>
+
+            {/* BODY */}
+            <div className="flex min-h-0 flex-1 flex-col space-y-2 overflow-hidden">
+              <Label className="shrink-0 text-xs font-extrabold uppercase tracking-wide">
+                Mensagem
+              </Label>
+
+              <Textarea
+                value={body}
+                onChange={(event) =>
+                  setBody(event.target.value)
+                }
+                className="
+                  min-h-0 flex-1 resize-none rounded-xl
+                  text-sm leading-relaxed
+                "
+              />
+            </div>
+
+            {/* VARIABLES */}
+            <div className="shrink-0 space-y-3">
+              <Label className="text-xs font-extrabold uppercase tracking-wide">
+                Variáveis disponíveis
+              </Label>
+
+              <div className="flex flex-wrap gap-2">
+                {VARIABLES.map((variable) => (
+                  <Button
+                    key={variable}
+                    type="button"
+                    variant="secondary"
+                    size="sm"
+                    onClick={() =>
+                      handleInsertVariable(variable)
+                    }
+                    className="h-8 rounded-lg font-mono text-xs font-bold"
+                  >
+                    {variable}
+                  </Button>
+                ))}
+              </div>
+            </div>
+
+            {/* ACTIONS */}
+            <div className="flex shrink-0 flex-col gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() =>
+                  setShowPreview(
+                    (current) => !current,
+                  )
+                }
+                className="h-10 gap-2 rounded-xl text-sm font-bold"
+              >
+                <Eye className="h-4 w-4" />
+
+                {showPreview
+                  ? "Ocultar preview"
+                  : "Mostrar preview"}
+              </Button>
+
+              <Button
+                type="button"
+                onClick={handleSubmit}
+                disabled={isPending}
+                className="h-10 gap-2 rounded-xl text-sm font-bold"
+              >
+                {isPending ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  <Save className="h-4 w-4" />
+                )}
+
+                {isPending
+                  ? "Salvando..."
+                  : "Salvar template"}
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>
 
+      {/* RIGHT */}
       {showPreview && (
-        <Card className="border-border bg-card text-card-foreground shadow-sm">
-          <CardHeader>
-            <CardTitle className="text-lg font-semibold">
-              Preview do e-mail
+        <Card className="flex h-full max-h-full flex-col overflow-hidden border-border bg-card text-card-foreground shadow-sm">
+          <CardHeader className="shrink-0 border-b border-border">
+            <CardTitle className="text-lg font-bold">
+              Preview
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="space-y-4">
-            <div className="rounded-xl border border-border bg-background p-4">
-              <p className="text-xs font-medium uppercase text-muted-foreground">
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">
+            <div className="shrink-0 rounded-xl border border-border bg-background p-4">
+              <p className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
                 Assunto
               </p>
 
-              <p className="mt-1 font-medium text-foreground">
+              <p className="mt-2 text-sm font-semibold text-foreground">
                 {getPreviewText(subject)}
               </p>
             </div>
 
-            <div className="rounded-xl border border-border bg-background p-4">
-              <p className="text-xs font-medium uppercase text-muted-foreground">
+            <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-4">
+              <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
                 Corpo
               </p>
 
-              <div className="mt-4 whitespace-pre-wrap text-sm leading-6 text-foreground">
+              <div className="h-full overflow-y-auto whitespace-pre-wrap pr-1 text-sm leading-6 text-foreground scrollbar-hide">
                 {getPreviewText(body)}
               </div>
             </div>

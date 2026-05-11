@@ -152,15 +152,15 @@ export function UserForm({
           <div className="rounded-2xl border border-border bg-muted/30 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+                <p className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
                   Status do usuário
                 </p>
 
                 <p
                   className={
                     currentStatus === "active"
-                      ? "mt-1 text-sm font-bold text-emerald-600 dark:text-emerald-300"
-                      : "mt-1 text-sm font-bold text-amber-600 dark:text-amber-300"
+                      ? "mt-1 text-base font-bold text-emerald-600 dark:text-emerald-300"
+                      : "mt-1 text-base font-bold text-amber-600 dark:text-amber-300"
                   }
                 >
                   {currentStatus === "active" ? "Ativo" : "Inativo"}
@@ -175,16 +175,16 @@ export function UserForm({
                   onClick={handleToggleStatus}
                   className={
                     currentStatus === "active"
-                      ? "h-10 rounded-xl border-amber-500/20 bg-amber-500/10 px-4 text-[10px] font-black uppercase tracking-widest text-amber-700 hover:bg-amber-500/15 dark:text-amber-300"
-                      : "h-10 rounded-xl border-emerald-500/20 bg-emerald-500/10 px-4 text-[10px] font-black uppercase tracking-widest text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300"
+                      ? "h-10 rounded-xl border-amber-500/20 bg-amber-500/10 px-4 text-xs font-extrabold uppercase tracking-wide text-amber-700 hover:bg-amber-500/15 dark:text-amber-300"
+                      : "h-10 rounded-xl border-emerald-500/20 bg-emerald-500/10 px-4 text-xs font-extrabold uppercase tracking-wide text-emerald-700 hover:bg-emerald-500/15 dark:text-emerald-300"
                   }
                 >
                   {statusLoading ? (
-                    <Loader2 className="mr-2 animate-spin" size={15} />
+                    <Loader2 className="mr-2 animate-spin" size={16} />
                   ) : currentStatus === "active" ? (
-                    <UserX className="mr-2" size={15} />
+                    <UserX className="mr-2" size={16} />
                   ) : (
-                    <UserCheck className="mr-2" size={15} />
+                    <UserCheck className="mr-2" size={16} />
                   )}
 
                   {currentStatus === "active" ? "Inativar" : "Reativar"}
@@ -195,7 +195,7 @@ export function UserForm({
         )}
 
         <div className="space-y-2">
-          <Label className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground">
+          <Label className="ml-1 text-xs font-extrabold uppercase tracking-wide text-foreground">
             Organização Vinculada
           </Label>
 
@@ -205,7 +205,7 @@ export function UserForm({
             <Input
               value={companyName}
               disabled
-              className="h-11 cursor-not-allowed rounded-xl border-border bg-zinc-100 pl-10 font-bold text-zinc-700 shadow-sm disabled:opacity-100 dark:bg-zinc-900 dark:text-zinc-200"
+              className="h-12 cursor-not-allowed rounded-xl border-border bg-zinc-100 pl-10 text-sm font-bold text-zinc-700 shadow-sm disabled:opacity-100 dark:bg-zinc-900 dark:text-zinc-200"
             />
           </div>
         </div>
@@ -213,7 +213,7 @@ export function UserForm({
         <div className="space-y-2">
           <Label
             htmlFor="name"
-            className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground"
+            className="ml-1 text-xs font-extrabold uppercase tracking-wide text-foreground"
           >
             Nome Completo
           </Label>
@@ -224,7 +224,7 @@ export function UserForm({
             defaultValue={initialData?.name ?? ""}
             placeholder="Ex: Otávio Augusto Pascoal"
             disabled={loading || !canEditForm}
-            className="h-11 rounded-xl border-border bg-zinc-50 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-zinc-900/60 dark:text-zinc-100"
+            className="h-12 rounded-xl border-border bg-zinc-50 text-sm font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-zinc-400 hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             required
           />
         </div>
@@ -232,7 +232,7 @@ export function UserForm({
         <div className="space-y-2">
           <Label
             htmlFor="email"
-            className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground"
+            className="ml-1 text-xs font-extrabold uppercase tracking-wide text-foreground"
           >
             E-mail Institucional
           </Label>
@@ -244,7 +244,7 @@ export function UserForm({
             defaultValue={initialData?.email ?? ""}
             disabled={loading || isEdit || !canEditForm}
             placeholder="usuario@empresa.com"
-            className="h-11 rounded-xl border-border bg-zinc-50 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-zinc-900/60 dark:text-zinc-100"
+            className="h-12 rounded-xl border-border bg-zinc-50 text-sm font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-zinc-400 hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500"
             required
           />
         </div>
@@ -253,13 +253,13 @@ export function UserForm({
           <div className="space-y-2">
             <Label
               htmlFor="password"
-              className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground"
+              className="ml-1 text-xs font-extrabold uppercase tracking-wide text-foreground"
             >
               Senha de Acesso
             </Label>
 
             <div className="relative">
-              <Lock className="absolute left-3 top-3.5 h-4 w-4 text-muted-foreground" />
+              <Lock className="absolute left-3 top-4 h-4 w-4 text-muted-foreground" />
 
               <Input
                 id="password"
@@ -267,7 +267,7 @@ export function UserForm({
                 type="password"
                 placeholder="••••••••"
                 disabled={loading || !canEditForm}
-                className="h-11 rounded-xl border-border bg-zinc-50 pl-10 font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-muted-foreground hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 dark:bg-zinc-900/60 dark:text-zinc-100"
+                className="h-12 rounded-xl border-border bg-zinc-50 pl-10 text-sm font-semibold text-zinc-900 shadow-sm transition-all placeholder:text-zinc-400 hover:border-primary/20 focus-visible:border-primary/30 focus-visible:ring-2 focus-visible:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-70 dark:bg-zinc-900/60 dark:text-zinc-100 dark:placeholder:text-zinc-500"
                 required
               />
             </div>
@@ -277,7 +277,7 @@ export function UserForm({
         <div className="space-y-2">
           <Label
             htmlFor="role"
-            className="ml-1 text-[10px] font-black uppercase tracking-widest text-foreground"
+            className="ml-1 text-xs font-extrabold uppercase tracking-wide text-foreground"
           >
             Nível de Acesso
           </Label>
@@ -287,14 +287,14 @@ export function UserForm({
             name="role"
             defaultValue={initialData?.role ?? "recruiter"}
             disabled={loading || !canEditRole}
-            className="h-11 w-full cursor-pointer appearance-none rounded-xl border border-border bg-zinc-50 px-4 text-sm font-semibold text-zinc-900 shadow-sm outline-none transition-all hover:border-primary/20 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-900 dark:text-zinc-100"
+            className="h-12 w-full cursor-pointer appearance-none rounded-xl border border-border bg-zinc-50 px-4 text-sm font-semibold text-zinc-900 shadow-sm outline-none transition-all hover:border-primary/20 focus:border-primary/30 focus:ring-2 focus:ring-primary/20 disabled:cursor-not-allowed disabled:opacity-60 dark:bg-zinc-900 dark:text-zinc-100"
           >
             <option value="admin">Administrador</option>
             <option value="recruiter">Recrutador</option>
           </select>
 
           {!canEditRole && (
-            <p className="ml-1 text-[10px] font-medium text-muted-foreground">
+            <p className="ml-1 text-xs font-medium leading-relaxed text-muted-foreground">
               {isEditingSelf
                 ? "Você não pode alterar sua própria permissão."
                 : "Apenas administradores podem alterar permissões."}
@@ -309,7 +309,7 @@ export function UserForm({
           variant="outline"
           disabled={loading || statusLoading}
           onClick={() => router.push("/dashboard/users")}
-          className="h-11 rounded-xl border-border bg-card px-6 text-[10px] font-bold uppercase tracking-widest text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          className="h-11 rounded-xl border-border bg-card px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
         >
           Cancelar
         </Button>
@@ -317,7 +317,7 @@ export function UserForm({
         <Button
           type="submit"
           disabled={loading || statusLoading || !canEditForm}
-          className="h-11 gap-2 rounded-xl bg-primary px-8 text-[10px] font-black uppercase tracking-widest text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
+          className="h-11 gap-2 rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} />

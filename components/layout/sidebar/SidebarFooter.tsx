@@ -5,7 +5,7 @@ import { LogOut } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 import type { SidebarUser } from "@/types/layout/sidebar/sidebar";
 
@@ -47,18 +47,19 @@ export function SidebarFooter({
                 {displayName}
               </p>
 
-              <p className="truncate text-[11px] leading-none text-muted-foreground">
+              <p className="truncate text-xs leading-none text-muted-foreground">
                 {displayEmail}
               </p>
 
               {user.company_name && (
-                <p className="mt-1 truncate text-[10px] font-bold uppercase tracking-wider text-indigo-500">
+                <p className="mt-1 truncate text-[11px] font-bold uppercase tracking-wider text-indigo-500">
                   {user.company_name}
                 </p>
               )}
             </div>
 
             <Button
+              type="button"
               variant="ghost"
               size="icon"
               className="h-8 w-8 transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-950/30"
@@ -73,6 +74,7 @@ export function SidebarFooter({
 
       {collapsed && (
         <Button
+          type="button"
           variant="ghost"
           size="icon"
           className="h-10 w-full transition-colors hover:bg-red-50 hover:text-red-600"

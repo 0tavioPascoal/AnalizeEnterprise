@@ -4,7 +4,7 @@ import { ChevronRight, Clock, CheckCircle2, XCircle } from "lucide-react";
 import { RowItem } from "@/components/layout/RowItem";
 import { StatusBadge } from "@/components/layout/filters/StatusBadge";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 import type { PipelineAnalysis } from "@/actions/pipeline/pipeline";
 
 interface PipelineRowProps {
@@ -50,28 +50,26 @@ export function PipelineRow({ item }: PipelineRowProps) {
                 "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300",
             )}
           >
-            <Icon size={20} />
+            <Icon size={22} />
           </div>
 
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <p className="truncate text-sm font-semibold text-foreground">
+              <p className="truncate text-base font-bold text-foreground">
                 {item.candidate_name ?? "Candidato sem nome"}
               </p>
 
-              <StatusBadge variant={statusVariant}>
-                {statusLabel}
-              </StatusBadge>
+              <StatusBadge variant={statusVariant}>{statusLabel}</StatusBadge>
             </div>
 
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="max-w-60 truncate text-xs text-muted-foreground">
+              <span className="max-w-60 truncate text-sm font-medium text-muted-foreground">
                 {item.candidate_email ?? "E-mail não informado"}
               </span>
 
-              <span className="text-xs text-muted-foreground">•</span>
+              <span className="text-sm text-muted-foreground">•</span>
 
-              <span className="max-w-60 truncate text-xs font-medium text-muted-foreground">
+              <span className="max-w-60 truncate text-sm font-medium text-muted-foreground">
                 {item.job_title ?? "Vaga não informada"}
               </span>
             </div>
@@ -81,21 +79,24 @@ export function PipelineRow({ item }: PipelineRowProps) {
       right={
         <div className="flex items-center gap-4">
           <div className="hidden min-w-24 text-right sm:block">
-            <StatusBadge variant={statusVariant} className="px-3 py-1.5 text-xs">
+            <StatusBadge
+              variant={statusVariant}
+              className="px-3 py-1.5 text-sm font-semibold"
+            >
               {item.score}%
             </StatusBadge>
 
-            <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Score Match
             </p>
           </div>
 
           <Link
             href={`/dashboard/analyses/${item.id}`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
             aria-label={`Abrir análise de ${item.candidate_name ?? "candidato"}`}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={20} />
           </Link>
         </div>
       }

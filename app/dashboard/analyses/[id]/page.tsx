@@ -8,7 +8,6 @@ import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
 import { Button } from "@/components/ui/button";
 
-// COMPONENTS
 import { AnalysisListCard } from "@/components/analyses/AnalysisListCard";
 import { AnalysisProfileCard } from "@/components/analyses/AnalysisProfileCard";
 import { AnalysisResultCard } from "@/components/analyses/AnalysisResultCard";
@@ -18,7 +17,6 @@ interface Props {
   params: Promise<{ id: string }>;
 }
 
-// evita cache zoado
 export const dynamic = "force-dynamic";
 
 export default async function AnalysisDetailPage({ params }: Props) {
@@ -45,15 +43,15 @@ export default async function AnalysisDetailPage({ params }: Props) {
           }
           action={
             <div className="flex items-center gap-3">
-              <Button asChild variant="outline">
+              <Button asChild variant="outline" className="h-10 rounded-xl text-sm font-semibold">
                 <Link href="/dashboard/analyses">
-                  <ArrowLeft size={16} />
+                  <ArrowLeft size={17} />
                   Voltar
                 </Link>
               </Button>
 
-              <div className="px-3 py-1.5 rounded-lg bg-indigo-50 dark:bg-indigo-500/10 border border-indigo-100 dark:border-indigo-500/20">
-                <span className="text-[10px] font-bold text-indigo-600 uppercase">
+              <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-2 dark:border-indigo-500/20 dark:bg-indigo-500/10">
+                <span className="text-xs font-extrabold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
                   Match: {analysis.score}%
                 </span>
               </div>
@@ -62,75 +60,43 @@ export default async function AnalysisDetailPage({ params }: Props) {
         />
       }
     >
-      <div className="grid gap-6 lg:grid-cols-3 h-full overflow-hidden">
-        {/* LEFT */}
-        <div className="lg:col-span-2 space-y-6 overflow-y-auto pr-2 scrollbar-hide">
+      <div className="grid h-full gap-6 overflow-hidden lg:grid-cols-3">
+        <div className="space-y-6 overflow-y-auto pr-2 scrollbar-hide lg:col-span-2">
           <AnalysisProfileCard analysis={analysis} />
           <AnalysisScoreCard analysis={analysis} />
 
-          {/* Parecer final (pode virar componente depois) */}
           <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Sparkles size={18} />
+              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
+                <Sparkles size={20} />
               </div>
 
               <div>
-                <p className="text-[10px] font-black uppercase tracking-widest text-primary">
+                <p className="text-sm font-extrabold uppercase tracking-wide text-primary">
                   Parecer Final
                 </p>
 
-                <p className="mt-1 text-xs text-muted-foreground">
+                <p className="mt-1 text-sm text-muted-foreground">
                   Conclusão consolidada da IA sobre o candidato
                 </p>
               </div>
             </div>
 
-            <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
               {analysis.final_opinion ?? "-"}
             </p>
           </section>
         </div>
 
-        {/* RIGHT */}
-        <div className="flex flex-col gap-6 overflow-y-auto pr-1 min-h-0 scrollbar-hide">
+        <div className="flex min-h-0 flex-col gap-6 overflow-y-auto pr-1 scrollbar-hide">
           <AnalysisResultCard analysis={analysis} />
 
-          <AnalysisListCard
-            title="Destaques"
-            items={analysis.strengths}
-            type="success"
-          />
-
-          <AnalysisListCard
-            title="Pontos de Atenção"
-            items={analysis.weaknesses}
-            type="warning"
-          />
-
-          <AnalysisListCard
-            title="Skills Encontradas"
-            items={analysis.matched_skills}
-            type="success"
-          />
-
-          <AnalysisListCard
-            title="Skills Ausentes"
-            items={analysis.missing_skills}
-            type="warning"
-          />
-
-          <AnalysisListCard
-            title="Riscos"
-            items={analysis.risks}
-            type="warning"
-          />
-
-          <AnalysisListCard
-            title="Perguntas para Entrevista"
-            items={analysis.interview_questions}
-            type="question"
-          />
+          <AnalysisListCard title="Destaques" items={analysis.strengths} type="success" />
+          <AnalysisListCard title="Pontos de Atenção" items={analysis.weaknesses} type="warning" />
+          <AnalysisListCard title="Skills Encontradas" items={analysis.matched_skills} type="success" />
+          <AnalysisListCard title="Skills Ausentes" items={analysis.missing_skills} type="warning" />
+          <AnalysisListCard title="Riscos" items={analysis.risks} type="warning" />
+          <AnalysisListCard title="Perguntas para Entrevista" items={analysis.interview_questions} type="question" />
         </div>
       </div>
     </PageLayout>

@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { CheckCircle2, XCircle, Loader2 } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 import { approveAnalysis } from "@/actions/analyzes/aproveAnalizys";
 import { rejectAnalysis } from "@/actions/analyzes/rejectAnalizys";
@@ -67,14 +67,14 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
 
   return (
     <div className="space-y-5 rounded-2xl border border-border bg-card p-6 shadow-sm">
-      <div className="flex items-center justify-between py-1">
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+      <div className="flex items-center justify-between gap-4 py-1">
+        <span className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
           Status
         </span>
 
         <span
           className={cn(
-            "rounded-lg px-2.5 py-1 text-sm font-black",
+            "rounded-lg px-3 py-1.5 text-sm font-black",
             isApproved &&
               "bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
             isRejected && "bg-red-500/10 text-red-700 dark:text-red-300",
@@ -85,8 +85,8 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
         </span>
       </div>
 
-      <div className="flex items-center justify-between py-1">
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+      <div className="flex items-center justify-between gap-4 py-1">
+        <span className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
           Match IA
         </span>
 
@@ -102,14 +102,14 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
         </span>
       </div>
 
-      <div className="flex items-center justify-between py-1">
-        <span className="text-[10px] font-black uppercase tracking-widest text-muted-foreground">
+      <div className="flex items-center justify-between gap-4 py-1">
+        <span className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
           Score
         </span>
 
         <span
           className={cn(
-            "text-sm font-black",
+            "text-base font-black",
             analysis.score >= 70
               ? "text-emerald-600 dark:text-emerald-300"
               : analysis.score >= 50
@@ -126,7 +126,7 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
           <Button
             type="button"
             disabled
-            className="h-11 w-full rounded-xl bg-emerald-600 text-[10px] font-black uppercase tracking-widest text-white opacity-100"
+            className="h-11 w-full rounded-xl bg-emerald-600 text-xs font-extrabold uppercase tracking-wide text-white opacity-100"
           >
             <CheckCircle2 size={16} className="mr-2" />
             Candidato aprovado
@@ -138,7 +138,7 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
             type="button"
             disabled
             variant="outline"
-            className="h-11 w-full rounded-xl border-red-500/20 bg-red-500/10 text-[10px] font-black uppercase tracking-widest text-red-600 opacity-100 dark:text-red-400"
+            className="h-11 w-full rounded-xl border-red-500/20 bg-red-500/10 text-xs font-extrabold uppercase tracking-wide text-red-600 opacity-100 dark:text-red-400"
           >
             <XCircle size={16} className="mr-2" />
             Candidato reprovado
@@ -151,7 +151,7 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
               type="button"
               disabled={loading}
               onClick={handleApprove}
-              className="h-11 w-full rounded-xl bg-emerald-600 text-[10px] font-black uppercase tracking-widest text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700"
+              className="h-11 w-full rounded-xl bg-emerald-600 text-xs font-extrabold uppercase tracking-wide text-white shadow-lg shadow-emerald-500/20 hover:bg-emerald-700"
             >
               {loading ? (
                 <Loader2 size={16} className="mr-2 animate-spin" />
@@ -167,22 +167,7 @@ export function AnalysisResultCard({ analysis }: AnalysisResultCardProps) {
               disabled={loading}
               variant="outline"
               onClick={handleReject}
-              className="
-    h-11
-    w-full
-    rounded-xl
-    border-red-500/20
-    bg-red-500/10
-    text-[10px]
-    font-black
-    uppercase
-    tracking-widest
-    text-red-600
-    transition-all
-    hover:bg-red-500/15
-    hover:text-red-700
-    dark:text-red-400
-  "
+              className="h-11 w-full rounded-xl border-red-500/20 bg-red-500/10 text-xs font-extrabold uppercase tracking-wide text-red-600 transition-all hover:bg-red-500/15 hover:text-red-700 dark:text-red-400"
             >
               {loading ? (
                 <Loader2 size={16} className="mr-2 animate-spin" />

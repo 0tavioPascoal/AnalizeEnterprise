@@ -1,6 +1,6 @@
 import type { LucideIcon } from "lucide-react";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 type StatColor = "indigo" | "emerald" | "rose" | "amber";
 
@@ -13,10 +13,12 @@ interface StatCardProps {
 }
 
 const colors: Record<StatColor, string> = {
-  indigo: "text-indigo-600 bg-indigo-50 dark:bg-indigo-500/10 dark:text-indigo-400",
-  emerald: "text-emerald-600 bg-emerald-50 dark:bg-emerald-500/10 dark:text-emerald-400",
-  rose: "text-rose-600 bg-rose-50 dark:bg-rose-500/10 dark:text-rose-400",
-  amber: "text-amber-600 bg-amber-50 dark:bg-amber-500/10 dark:text-amber-400",
+  indigo:
+    "bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400",
+  emerald:
+    "bg-emerald-50 text-emerald-600 dark:bg-emerald-500/10 dark:text-emerald-400",
+  rose: "bg-rose-50 text-rose-600 dark:bg-rose-500/10 dark:text-rose-400",
+  amber: "bg-amber-50 text-amber-600 dark:bg-amber-500/10 dark:text-amber-400",
 };
 
 export function StatCard({
@@ -27,23 +29,23 @@ export function StatCard({
   color,
 }: StatCardProps) {
   return (
-    <div className="flex items-center justify-between rounded-xl border border-transparent bg-white p-4 shadow-sm transition-all hover:border-zinc-200 dark:bg-zinc-900 dark:hover:border-zinc-800 mr-5">
+    <div className="mr-5 flex items-center justify-between rounded-2xl border border-transparent bg-white p-5 shadow-sm transition-all hover:border-zinc-200 dark:bg-zinc-900 dark:hover:border-zinc-800">
       <div className="min-w-0">
-        <p className="mb-2 truncate text-[9px] font-bold uppercase leading-none tracking-widest text-zinc-400">
+        <p className="mb-2 truncate text-xs font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           {title}
         </p>
 
-        <h2 className="text-xl font-black text-zinc-900 dark:text-zinc-50">
+        <h2 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-50">
           {value}
         </h2>
 
-        <p className="mt-1 truncate text-[10px] font-medium text-zinc-400">
+        <p className="mt-2 truncate text-sm font-medium text-zinc-500 dark:text-zinc-400">
           {description}
         </p>
       </div>
 
-      <div className={cn("shrink-0 rounded-lg p-2", colors[color])}>
-        <Icon size={18} />
+      <div className={cn("shrink-0 rounded-xl p-3 shadow-sm", colors[color])}>
+        <Icon size={22} />
       </div>
     </div>
   );

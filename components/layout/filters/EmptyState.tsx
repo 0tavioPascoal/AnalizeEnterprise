@@ -6,15 +6,19 @@ export function EmptyState({
   description,
 }: EmptyStateProps) {
   return (
-    <div className="flex h-44 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/60 px-6 text-center shadow-sm">
-      <div className="mb-3 flex h-11 w-11 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
-        <Icon size={22} />
+    <div className="flex h-48 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border bg-card/60 px-6 text-center shadow-sm">
+      <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-muted text-muted-foreground">
+        <Icon size={24} />
       </div>
 
-      <p className="text-sm font-semibold text-foreground">{title}</p>
+      <p className="text-base font-bold text-foreground">
+        {title}
+      </p>
 
       {description && (
-        <p className="mt-1 text-xs text-muted-foreground">{description}</p>
+        <p className="mt-2 max-w-md text-sm leading-relaxed text-muted-foreground">
+          {description}
+        </p>
       )}
     </div>
   );

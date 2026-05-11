@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+
 import type { StatusFilterTabsProps } from "@/types/layout/filters/statusFilterProps";
 
 export function StatusFilterTabs<T extends string>({
@@ -17,7 +18,14 @@ export function StatusFilterTabs<T extends string>({
           variant={value === option.value ? "default" : "ghost"}
           size="sm"
           onClick={() => onChange(option.value)}
-          className="h-8 rounded-lg px-3 text-xs"
+          className="
+            h-9 rounded-lg px-4
+
+            text-sm
+            font-bold
+
+            transition-all
+          "
         >
           {option.label}
         </Button>

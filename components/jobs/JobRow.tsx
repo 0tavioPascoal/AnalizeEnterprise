@@ -29,15 +29,15 @@ export function JobRow({ job }: JobRowProps) {
       left={
         <div className="flex min-w-0 items-center gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm">
-            <Briefcase size={20} />
+            <Briefcase size={22} />
           </div>
 
           <div className="min-w-0">
-            <p className="truncate text-sm font-semibold text-foreground">
+            <p className="truncate text-base font-bold text-foreground">
               {job.title}
             </p>
 
-            <div className="mt-1.5 flex min-w-0 flex-wrap items-center gap-2">
+            <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
               {job.seniority && (
                 <StatusBadge variant="muted">
                   {job.seniority}
@@ -58,23 +58,23 @@ export function JobRow({ job }: JobRowProps) {
           <div className="hidden text-right sm:block">
             <StatusBadge
               variant={scoreVariant}
-              className="px-3 py-1.5 text-xs"
+              className="px-3 py-1.5 text-sm font-semibold"
             >
-              <Target size={14} className="mr-1 inline" />
+              <Target size={15} className="mr-1 inline" />
               {job.score_min ?? 0}%
             </StatusBadge>
 
-            <p className="mt-1 text-[10px] font-medium uppercase tracking-wide text-muted-foreground">
+            <p className="mt-1 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
               Match mínimo
             </p>
           </div>
 
           <Link
             href={`/dashboard/jobs/${job.id}/edit`}
-            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
+            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
             aria-label={`Editar vaga ${job.title}`}
           >
-            <ChevronRight size={18} />
+            <ChevronRight size={20} />
           </Link>
         </div>
       }

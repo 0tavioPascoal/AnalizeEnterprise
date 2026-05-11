@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 
-import { cn } from "@/lib/utils";
+import { cn } from "@/lib/supabase/utils";
 
 interface SidebarNavItemProps {
   href: string;
@@ -24,10 +24,10 @@ export function SidebarNavItem({
       href={href}
       title={collapsed ? label : undefined}
       className={cn(
-        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-medium transition-all",
+        "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-bold transition-all",
         active
-          ? "text-zinc-900 dark:text-white"
-          : "text-zinc-500 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-white",
+          ? "bg-indigo-50 text-indigo-700 shadow-sm dark:bg-indigo-500/10 dark:text-indigo-300"
+          : "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white",
         collapsed && "justify-center px-0",
       )}
     >
