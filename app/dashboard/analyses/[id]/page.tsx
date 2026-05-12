@@ -12,6 +12,7 @@ import { AnalysisListCard } from "@/components/analyses/AnalysisListCard";
 import { AnalysisProfileCard } from "@/components/analyses/AnalysisProfileCard";
 import { AnalysisResultCard } from "@/components/analyses/AnalysisResultCard";
 import { AnalysisScoreCard } from "@/components/analyses/AnalysisScoreCard";
+import { DownloadResumeButton } from "@/components/analyses/downloadCv";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -42,13 +43,22 @@ export default async function AnalysisDetailPage({ params }: Props) {
             </>
           }
           action={
-            <div className="flex items-center gap-3">
-              <Button asChild variant="outline" className="h-10 rounded-xl text-sm font-semibold">
+            <div className="flex flex-wrap items-center gap-3">
+              <Button
+                asChild
+                variant="outline"
+                className="h-10 rounded-xl text-sm font-semibold"
+              >
                 <Link href="/dashboard/analyses">
                   <ArrowLeft size={17} />
                   Voltar
                 </Link>
               </Button>
+
+              <DownloadResumeButton
+                analysisId={analysis.id}
+                disabled={!analysis.resume_file_path}
+              />
 
               <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-2 dark:border-indigo-500/20 dark:bg-indigo-500/10">
                 <span className="text-xs font-extrabold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
