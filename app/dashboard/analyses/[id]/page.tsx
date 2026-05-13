@@ -3,16 +3,20 @@ import { notFound } from "next/navigation";
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { getAnalysisById } from "@/actions/analyzes/getAnalysisById";
+import { getInterviewByAnalysisId } from "@/actions/interviews/getInterviewByAnalysisId";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
+
 import { Button } from "@/components/ui/button";
 
 import { AnalysisListCard } from "@/components/analyses/AnalysisListCard";
 import { AnalysisProfileCard } from "@/components/analyses/AnalysisProfileCard";
 import { AnalysisResultCard } from "@/components/analyses/AnalysisResultCard";
 import { AnalysisScoreCard } from "@/components/analyses/AnalysisScoreCard";
+
 import { DownloadResumeButton } from "@/components/analyses/downloadCv";
+import { GenerateInterviewButton } from "@/components/analyses/generateInterviewButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -20,7 +24,9 @@ interface Props {
 
 export const dynamic = "force-dynamic";
 
-export default async function AnalysisDetailPage({ params }: Props) {
+export default async function AnalysisDetailPage({
+  params,
+}: Props) {
   const { id } = await params;
 
   const analysis = await getAnalysisById(id);
@@ -28,6 +34,10 @@ export default async function AnalysisDetailPage({ params }: Props) {
   if (!analysis) {
     notFound();
   }
+
+  const interview = await getInterviewByAnalysisId(
+    analysis.id,
+  );
 
   return (
     <PageLayout
@@ -55,10 +65,23 @@ export default async function AnalysisDetailPage({ params }: Props) {
                 </Link>
               </Button>
 
-              <DownloadResumeButton
-                analysisId={analysis.id}
-                disabled={!analysis.resume_file_path}
-              />
+              {interview ? (
+                <Button
+                  asChild
+                  className="h-10 rounded-xl text-sm font-bold shadow-lg shadow-primary/20"
+                >
+                  <Link
+                    href={`/dashboard/interviews/${interview.id}`}
+                  >
+                    Ver entrevista
+                  </Link>
+                </Button>
+              ) : (
+                <GenerateInterviewButton
+                  analysisId={analysis.id}
+                  disabled={analysis.status !== "approved"}
+                />
+              )}
 
               <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-2 dark:border-indigo-500/20 dark:bg-indigo-500/10">
                 <span className="text-xs font-extrabold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
@@ -73,7 +96,13 @@ export default async function AnalysisDetailPage({ params }: Props) {
       <div className="grid h-full gap-6 overflow-hidden lg:grid-cols-3">
         <div className="space-y-6 overflow-y-auto pr-2 scrollbar-hide lg:col-span-2">
           <AnalysisProfileCard analysis={analysis} />
+
           <AnalysisScoreCard analysis={analysis} />
+
+          <DownloadResumeButton
+            analysisId={analysis.id}
+            disabled={!analysis.resume_file_path}
+          />
 
           <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="mb-5 flex items-center gap-3">
@@ -101,12 +130,41 @@ export default async function AnalysisDetailPage({ params }: Props) {
         <div className="flex min-h-0 flex-col gap-6 overflow-y-auto pr-1 scrollbar-hide">
           <AnalysisResultCard analysis={analysis} />
 
-          <AnalysisListCard title="Destaques" items={analysis.strengths} type="success" />
-          <AnalysisListCard title="Pontos de Atenção" items={analysis.weaknesses} type="warning" />
-          <AnalysisListCard title="Skills Encontradas" items={analysis.matched_skills} type="success" />
-          <AnalysisListCard title="Skills Ausentes" items={analysis.missing_skills} type="warning" />
-          <AnalysisListCard title="Riscos" items={analysis.risks} type="warning" />
-          <AnalysisListCard title="Perguntas para Entrevista" items={analysis.interview_questions} type="question" />
+          <AnalysisListCard
+            title="Destaques"
+            items={analysis.strengths}
+            type="success"
+          />
+
+          <AnalysisListCard
+            title="Pontos de Atenção"
+            items={analysis.weaknesses}
+            type="warning"
+          />
+
+          <AnalysisListCard
+            title="Skills Encontradas"
+            items={analysis.matched_skills}
+            type="success"
+          />
+
+          <AnalysisListCard
+            title="Skills Ausentes"
+            items={analysis.missing_skills}
+            type="warning"
+          />
+
+          <AnalysisListCard
+            title="Riscos"
+            items={analysis.risks}
+            type="warning"
+          />
+
+          <AnalysisListCard
+            title="Perguntas para Entrevista"
+            items={analysis.interview_questions}
+            type="question"
+          />
         </div>
       </div>
     </PageLayout>
