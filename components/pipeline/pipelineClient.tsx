@@ -1,7 +1,14 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, CheckCircle2, Clock, XCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  CircleDot,
+  MessageCircle,
+  SearchCheck,
+  XCircle,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 
 import { PageLayout } from "@/components/layout/PageLayout";
@@ -17,10 +24,10 @@ import { Button } from "@/components/ui/button";
 
 import { PipelineRow } from "@/components/pipeline/pipelineRow";
 
-import type { PipelineAnalysis } from "@/actions/pipeline/pipeline";
-import type { AnalysisStatus } from "@/actions/analyzes/getAnalysisById";
-
-type PipelineStatus = AnalysisStatus;
+import type {
+  PipelineAnalysis,
+  PipelineStage,
+} from "@/actions/pipeline/pipeline";
 
 interface PipelineClientProps {
   analyses: PipelineAnalysis[];
@@ -28,24 +35,35 @@ interface PipelineClientProps {
 
 const ITEMS_PER_PAGE = 8;
 
-const statusOptions: Array<{ label: string; value: PipelineStatus }> = [
-  { label: "Pendentes", value: "pending" },
+const baseStageOptions: Array<{ label: string; value: PipelineStage }> = [
+  { label: "Triagem", value: "screening" },
+  { label: "Entrevista", value: "interview" },
   { label: "Aprovados", value: "approved" },
   { label: "Reprovados", value: "rejected" },
 ];
 
-const emptyStateByStatus: Record<
-  PipelineStatus,
+const emptyStateByStage: Record<
+  PipelineStage,
   {
-    icon: typeof Clock;
+    icon: typeof CircleDot;
     title: string;
     description: string;
   }
 > = {
-  pending: {
-    icon: Clock,
-    title: "Nenhum candidato pendente.",
-    description: "Não existem análises pendentes para o filtro atual.",
+  new: {
+    icon: CircleDot,
+    title: "Nenhum candidato novo.",
+    description: "Não existem candidatos novos.",
+  },
+  screening: {
+    icon: SearchCheck,
+    title: "Nenhum candidato em triagem.",
+    description: "Não existem candidatos em triagem para o filtro atual.",
+  },
+  interview: {
+    icon: MessageCircle,
+    title: "Nenhum candidato em entrevista.",
+    description: "Não existem candidatos na etapa de entrevista.",
   },
   approved: {
     icon: CheckCircle2,
@@ -63,10 +81,23 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
   const router = useRouter();
 
   const [jobFilter, setJobFilter] = useState<string>("all");
-  const [activeStatus, setActiveStatus] =
-    useState<PipelineStatus>("approved");
+  const [activeStage, setActiveStage] =
+    useState<PipelineStage>("screening");
   const [search, setSearch] = useState<string>("");
   const [page, setPage] = useState<number>(1);
+
+  const stageOptions = useMemo(() => {
+    return baseStageOptions.map((option) => {
+      const total = analyses.filter(
+        (analysis) => analysis.pipeline_stage === option.value,
+      ).length;
+
+      return {
+        ...option,
+        label: `${option.label} (${total})`,
+      };
+    });
+  }, [analyses]);
 
   const jobOptions = useMemo(() => {
     const uniqueJobs = Array.from(
@@ -90,7 +121,7 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
     const term = search.trim().toLowerCase();
 
     return analyses.filter((item) => {
-      const matchesStatus = item.status === activeStatus;
+      const matchesStage = item.pipeline_stage === activeStage;
 
       const matchesJob =
         jobFilter === "all" || item.job_title === jobFilter;
@@ -101,9 +132,9 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
         (item.candidate_email?.toLowerCase() ?? "").includes(term) ||
         (item.job_title?.toLowerCase() ?? "").includes(term);
 
-      return matchesStatus && matchesJob && matchesSearch;
+      return matchesStage && matchesJob && matchesSearch;
     });
-  }, [analyses, activeStatus, jobFilter, search]);
+  }, [analyses, activeStage, jobFilter, search]);
 
   const totalPages = Math.max(
     1,
@@ -117,10 +148,10 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
     return filteredAnalyses.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredAnalyses, page, totalPages]);
 
-  const emptyState = emptyStateByStatus[activeStatus];
+  const emptyState = emptyStateByStage[activeStage];
 
-  function handleStatusChange(value: PipelineStatus): void {
-    setActiveStatus(value);
+  function handleStageChange(value: PipelineStage): void {
+    setActiveStage(value);
     setPage(1);
   }
 
@@ -139,13 +170,13 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
       header={
         <PageHeader
           title="Pipeline de Talentos"
-          description="Consulte o histórico de decisões e o banco de talentos aprovados."
+          description="Acompanhe candidatos por etapa do processo seletivo."
           action={
             <FilterBar className="xl:flex-nowrap">
               <StatusFilterTabs
-                value={activeStatus}
-                options={statusOptions}
-                onChange={handleStatusChange}
+                value={activeStage}
+                options={stageOptions}
+                onChange={handleStageChange}
               />
 
               <SearchInput
@@ -179,6 +210,9 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
             page={page}
             totalPages={totalPages}
             setPage={setPage}
+            totalItems={filteredAnalyses.length}
+            pageSize={ITEMS_PER_PAGE}
+            itemLabel="candidatos"
           />
         )
       }

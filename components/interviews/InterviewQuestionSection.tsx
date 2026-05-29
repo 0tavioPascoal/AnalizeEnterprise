@@ -30,10 +30,8 @@ const tones: Record<
     button: "text-violet-700 hover:text-violet-800 dark:text-violet-300",
     itemNumber:
       "bg-violet-500/[0.08] text-violet-700 dark:bg-violet-500/[0.12] dark:text-violet-300",
-    itemHover:
-      "hover:border-violet-500/20 hover:bg-violet-500/[0.035]",
+    itemHover: "hover:border-violet-500/20 hover:bg-violet-500/[0.035]",
   },
-
   emerald: {
     iconBox:
       "bg-emerald-500/[0.08] text-emerald-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
@@ -42,10 +40,8 @@ const tones: Record<
     button: "text-emerald-700 hover:text-emerald-800 dark:text-emerald-300",
     itemNumber:
       "bg-emerald-500/[0.08] text-emerald-700 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
-    itemHover:
-      "hover:border-emerald-500/20 hover:bg-emerald-500/[0.035]",
+    itemHover: "hover:border-emerald-500/20 hover:bg-emerald-500/[0.035]",
   },
-
   amber: {
     iconBox:
       "bg-amber-500/[0.08] text-amber-600 dark:bg-amber-500/[0.12] dark:text-amber-300",
@@ -54,10 +50,8 @@ const tones: Record<
     button: "text-amber-700 hover:text-amber-800 dark:text-amber-300",
     itemNumber:
       "bg-amber-500/[0.08] text-amber-700 dark:bg-amber-500/[0.12] dark:text-amber-300",
-    itemHover:
-      "hover:border-amber-500/20 hover:bg-amber-500/[0.035]",
+    itemHover: "hover:border-amber-500/20 hover:bg-amber-500/[0.035]",
   },
-
   rose: {
     iconBox:
       "bg-rose-500/[0.08] text-rose-600 dark:bg-rose-500/[0.12] dark:text-rose-300",
@@ -66,8 +60,7 @@ const tones: Record<
     button: "text-rose-700 hover:text-rose-800 dark:text-rose-300",
     itemNumber:
       "bg-rose-500/[0.08] text-rose-700 dark:bg-rose-500/[0.12] dark:text-rose-300",
-    itemHover:
-      "hover:border-rose-500/20 hover:bg-rose-500/[0.035]",
+    itemHover: "hover:border-rose-500/20 hover:bg-rose-500/[0.035]",
   },
 };
 
@@ -78,7 +71,7 @@ export function InterviewQuestionSection({
   tone = "indigo",
 }: InterviewQuestionSectionProps) {
   const style = tones[tone];
-  const visibleItems = items.slice(0, 3);
+  const visibleItems = items.slice(0, 5);
 
   return (
     <section className="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-lg shadow-zinc-900/3 dark:border-zinc-800 dark:bg-zinc-900/90">
@@ -99,7 +92,7 @@ export function InterviewQuestionSection({
             </p>
 
             <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
-              Perguntas sugeridas pela IA
+              Roteiro sugerido pela IA para conduzir a entrevista
             </p>
           </div>
         </div>
@@ -121,28 +114,42 @@ export function InterviewQuestionSection({
               <div
                 key={`${item}-${index}`}
                 className={cn(
-                  "group rounded-2xl border border-zinc-200/70 bg-zinc-50/70 px-4 py-4 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-zinc-900/3 dark:border-zinc-800 dark:bg-zinc-950/40",
+                  `
+                  group relative overflow-hidden rounded-2xl
+                  border border-zinc-200/70 bg-white
+                  px-5 py-5
+                  transition-all duration-200
+                  hover:-translate-y-0.5
+                  hover:shadow-lg hover:shadow-zinc-900/5
+                  dark:border-zinc-800 dark:bg-zinc-950/40
+                  `,
                   style.itemHover,
                 )}
               >
-                <div className="flex gap-4">
+                <div className="absolute inset-x-0 top-0 h-px bg-linear-to-r from-transparent via-zinc-200 to-transparent dark:via-zinc-700" />
+
+                <div className="mb-4 flex items-center justify-between gap-3">
                   <div
                     className={cn(
-                      "flex h-8 w-8 shrink-0 items-center justify-center rounded-xl text-xs font-black shadow-sm",
+                      `
+                      inline-flex items-center rounded-lg
+                      px-2.5 py-1
+                      text-[10px] font-black uppercase tracking-[0.15em]
+                      `,
                       style.itemNumber,
                     )}
                   >
-                    {String(index + 1).padStart(2, "0")}
+                    Pergunta {String(index + 1).padStart(2, "0")}
                   </div>
-
-                  <p className="text-[16px] font-semibold leading-8 tracking-[-0.01em] text-zinc-800 dark:text-zinc-200">
-                    {item}
-                  </p>
                 </div>
+
+                <p className="text-[17px] font-semibold leading-8 tracking-[-0.01em] text-zinc-900 dark:text-zinc-100">
+                  {item}
+                </p>
               </div>
             ))}
 
-            {items.length > 3 && (
+            {items.length > 5 && (
               <button
                 type="button"
                 className={cn(

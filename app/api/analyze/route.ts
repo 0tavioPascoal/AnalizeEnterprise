@@ -133,6 +133,9 @@ export async function POST(req: NextRequest) {
     n8nFormData.append("job", JSON.stringify(job));
     n8nFormData.append("analysis_id", analysisId);
     n8nFormData.append("company_id", profile.company_id);
+
+    n8nFormData.append("pipeline_stage", "screening");
+
     n8nFormData.append("resume_file_path", filePath);
     n8nFormData.append("resume_file_name", file.name);
     n8nFormData.append("resume_file_size", String(file.size));

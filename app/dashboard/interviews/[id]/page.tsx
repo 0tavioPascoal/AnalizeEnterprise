@@ -20,9 +20,9 @@ import { Button } from "@/components/ui/button";
 import { InterviewHeroCard } from "@/components/interviews/InterviewHeroCard";
 import { InterviewObjectiveCard } from "@/components/interviews/InterviewObjectiveCard";
 import { InterviewSummaryCard } from "@/components/interviews/InterviewSummaryCard";
-import { InterviewScorecard } from "@/components/interviews/InterviewScorecard";
 import { InterviewQuestionSection } from "@/components/interviews/InterviewQuestionSection";
 import { InterviewFinalCriteriaCard } from "@/components/interviews/InterviewFinalCriteriaCard";
+import { ExportInterviewPdfButton } from "@/components/interviews/ExportInterviewPdfButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -57,14 +57,16 @@ export default async function InterviewDetailPage({ params }: Props) {
           }
           action={
             <div className="flex flex-wrap items-center gap-3">
+              <ExportInterviewPdfButton interview={interview} />
+
               <Button
                 asChild
                 variant="outline"
                 className="h-10 rounded-xl text-sm font-semibold"
               >
-                <Link href={`/dashboard/analyses/${interview.analysis_id}`}>
+                <Link href={`/dashboard/pipeline`}>
                   <ArrowLeft size={17} />
-                  Voltar para análise
+                  Voltar para Pipeline
                 </Link>
               </Button>
             </div>
@@ -80,8 +82,6 @@ export default async function InterviewDetailPage({ params }: Props) {
             <InterviewObjectiveCard objective={content.interview_objective} />
 
             <InterviewSummaryCard summary={content.summary} />
-
-            <InterviewScorecard items={content.scorecard ?? []} />
 
             <InterviewFinalCriteriaCard
               text={content.final_recommendation_criteria}

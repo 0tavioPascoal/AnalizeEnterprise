@@ -164,9 +164,12 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
 
     const { data, error } = await supabase
       .from("candidate_analysis")
-      .update({ status: "approved" })
+      .update({
+        status: "approved",
+        pipeline_stage: "approved",
+      })
       .eq("id", id)
-      .select("id, status")
+      .select("id, status, pipeline_stage")
       .single();
 
     if (error || !data) {
@@ -199,9 +202,12 @@ export async function rejectAnalysis(id: string): Promise<ActionResponse> {
 
   const { data, error } = await supabase
     .from("candidate_analysis")
-    .update({ status: "rejected" })
+    .update({
+      status: "rejected",
+      pipeline_stage: "rejected",
+    })
     .eq("id", id)
-    .select("id, status")
+    .select("id, status, pipeline_stage")
     .single();
 
   if (error || !data) {

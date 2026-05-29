@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { ChevronLeft, ChevronDown, Settings } from "lucide-react";
+import { ChevronDown, ChevronLeft, Settings } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { logout } from "@/actions/auth/logout";
@@ -88,18 +88,27 @@ export function Sidebar({ user }: SidebarProps) {
 
           <button
             type="button"
-            onClick={() => setSettingsOpen((value) => !value)}
+            onClick={() => {
+              if (!collapsed) {
+                setSettingsOpen((value) => !value);
+              }
+            }}
+            title={collapsed ? "Configurações" : undefined}
             className={cn(
               "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-bold transition-all duration-200",
-              "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900 dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white",
+              "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900",
+              "dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white",
               collapsed && "justify-center px-0",
             )}
+            aria-label="Configurações"
           >
-            <Settings size={20} className="shrink-0" />
+            <span className="shrink-0 transition-transform duration-200 group-hover:scale-105">
+              <Settings size={20} />
+            </span>
 
             <span
               className={cn(
-                "min-w-0 flex-1 text-left transition-all duration-200",
+                "min-w-0 truncate transition-all duration-200",
                 collapsed
                   ? "pointer-events-none w-0 translate-x-2 overflow-hidden opacity-0"
                   : "w-auto translate-x-0 opacity-100",
@@ -112,7 +121,7 @@ export function Sidebar({ user }: SidebarProps) {
               <ChevronDown
                 size={17}
                 className={cn(
-                  "shrink-0 transition-transform duration-300",
+                  "ml-auto shrink-0 transition-transform duration-300",
                   settingsOpen && "rotate-180",
                 )}
               />

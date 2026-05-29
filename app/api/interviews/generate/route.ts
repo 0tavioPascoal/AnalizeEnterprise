@@ -72,6 +72,14 @@ export async function POST(req: NextRequest) {
       .maybeSingle();
 
     if (existingInterview) {
+      await supabase
+        .from("candidate_analysis")
+        .update({
+          pipeline_stage: "interview",
+        })
+        .eq("id", analysis.id)
+        .eq("company_id", profile.company_id);
+
       return NextResponse.json({
         success: true,
         interview_id: existingInterview.id,
@@ -96,6 +104,31 @@ export async function POST(req: NextRequest) {
     if (interviewError || !interview) {
       return NextResponse.json(
         { success: false, message: "Erro ao criar entrevista." },
+        { status: 500 },
+      );
+    }
+
+    const { error: pipelineError } = await supabase
+      .from("candidate_analysis")
+      .update({
+        pipeline_stage: "interview",
+      })
+      .eq("id", analysis.id)
+      .eq("company_id", profile.company_id);
+
+    if (pipelineError) {
+      await supabase
+        .from("interview_guides")
+        .update({
+          status: "failed",
+        })
+        .eq("id", interview.id);
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: "Entrevista criada, mas houve erro ao atualizar a pipeline.",
+        },
         { status: 500 },
       );
     }

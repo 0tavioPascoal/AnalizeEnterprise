@@ -1,39 +1,86 @@
 import Link from "next/link";
-import { ChevronRight, Clock, CheckCircle2, XCircle } from "lucide-react";
+import {
+  CheckCircle2,
+  ChevronRight,
+  CircleDot,
+  ExternalLink,
+  MessageCircle,
+  SearchCheck,
+  XCircle,
+} from "lucide-react";
 
 import { RowItem } from "@/components/layout/RowItem";
 import { StatusBadge } from "@/components/layout/filters/StatusBadge";
 
 import { cn } from "@/lib/supabase/utils";
-import type { PipelineAnalysis } from "@/actions/pipeline/pipeline";
+import type {
+  PipelineAnalysis,
+  PipelineStage,
+} from "@/actions/pipeline/pipeline";
 
 interface PipelineRowProps {
   item: PipelineAnalysis;
 }
 
+const stageConfig: Record<
+  PipelineStage,
+  {
+    label: string;
+    icon: typeof CircleDot;
+    variant: "success" | "danger" | "warning";
+    className: string;
+  }
+> = {
+  new: {
+    label: "Novo",
+    icon: CircleDot,
+    variant: "warning",
+    className:
+      "border-sky-500/20 bg-sky-500/10 text-sky-700 dark:text-sky-300",
+  },
+  screening: {
+    label: "Triagem",
+    icon: SearchCheck,
+    variant: "warning",
+    className:
+      "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+  },
+  interview: {
+    label: "Entrevista",
+    icon: MessageCircle,
+    variant: "warning",
+    className:
+      "border-violet-500/20 bg-violet-500/10 text-violet-700 dark:text-violet-300",
+  },
+  approved: {
+    label: "Aprovado",
+    icon: CheckCircle2,
+    variant: "success",
+    className:
+      "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
+  },
+  rejected: {
+    label: "Reprovado",
+    icon: XCircle,
+    variant: "danger",
+    className:
+      "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-300",
+  },
+};
+
 export function PipelineRow({ item }: PipelineRowProps) {
-  const status = item.status;
+  const stage = item.pipeline_stage ?? "screening";
+  const config = stageConfig[stage];
+  const Icon = config.icon;
 
-  const statusLabel =
-    status === "approved"
-      ? "Aprovado"
-      : status === "rejected"
-        ? "Reprovado"
-        : "Pendente";
+  const shouldOpenInterview = stage === "interview" && item.interview_id;
 
-  const statusVariant =
-    status === "approved"
-      ? "success"
-      : status === "rejected"
-        ? "danger"
-        : "warning";
+  const href = shouldOpenInterview
+    ? `/dashboard/interviews/${item.interview_id}`
+    : `/dashboard/analyses/${item.id}`;
 
-  const Icon =
-    status === "approved"
-      ? CheckCircle2
-      : status === "rejected"
-        ? XCircle
-        : Clock;
+  const actionLabel = shouldOpenInterview ? "Abrir entrevista" : "Abrir análise";
+  const ActionIcon = shouldOpenInterview ? ExternalLink : ChevronRight;
 
   return (
     <RowItem
@@ -42,12 +89,7 @@ export function PipelineRow({ item }: PipelineRowProps) {
           <div
             className={cn(
               "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-sm",
-              status === "approved" &&
-                "border-emerald-500/20 bg-emerald-500/10 text-emerald-700 dark:text-emerald-300",
-              status === "rejected" &&
-                "border-red-500/20 bg-red-500/10 text-red-700 dark:text-red-300",
-              status === "pending" &&
-                "border-amber-500/20 bg-amber-500/10 text-amber-700 dark:text-amber-300",
+              config.className,
             )}
           >
             <Icon size={22} />
@@ -59,7 +101,9 @@ export function PipelineRow({ item }: PipelineRowProps) {
                 {item.candidate_name ?? "Candidato sem nome"}
               </p>
 
-              <StatusBadge variant={statusVariant}>{statusLabel}</StatusBadge>
+              <StatusBadge variant={config.variant}>
+                {config.label}
+              </StatusBadge>
             </div>
 
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
@@ -80,7 +124,7 @@ export function PipelineRow({ item }: PipelineRowProps) {
         <div className="flex items-center gap-4">
           <div className="hidden min-w-24 text-right sm:block">
             <StatusBadge
-              variant={statusVariant}
+              variant={item.match ? "success" : "warning"}
               className="px-3 py-1.5 text-sm font-semibold"
             >
               {item.score}%
@@ -92,11 +136,20 @@ export function PipelineRow({ item }: PipelineRowProps) {
           </div>
 
           <Link
-            href={`/dashboard/analyses/${item.id}`}
-            className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-border bg-card text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary"
-            aria-label={`Abrir análise de ${item.candidate_name ?? "candidato"}`}
+            href={href}
+            className={cn(
+              "flex h-10 shrink-0 items-center justify-center gap-2 rounded-xl border border-border bg-card px-3 text-sm font-bold text-muted-foreground shadow-sm transition-all hover:border-primary/30 hover:bg-primary/10 hover:text-primary",
+              shouldOpenInterview ? "w-auto" : "w-10 px-0",
+            )}
+            aria-label={`${actionLabel} de ${
+              item.candidate_name ?? "candidato"
+            }`}
           >
-            <ChevronRight size={20} />
+            {shouldOpenInterview && (
+              <span className="hidden xl:inline">{actionLabel}</span>
+            )}
+
+            <ActionIcon size={18} />
           </Link>
         </div>
       }

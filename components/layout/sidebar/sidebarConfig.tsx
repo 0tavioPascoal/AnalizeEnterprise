@@ -1,5 +1,3 @@
-// components/layout/sidebar/sidebar.config.tsx
-
 import {
   LayoutDashboard,
   Briefcase,
@@ -22,7 +20,7 @@ export const mainItems: SidebarNavItem[] = [
 
   {
     href: "/dashboard/analyses",
-    label: "Análises Internas",
+    label: "Triagem",
     icon: <ClipboardList size={21} />,
     active: (pathname) => pathname === "/dashboard/analyses",
   },

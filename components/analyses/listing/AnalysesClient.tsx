@@ -115,7 +115,7 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
     <PageLayout
       header={
         <PageHeader
-          title="Análises"
+          title="Análises em Triagem"
           description="Histórico de currículos analisados pela IA"
           action={
             <FilterBar className="xl:flex-nowrap">

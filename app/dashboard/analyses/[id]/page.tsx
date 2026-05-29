@@ -24,9 +24,7 @@ interface Props {
 
 export const dynamic = "force-dynamic";
 
-export default async function AnalysisDetailPage({
-  params,
-}: Props) {
+export default async function AnalysisDetailPage({ params }: Props) {
   const { id } = await params;
 
   const analysis = await getAnalysisById(id);
@@ -35,9 +33,7 @@ export default async function AnalysisDetailPage({
     notFound();
   }
 
-  const interview = await getInterviewByAnalysisId(
-    analysis.id,
-  );
+  const interview = await getInterviewByAnalysisId(analysis.id);
 
   return (
     <PageLayout
@@ -65,14 +61,17 @@ export default async function AnalysisDetailPage({
                 </Link>
               </Button>
 
+              <DownloadResumeButton
+                analysisId={analysis.id}
+                disabled={!analysis.resume_file_path}
+              />
+
               {interview ? (
                 <Button
                   asChild
                   className="h-10 rounded-xl text-sm font-bold shadow-lg shadow-primary/20"
                 >
-                  <Link
-                    href={`/dashboard/interviews/${interview.id}`}
-                  >
+                  <Link href={`/dashboard/interviews/${interview.id}`}>
                     Ver entrevista
                   </Link>
                 </Button>
@@ -98,11 +97,6 @@ export default async function AnalysisDetailPage({
           <AnalysisProfileCard analysis={analysis} />
 
           <AnalysisScoreCard analysis={analysis} />
-
-          <DownloadResumeButton
-            analysisId={analysis.id}
-            disabled={!analysis.resume_file_path}
-          />
 
           <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
             <div className="mb-5 flex items-center gap-3">

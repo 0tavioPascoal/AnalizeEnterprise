@@ -170,9 +170,16 @@ export async function rejectAnalysis(
       .from("candidate_analysis")
       .update({
         status: "rejected",
+        pipeline_stage: "rejected",
       })
       .eq("id", id)
-      .select("id, status")
+      .select(
+        `
+        id,
+        status,
+        pipeline_stage
+      `,
+      )
       .single();
 
     if (error || !data) {
