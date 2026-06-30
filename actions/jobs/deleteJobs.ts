@@ -3,6 +3,7 @@
 import { createServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
 import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { logger } from "@/lib/logger";
 
 export interface DeleteJobResponse {
   success: boolean;
@@ -27,7 +28,11 @@ export async function deleteJob(id: string): Promise<DeleteJobResponse> {
     .eq("company_id", currentProfile.company_id);
 
   if (error) {
-    console.error("Erro ao excluir vaga:", error);
+    logger.error("job.delete.failed", error, {
+      companyId: currentProfile.company_id,
+      userId: currentProfile.id,
+      jobId: id,
+    });
 
     return {
       success: false,

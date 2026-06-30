@@ -51,8 +51,9 @@ export default function RegisterPage() {
 
       form.reset();
     } catch (err) {
-      console.error("REGISTER ERROR:", err);
-      toast.error("Erro ao criar empresa");
+      toast.error(
+        err instanceof Error ? err.message : "Erro ao criar empresa",
+      );
     } finally {
       setLoading(false);
     }

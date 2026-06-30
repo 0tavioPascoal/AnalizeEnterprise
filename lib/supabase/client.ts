@@ -1,4 +1,5 @@
 import { createBrowserClient } from "@supabase/ssr";
+import type { Database } from "@/types/supabase/database";
 
 /**
  * Helper para instanciar o Supabase em Client Components.
@@ -12,7 +13,7 @@ export function createClient() {
     throw new Error("Missing required Supabase public environment variables.");
   }
 
-  return createBrowserClient(
+  return createBrowserClient<Database>(
     supabaseUrl,
     supabaseAnonKey,
   );

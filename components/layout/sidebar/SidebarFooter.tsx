@@ -27,16 +27,16 @@ export function SidebarFooter({
   const initial = displayName.charAt(0).toUpperCase();
 
   return (
-    <div className="mt-auto flex flex-col gap-2 p-3">
+    <div className="mt-auto flex flex-col gap-2 border-t border-sidebar-border p-3">
       <ThemeToggle collapsed={collapsed} />
 
       <div
         className={cn(
-          "flex items-center gap-2 rounded-xl border bg-white/50 p-2 transition-all dark:bg-zinc-900/50",
+          "flex items-center gap-2 rounded-xl border border-sidebar-border bg-sidebar-accent/60 p-2 transition-all",
           collapsed ? "justify-center" : "px-3",
         )}
       >
-        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-linear-to-br from-indigo-500 to-purple-600 text-xs font-bold text-white">
+        <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-sidebar-primary text-xs font-bold text-sidebar-primary-foreground">
           {initial}
         </div>
 
@@ -52,7 +52,7 @@ export function SidebarFooter({
               </p>
 
               {user.company_name && (
-                <p className="mt-1 truncate text-[11px] font-bold uppercase tracking-wider text-indigo-500">
+                <p className="mt-1 truncate text-[11px] font-bold uppercase tracking-wider text-sidebar-primary">
                   {user.company_name}
                 </p>
               )}

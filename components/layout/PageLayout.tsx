@@ -12,11 +12,13 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        "box-border flex h-full w-full flex-col gap-5 overflow-hidden bg-transparent p-4 pt-20 md:gap-6 md:p-6",
+        "box-border flex h-full w-full flex-col gap-4 overflow-hidden bg-transparent p-4 pt-18 sm:gap-5 md:gap-6 md:p-6 md:pt-6",
         className,
       )}
     >
-      <div className="shrink-0">{header}</div>
+      <div className="shrink-0 rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm backdrop-blur-sm md:p-5">
+        {header}
+      </div>
 
       {filters && (
         <div className="shrink-0 border-b border-border pb-4">
@@ -36,7 +38,9 @@ export function PageLayout({
       </div>
 
       {pagination && (
-        <div className="shrink-0 border-t border-border pt-4">{pagination}</div>
+        <div className="shrink-0 rounded-2xl border border-border/70 bg-background/70 p-3 shadow-sm backdrop-blur-sm">
+          {pagination}
+        </div>
       )}
     </div>
   );

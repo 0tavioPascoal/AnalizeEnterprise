@@ -65,7 +65,7 @@ export function Sidebar({ user }: SidebarProps) {
       <button
         type="button"
         onClick={() => setMobileOpen(true)}
-        className="fixed left-4 top-4 z-40 flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background shadow-sm md:hidden"
+        className="fixed left-4 top-4 z-40 flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background/95 shadow-sm backdrop-blur md:hidden"
         aria-label="Abrir menu"
       >
         <Menu size={21} />
@@ -82,8 +82,8 @@ export function Sidebar({ user }: SidebarProps) {
 
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 flex h-dvh w-64 shrink-0 flex-col overflow-hidden border-r bg-zinc-50/95 backdrop-blur-xl",
-          "transition-[transform,width] duration-300 ease-in-out dark:bg-zinc-950/95 md:relative md:z-auto md:translate-x-0 md:bg-zinc-50/50 md:dark:bg-zinc-950/50",
+          "fixed inset-y-0 left-0 z-50 flex h-dvh w-64 shrink-0 flex-col overflow-hidden border-r border-sidebar-border bg-sidebar/95 text-sidebar-foreground backdrop-blur-xl",
+          "transition-[transform,width] duration-300 ease-in-out md:relative md:z-auto md:translate-x-0 md:bg-sidebar/80",
           mobileOpen ? "translate-x-0" : "-translate-x-full",
           collapsed ? "md:w-18" : "md:w-64",
         )}
@@ -91,7 +91,7 @@ export function Sidebar({ user }: SidebarProps) {
         <button
           type="button"
           onClick={() => setMobileOpen(false)}
-          className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-xl border bg-background shadow-sm md:hidden"
+          className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-xl border border-border bg-background shadow-sm md:hidden"
           aria-label="Fechar menu"
         >
           <X size={19} />
@@ -100,7 +100,7 @@ export function Sidebar({ user }: SidebarProps) {
         <button
           type="button"
           onClick={handleCollapsedChange}
-          className="absolute -right-3 top-12 z-50 hidden h-7 w-7 items-center justify-center rounded-full border bg-background shadow-md transition-all duration-200 hover:scale-105 hover:bg-muted active:scale-95 md:flex"
+          className="absolute -right-3 top-12 z-50 hidden h-7 w-7 items-center justify-center rounded-full border border-border bg-background shadow-md transition-all duration-200 hover:scale-105 hover:bg-muted active:scale-95 md:flex"
           aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
         >
           <ChevronLeft
@@ -140,7 +140,9 @@ export function Sidebar({ user }: SidebarProps) {
                 onNavigate={() => setMobileOpen(false)}
               />
             ))}
+          </SidebarSection>
 
+          <SidebarSection title="Configurações" collapsed={collapsed}>
           <button
             type="button"
             onClick={() => {
@@ -151,8 +153,7 @@ export function Sidebar({ user }: SidebarProps) {
             title={collapsed ? "Configurações" : undefined}
             className={cn(
               "group flex h-11 w-full items-center gap-3 rounded-xl px-3 text-sm font-bold transition-all duration-200",
-              "text-zinc-500 hover:bg-zinc-100 hover:text-zinc-900",
-              "dark:text-zinc-400 dark:hover:bg-zinc-900 dark:hover:text-white",
+              "text-sidebar-foreground/65 hover:bg-sidebar-accent hover:text-sidebar-accent-foreground",
               collapsed && "justify-center px-0",
             )}
             aria-label="Configurações"
@@ -192,7 +193,7 @@ export function Sidebar({ user }: SidebarProps) {
             )}
           >
             <div className="overflow-hidden">
-              <div className="ml-4 mt-1 space-y-1 border-l border-zinc-200 pl-3 dark:border-zinc-800">
+              <div className="ml-4 mt-1 space-y-1 border-l border-sidebar-border pl-3">
                 {settingsItems.map((item) => (
                   <SidebarNavItem
                     key={item.href}

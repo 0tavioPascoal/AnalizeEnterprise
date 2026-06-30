@@ -40,8 +40,8 @@ export const authOptions: AuthOptions = {
 
         return {
           id: data.id,
-          email: data.email,
-          name: data.name,
+          email: data.email ?? authData.user.email ?? "",
+          name: data.name ?? authData.user.email ?? "Usuário",
           role: data.role,
           companyId: data.company_id,
         };

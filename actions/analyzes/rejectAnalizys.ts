@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 import { getEmailTemplateByType } from "@/actions/email/mail-templates";
+import { getOptionalEnv } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { postWebhook } from "@/lib/webhook";
 
 interface RejectAnalysisResult {
   success: boolean;
@@ -30,12 +33,16 @@ export async function rejectAnalysis(
   try {
     const supabase = await createServerClient();
 
-    const webhookUrl = process.env.N8N_CANDIDATE_EMAIL_WEBHOOK_URL;
+    const webhookUrl = getOptionalEnv("N8N_CANDIDATE_EMAIL_WEBHOOK_URL");
 
     if (!webhookUrl) {
+      logger.warn("candidate.reject.webhook_missing", {
+        analysisId: id,
+      });
+
       return {
         success: false,
-        message: "Webhook do n8n não configurado.",
+        message: "Serviço de e-mail não configurado.",
       };
     }
 
@@ -61,9 +68,15 @@ export async function rejectAnalysis(
       .single();
 
     if (analysisError || !analysis) {
+      if (analysisError) {
+        logger.error("candidate.reject.analysis_lookup_failed", analysisError, {
+          analysisId: id,
+        });
+      }
+
       return {
         success: false,
-        message: analysisError?.message ?? "Análise não encontrada.",
+        message: "Análise não encontrada.",
       };
     }
 
@@ -137,32 +150,38 @@ export async function rejectAnalysis(
       },
     };
 
-    const response = await fetch(webhookUrl, {
-      method: "POST",
+    const webhookResult = await postWebhook<N8nResponse>({
+      url: webhookUrl,
+      operation: "candidate.reject.webhook",
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
-      body: JSON.stringify(payload),
+      payload,
+      metadata: {
+        analysisId: analysis.id,
+        companyId: analysis.company_id,
+        jobId: job.id,
+      },
     });
 
-    if (!response.ok) {
+    if (!webhookResult.ok) {
       return {
         success: false,
-        message: `Erro ao enviar para o n8n. Status HTTP ${response.status}.`,
+        message: "Não foi possível concluir o envio. Tente novamente.",
       };
     }
 
-    const n8nResult = (await response
-      .json()
-      .catch(() => null)) as N8nResponse | null;
+    if (!webhookResult.data?.success) {
+      logger.warn("candidate.reject.webhook_unconfirmed", {
+        analysisId: analysis.id,
+        companyId: analysis.company_id,
+        jobId: job.id,
+        webhookMessage: webhookResult.data?.message,
+      });
 
-    if (!n8nResult?.success) {
       return {
         success: false,
-        message:
-          n8nResult?.message ??
-          "n8n não confirmou o envio do e-mail. Candidato não foi reprovado.",
+        message: "Não foi possível confirmar o envio. Tente novamente.",
       };
     }
 
@@ -183,9 +202,16 @@ export async function rejectAnalysis(
       .single();
 
     if (error || !data) {
+      if (error) {
+        logger.error("candidate.reject.update_failed", error, {
+          analysisId: id,
+          companyId: analysis.company_id,
+        });
+      }
+
       return {
         success: false,
-        message: error?.message ?? "Nenhuma análise foi atualizada.",
+        message: "Nenhuma análise foi atualizada.",
       };
     }
 
@@ -199,10 +225,13 @@ export async function rejectAnalysis(
       status: "rejected",
     };
   } catch (error) {
+    logger.error("candidate.reject.unhandled", error, {
+      analysisId: id,
+    });
+
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Erro ao reprovar candidato.",
+      message: "Erro ao reprovar candidato.",
     };
   }
 }

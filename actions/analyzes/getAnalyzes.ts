@@ -2,6 +2,7 @@
 
 import { createServerClient } from "@/lib/supabase/server";
 import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { logger } from "@/lib/logger";
 
 export type AnalysisStatus = "pending" | "approved" | "rejected";
 
@@ -145,7 +146,10 @@ export async function getAnalyses({
     .range(from, to);
 
   if (analysesError) {
-    console.error("ANALYSES ERROR:", analysesError);
+    logger.error("analysis.list.failed", analysesError, {
+      companyId: currentProfile.company_id,
+      userId: currentProfile.id,
+    });
     return {
       items: [],
       total: 0,
@@ -194,7 +198,10 @@ export async function getAnalyses({
     .in("id", jobIds);
 
   if (jobsError) {
-    console.error("JOBS ERROR:", jobsError);
+    logger.error("analysis.list.jobs_failed", jobsError, {
+      companyId: currentProfile.company_id,
+      userId: currentProfile.id,
+    });
   }
 
   const jobRows = (jobs ?? []) as JobRow[];
@@ -238,7 +245,10 @@ export async function getAnalysisJobOptions(): Promise<AnalysisJobOption[]> {
     .order("title", { ascending: true });
 
   if (error) {
-    console.error("ANALYSES JOB OPTIONS ERROR:", error);
+    logger.error("analysis.job_options.failed", error, {
+      companyId: currentProfile.company_id,
+      userId: currentProfile.id,
+    });
     return [];
   }
 

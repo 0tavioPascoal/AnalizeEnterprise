@@ -52,7 +52,11 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
       <div className="grid min-h-full gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <UserForm
-            initialData={user}
+            initialData={{
+              ...user,
+              name: user.name ?? "",
+              email: user.email ?? "",
+            }}
             isEdit
             currentUserId={currentProfile.id}
             currentUserRole={currentProfile.role}

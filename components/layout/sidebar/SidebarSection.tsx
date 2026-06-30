@@ -17,7 +17,7 @@ export function SidebarSection({
     <div className="space-y-2">
       <p
         className={cn(
-          "px-3 text-[11px] font-black uppercase tracking-[0.18em] text-zinc-400",
+          "px-3 text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground/70",
           collapsed && "text-center",
         )}
       >

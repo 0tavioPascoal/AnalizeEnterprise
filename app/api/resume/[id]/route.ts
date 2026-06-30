@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { apiError } from "@/lib/api-response";
+import { logger } from "@/lib/logger";
 
 const RESUME_BUCKET = "candidate-cvs";
 
@@ -22,13 +24,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Usuário não autenticado.",
-        },
-        { status: 401 },
-      );
+      return apiError("Usuário não autenticado.", 401);
     }
 
     const { data: profile, error: profileError } = await supabase
@@ -38,13 +34,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
       .single();
 
     if (profileError || !profile?.company_id) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Empresa do usuário não encontrada.",
-        },
-        { status: 403 },
-      );
+      return apiError("Empresa do usuário não encontrada.", 403);
     }
 
     const { data: analysis, error: analysisError } = await supabase
@@ -55,23 +45,11 @@ export async function GET(_req: NextRequest, { params }: Props) {
       .single();
 
     if (analysisError || !analysis) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Análise não encontrada.",
-        },
-        { status: 404 },
-      );
+      return apiError("Análise não encontrada.", 404);
     }
 
     if (!analysis.resume_file_path) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Currículo não encontrado para esta análise.",
-        },
-        { status: 404 },
-      );
+      return apiError("Currículo não encontrado para esta análise.", 404);
     }
 
     const { data, error: signedUrlError } = await supabase.storage
@@ -79,14 +57,13 @@ export async function GET(_req: NextRequest, { params }: Props) {
       .createSignedUrl(analysis.resume_file_path, 60);
 
     if (signedUrlError || !data?.signedUrl) {
-      return NextResponse.json(
-        {
-          success: false,
-          message:
-            "Erro ao gerar link do currículo.",
-        },
-        { status: 500 },
-      );
+      logger.error("resume.signed_url_failed", signedUrlError, {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId: analysis.id,
+      });
+
+      return apiError("Erro ao gerar link do currículo.", 500);
     }
 
     return NextResponse.json({
@@ -94,14 +71,8 @@ export async function GET(_req: NextRequest, { params }: Props) {
       url: data.signedUrl,
     });
   } catch (error) {
-    console.error("Resume API error:", error);
+    logger.error("resume.download.unhandled", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Erro interno ao gerar download.",
-      },
-      { status: 500 },
-    );
+    return apiError("Erro interno ao gerar download.", 500);
   }
 }

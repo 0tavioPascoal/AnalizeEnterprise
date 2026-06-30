@@ -6,7 +6,12 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "typecheck": "tsc --noEmit",
+    "supabase:link": "pnpm dlx supabase@latest link --project-ref ${SUPABASE_PROJECT_REF:-ioixccgkyxclsdrliyyi}",
+    "supabase:pull": "pnpm dlx supabase@latest db pull",
+    "supabase:diff": "pnpm dlx supabase@latest db diff --schema public",
+    "supabase:types": "pnpm dlx supabase@latest gen types typescript --project-id ${SUPABASE_PROJECT_REF:-ioixccgkyxclsdrliyyi} --schema public > types/supabase/database.ts"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.2.2",

@@ -3,6 +3,7 @@
 import { cache } from "react";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import type { UserRole, UserStatus } from "@/types/user/user";
 import type { CurrentProfile } from "@/types/profile/currentProfile";
 
@@ -37,7 +38,9 @@ export const getCurrentProfile = cache(
       .single();
 
     if (error || !data) {
-      console.error("Erro profile:", error);
+      logger.error("auth.current_profile.failed", error, {
+        userId: user.id,
+      });
       return null;
     }
 

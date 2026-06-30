@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import type { UserFormData, UserRole, UserStatus } from "@/types/user/user";
 
 export interface ActionResponse {
@@ -95,9 +96,15 @@ export async function updateUser(
     .eq("company_id", currentProfile.company_id);
 
   if (error) {
+    logger.error("user.update.failed", error, {
+      userId: authUser.id,
+      targetUserId: id,
+      companyId: currentProfile.company_id,
+    });
+
     return {
       success: false,
-      message: error.message,
+      message: "Erro ao atualizar usuário.",
     };
   }
 
@@ -185,9 +192,16 @@ export async function updateUserStatus(
     .eq("company_id", currentProfile.company_id);
 
   if (error) {
+    logger.error("user.status_update.failed", error, {
+      userId: authUser.id,
+      targetUserId: id,
+      companyId: currentProfile.company_id,
+      status,
+    });
+
     return {
       success: false,
-      message: error.message,
+      message: "Erro ao atualizar status do usuário.",
     };
   }
 

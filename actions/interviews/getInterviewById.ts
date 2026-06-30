@@ -1,6 +1,7 @@
 // src/actions/interviews/getInterviewById.ts
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 
 export interface InterviewGuideContent {
   summary?: string;
@@ -36,6 +37,14 @@ export interface InterviewGuideDetail {
   job_contract_type: string | null;
 }
 
+function toInterviewGuideContent(value: unknown): InterviewGuideContent {
+  if (!value || typeof value !== "object" || Array.isArray(value)) {
+    return {};
+  }
+
+  return value as InterviewGuideContent;
+}
+
 export async function getInterviewById(
   id: string,
 ): Promise<InterviewGuideDetail | null> {
@@ -43,12 +52,14 @@ export async function getInterviewById(
 
   const { data: interview, error } = await supabase
     .from("interview_guides")
-    .select("*")
+    .select("id, company_id, analysis_id, job_id, title, status, content, created_at")
     .eq("id", id)
     .single();
 
   if (error || !interview) {
-    console.error("Erro ao buscar entrevista:", error);
+    logger.error("interview.detail.failed", error, {
+      interviewId: id,
+    });
     return null;
   }
 
@@ -58,11 +69,13 @@ export async function getInterviewById(
     .eq("id", interview.analysis_id)
     .maybeSingle();
 
-  const { data: job } = await supabase
-    .from("jobs")
-    .select("title, seniority, contract_type")
-    .eq("id", interview.job_id)
-    .maybeSingle();
+  const { data: job } = interview.job_id
+    ? await supabase
+        .from("jobs")
+        .select("title, seniority, contract_type")
+        .eq("id", interview.job_id)
+        .maybeSingle()
+    : { data: null };
 
   return {
     id: interview.id,
@@ -71,7 +84,7 @@ export async function getInterviewById(
     job_id: interview.job_id,
     title: interview.title,
     status: interview.status,
-    content: interview.content ?? {},
+    content: toInterviewGuideContent(interview.content),
     created_at: interview.created_at,
 
     candidate_name: analysis?.candidate_name ?? null,

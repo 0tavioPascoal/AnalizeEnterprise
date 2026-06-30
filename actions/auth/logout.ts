@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 
 export async function logout() {
   const supabase = await createServerClient();
@@ -8,7 +9,8 @@ export async function logout() {
   const { error } = await supabase.auth.signOut();
 
   if (error) {
-    throw new Error(error.message);
+    logger.error("auth.logout.failed", error);
+    throw new Error("Erro ao sair da sessão.");
   }
 
   return { success: true };

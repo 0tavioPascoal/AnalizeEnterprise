@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 import type {
   CandidateEmailTemplate,
   CandidateEmailTemplateType,
@@ -38,12 +39,15 @@ export async function getEmailTemplates(): Promise<CandidateEmailTemplate[]> {
 
   const { data, error } = await supabase
     .from("candidate_email_templates")
-    .select("*")
+    .select("id, company_id, type, subject, body, is_active, created_at, updated_at")
     .eq("company_id", companyId)
     .order("type", { ascending: true });
 
   if (error) {
-    throw new Error(error.message);
+    logger.error("email_template.list.failed", error, {
+      companyId,
+    });
+    throw new Error("Erro ao buscar templates de e-mail.");
   }
 
   return (data ?? []) as CandidateEmailTemplate[];
@@ -78,11 +82,15 @@ export async function upsertEmailTemplate(
         onConflict: "company_id,type",
       },
     )
-    .select("*")
+    .select("id, company_id, type, subject, body, is_active, created_at, updated_at")
     .single();
 
   if (error) {
-    throw new Error(error.message);
+    logger.error("email_template.upsert.failed", error, {
+      companyId,
+      type: payload.type,
+    });
+    throw new Error("Erro ao salvar template de e-mail.");
   }
 
   return data as CandidateEmailTemplate;
@@ -96,14 +104,18 @@ export async function getEmailTemplateByType(
 
   const { data, error } = await supabase
     .from("candidate_email_templates")
-    .select("*")
+    .select("id, company_id, type, subject, body, is_active, created_at, updated_at")
     .eq("company_id", companyId)
     .eq("type", type)
     .eq("is_active", true)
     .maybeSingle();
 
   if (error) {
-    throw new Error(error.message);
+    logger.error("email_template.lookup.failed", error, {
+      companyId,
+      type,
+    });
+    throw new Error("Erro ao buscar template de e-mail.");
   }
 
   return data as CandidateEmailTemplate | null;

@@ -11,7 +11,7 @@ export async function getJobById(id: string) {
 
   const { data, error } = await supabase
     .from("jobs")
-    .select("*")
+    .select("title, seniority, contract_type, score_min, skills, context")
     .eq("id", id)
     .eq("company_id", currentProfile.company_id)
     .single();

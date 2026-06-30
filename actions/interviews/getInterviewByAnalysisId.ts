@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 
 export async function getInterviewByAnalysisId(analysisId: string) {
   const supabase = await createServerClient();
@@ -14,7 +15,9 @@ export async function getInterviewByAnalysisId(analysisId: string) {
     .maybeSingle();
 
   if (error) {
-    console.error("Erro ao buscar entrevista por análise:", error);
+    logger.error("interview.lookup_by_analysis.failed", error, {
+      analysisId,
+    });
     return null;
   }
 

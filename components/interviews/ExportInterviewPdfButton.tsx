@@ -1,8 +1,8 @@
 "use client";
 
 import { FileDown } from "lucide-react";
-import { jsPDF } from "jspdf";
-import { autoTable } from "jspdf-autotable";
+import type { jsPDF as JsPDF } from "jspdf";
+import type { UserOptions } from "jspdf-autotable";
 
 import { Button } from "@/components/ui/button";
 
@@ -12,10 +12,19 @@ interface ExportInterviewPdfButtonProps {
   interview: InterviewGuideDetail;
 }
 
+type AutoTable = (doc: JsPDF, options: UserOptions) => void;
+
+let autoTableFn: AutoTable | null = null;
+
 export function ExportInterviewPdfButton({
   interview,
 }: ExportInterviewPdfButtonProps) {
-  function handleExport() {
+  async function handleExport() {
+    const [{ jsPDF }, { autoTable }] = await Promise.all([
+      import("jspdf"),
+      import("jspdf-autotable"),
+    ]);
+    autoTableFn = autoTable;
     const doc = new jsPDF();
 
     const content = interview.content;
@@ -98,7 +107,7 @@ export function ExportInterviewPdfButton({
 }
 
 function addCover(
-  doc: jsPDF,
+  doc: JsPDF,
   interview: InterviewGuideDetail,
 ): number {
   doc.setFillColor(24, 24, 27);
@@ -116,7 +125,7 @@ function addCover(
   doc.setFontSize(10);
   doc.setFont("helvetica", "normal");
 
-  autoTable(doc, {
+  addAutoTable(doc, {
     startY: 52,
     body: [
       ["Candidato", interview.candidate_name ?? "-"],
@@ -162,7 +171,7 @@ function addTextSection({
   text,
   startY,
 }: {
-  doc: jsPDF;
+  doc: JsPDF;
   title: string;
   text?: string | null;
   startY: number;
@@ -190,7 +199,7 @@ function addScorecardSection({
   items,
   startY,
 }: {
-  doc: jsPDF;
+  doc: JsPDF;
   items: {
     title: string;
     description: string;
@@ -204,7 +213,7 @@ function addScorecardSection({
 
   const weights = getWeights(items.length);
 
-  autoTable(doc, {
+  addAutoTable(doc, {
     startY: y + 12,
     head: [["Critério", "Peso", "Descrição", "Como avaliar"]],
     body:
@@ -254,7 +263,7 @@ function addQuestionSection({
   items,
   startY,
 }: {
-  doc: jsPDF;
+  doc: JsPDF;
   title: string;
   items: string[];
   startY: number;
@@ -307,7 +316,7 @@ function addQuestionSection({
 }
 
 function addSectionHeader(
-  doc: jsPDF,
+  doc: JsPDF,
   title: string,
   y: number,
 ) {
@@ -322,7 +331,7 @@ function addSectionHeader(
   doc.setTextColor(0, 0, 0);
 }
 
-function addFooter(doc: jsPDF) {
+function addFooter(doc: JsPDF) {
   const generatedAt = new Intl.DateTimeFormat("pt-BR", {
     dateStyle: "short",
     timeStyle: "short",
@@ -358,7 +367,7 @@ function addFooter(doc: jsPDF) {
 }
 
 function ensurePageSpace(
-  doc: jsPDF,
+  doc: JsPDF,
   y: number,
   neededSpace: number,
 ) {
@@ -372,14 +381,22 @@ function ensurePageSpace(
   return y;
 }
 
-function getFinalY(doc: jsPDF) {
-  const docWithTable = doc as jsPDF & {
+function getFinalY(doc: JsPDF) {
+  const docWithTable = doc as JsPDF & {
     lastAutoTable?: {
       finalY?: number;
     };
   };
 
   return docWithTable.lastAutoTable?.finalY ?? 20;
+}
+
+function addAutoTable(doc: JsPDF, options: UserOptions): void {
+  if (!autoTableFn) {
+    throw new Error("PDF table generator was not loaded.");
+  }
+
+  autoTableFn(doc, options);
 }
 
 function getWeights(totalItems: number): number[] {

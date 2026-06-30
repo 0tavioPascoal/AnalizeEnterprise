@@ -3,6 +3,9 @@
 import { revalidatePath } from "next/cache";
 import { createServerClient } from "@/lib/supabase/server";
 import { getEmailTemplateByType } from "@/actions/email/mail-templates";
+import { getOptionalEnv } from "@/lib/env";
+import { logger } from "@/lib/logger";
+import { postWebhook } from "@/lib/webhook";
 
 export interface ActionResponse {
   success: boolean;
@@ -28,12 +31,16 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
   try {
     const supabase = await createServerClient();
 
-    const webhookUrl = process.env.N8N_CANDIDATE_EMAIL_WEBHOOK_URL;
+    const webhookUrl = getOptionalEnv("N8N_CANDIDATE_EMAIL_WEBHOOK_URL");
 
     if (!webhookUrl) {
+      logger.warn("candidate.approve.webhook_missing", {
+        analysisId: id,
+      });
+
       return {
         success: false,
-        message: "Webhook do n8n não configurado.",
+        message: "Serviço de e-mail não configurado.",
       };
     }
 
@@ -59,9 +66,15 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
       .single();
 
     if (analysisError || !analysis) {
+      if (analysisError) {
+        logger.error("candidate.approve.analysis_lookup_failed", analysisError, {
+          analysisId: id,
+        });
+      }
+
       return {
         success: false,
-        message: analysisError?.message ?? "Análise não encontrada.",
+        message: "Análise não encontrada.",
       };
     }
 
@@ -135,30 +148,38 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
       },
     };
 
-    const response = await fetch(webhookUrl, {
-      method: "POST",
+    const webhookResult = await postWebhook<N8nResponse>({
+      url: webhookUrl,
+      operation: "candidate.approve.webhook",
       headers: {
         "Content-Type": "application/json",
       },
-      cache: "no-store",
-      body: JSON.stringify(payload),
+      payload,
+      metadata: {
+        analysisId: analysis.id,
+        companyId: analysis.company_id,
+        jobId: job.id,
+      },
     });
 
-    if (!response.ok) {
+    if (!webhookResult.ok) {
       return {
         success: false,
-        message: `Erro ao enviar para o n8n. Status HTTP ${response.status}.`,
+        message: "Não foi possível concluir o envio. Tente novamente.",
       };
     }
 
-    const n8nResult = (await response
-      .json()
-      .catch(() => null)) as N8nResponse | null;
+    if (!webhookResult.data?.success) {
+      logger.warn("candidate.approve.webhook_unconfirmed", {
+        analysisId: analysis.id,
+        companyId: analysis.company_id,
+        jobId: job.id,
+        webhookMessage: webhookResult.data?.message,
+      });
 
-    if (!n8nResult?.success) {
       return {
         success: false,
-        message: n8nResult?.message ?? "n8n não confirmou o envio do e-mail.",
+        message: "Não foi possível confirmar o envio. Tente novamente.",
       };
     }
 
@@ -173,9 +194,16 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
       .single();
 
     if (error || !data) {
+      if (error) {
+        logger.error("candidate.approve.update_failed", error, {
+          analysisId: id,
+          companyId: analysis.company_id,
+        });
+      }
+
       return {
         success: false,
-        message: error?.message ?? "Nenhuma análise foi atualizada.",
+        message: "Nenhuma análise foi atualizada.",
       };
     }
 
@@ -189,41 +217,13 @@ export async function approveAnalysis(id: string): Promise<ActionResponse> {
       status: "approved",
     };
   } catch (error) {
+    logger.error("candidate.approve.unhandled", error, {
+      analysisId: id,
+    });
+
     return {
       success: false,
-      message:
-        error instanceof Error ? error.message : "Erro ao aprovar candidato.",
+      message: "Erro ao aprovar candidato.",
     };
   }
-}
-
-export async function rejectAnalysis(id: string): Promise<ActionResponse> {
-  const supabase = await createServerClient();
-
-  const { data, error } = await supabase
-    .from("candidate_analysis")
-    .update({
-      status: "rejected",
-      pipeline_stage: "rejected",
-    })
-    .eq("id", id)
-    .select("id, status, pipeline_stage")
-    .single();
-
-  if (error || !data) {
-    return {
-      success: false,
-      message: error?.message ?? "Nenhuma análise foi atualizada.",
-    };
-  }
-
-  revalidatePath("/dashboard/analyses");
-  revalidatePath(`/dashboard/analyses/${id}`);
-  revalidatePath("/dashboard/pipeline");
-
-  return {
-    success: true,
-    message: "Candidato reprovado com sucesso!",
-    status: "rejected",
-  };
 }

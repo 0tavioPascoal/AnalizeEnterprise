@@ -2,6 +2,7 @@
 
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { logger } from "@/lib/logger";
 import type { ActionResponse, UserFormData } from "@/types/user/user";
 
 export async function createUser(
@@ -43,9 +44,16 @@ export async function createUser(
     });
 
   if (authError || !authData.user) {
+    if (authError) {
+      logger.error("user.create.auth_failed", authError, {
+        companyId: currentProfile.company_id,
+        createdBy: currentProfile.id,
+      });
+    }
+
     return {
       success: false,
-      message: authError?.message ?? "Erro ao criar usuário.",
+      message: "Erro ao criar usuário.",
     };
   }
 
@@ -58,9 +66,15 @@ export async function createUser(
   });
 
   if (profileError) {
+    logger.error("user.create.profile_failed", profileError, {
+      companyId: currentProfile.company_id,
+      createdBy: currentProfile.id,
+      targetUserId: authData.user.id,
+    });
+
     return {
       success: false,
-      message: profileError.message,
+      message: "Erro ao criar perfil do usuário.",
     };
   }
 

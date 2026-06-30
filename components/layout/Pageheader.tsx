@@ -11,11 +11,11 @@ export function PageHeader({
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between",
+        "flex min-w-0 flex-col gap-4 lg:flex-row lg:items-start lg:justify-between",
         className,
       )}
     >
-      <div className="min-w-0">
+      <div className="min-w-0 flex-1">
         <div className="flex items-start gap-3 sm:items-center sm:gap-4">
           {Icon && (
             <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-primary/10 text-primary shadow-sm sm:h-12 sm:w-12">
@@ -38,7 +38,7 @@ export function PageHeader({
       </div>
 
       {action && (
-        <div className="flex w-full flex-wrap items-center gap-3 lg:w-auto">
+        <div className="flex w-full min-w-0 flex-wrap items-center gap-3 lg:w-auto lg:justify-end">
           {action}
         </div>
       )}

@@ -30,12 +30,12 @@ export function ThemeToggle({ collapsed }: { collapsed?: boolean }) {
         ${collapsed ? "justify-center px-0" : "justify-start gap-3 px-3"}
 
         text-sm font-bold
-        text-muted-foreground
+        text-sidebar-foreground/70
 
         transition-all
 
-        hover:bg-muted
-        hover:text-foreground
+        hover:bg-sidebar-accent
+        hover:text-sidebar-accent-foreground
       `}
       aria-label={isDark ? "Ativar modo claro" : "Ativar modo escuro"}
     >

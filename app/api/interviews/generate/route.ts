@@ -2,8 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@/lib/supabase/server";
 import { getOptionalEnv } from "@/lib/env";
-import { fetchWithTimeout } from "@/lib/http";
 import { interviewGenerateSchema } from "@/lib/validations";
+import { apiError } from "@/lib/api-response";
+import { logger } from "@/lib/logger";
+import { postWebhook } from "@/lib/webhook";
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,10 +13,8 @@ export async function POST(req: NextRequest) {
     const n8nWebhookUrl = getOptionalEnv("N8N_INTERVIEW_WEBHOOK_URL");
 
     if (!n8nWebhookUrl) {
-      return NextResponse.json(
-        { success: false, message: "Webhook do n8n não configurado." },
-        { status: 500 },
-      );
+      logger.warn("interview.generate.webhook_missing");
+      return apiError("Serviço de entrevista não configurado.", 500);
     }
 
     const {
@@ -23,22 +23,16 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (userError || !user) {
-      return NextResponse.json(
-        { success: false, message: "Usuário não autenticado." },
-        { status: 401 },
-      );
+      return apiError("Usuário não autenticado.", 401);
     }
 
     const body = await req.json().catch(() => null);
     const parsedBody = interviewGenerateSchema.safeParse(body);
 
     if (!parsedBody.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: parsedBody.error.issues[0]?.message ?? "analysis_id inválido.",
-        },
-        { status: 400 },
+      return apiError(
+        parsedBody.error.issues[0]?.message ?? "analysis_id inválido.",
+        400,
       );
     }
 
@@ -49,29 +43,55 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (profileError || !profile?.company_id) {
-      return NextResponse.json(
-        { success: false, message: "Perfil não encontrado." },
-        { status: 403 },
-      );
+      return apiError("Perfil não encontrado.", 403);
     }
 
     const { data: analysis, error: analysisError } = await supabase
       .from("candidate_analysis")
-      .select("*")
+      .select(
+        `
+        id,
+        company_id,
+        job_id,
+        candidate_name,
+        candidate_email,
+        candidate_phone,
+        score,
+        passed_minimum_score,
+        match,
+        recommendation,
+        summary,
+        status,
+        strengths,
+        weaknesses,
+        matched_skills,
+        missing_skills,
+        risks,
+        interview_questions,
+        seniority_assessment,
+        contract_fit,
+        final_opinion,
+        technical_score,
+        experience_score,
+        seniority_score,
+        context_fit_score,
+        communication_score,
+        ai_feedback,
+        pipeline_stage,
+        created_at
+        `,
+      )
       .eq("id", parsedBody.data.analysis_id)
       .eq("company_id", profile.company_id)
       .single();
 
     if (analysisError || !analysis) {
-      return NextResponse.json(
-        { success: false, message: "Análise não encontrada." },
-        { status: 404 },
-      );
+      return apiError("Análise não encontrada.", 404);
     }
 
     const { data: job } = await supabase
       .from("jobs")
-      .select("*")
+      .select("id, title, context, score_min, company_id, contract_type, seniority, skills")
       .eq("id", analysis.job_id)
       .eq("company_id", profile.company_id)
       .maybeSingle();
@@ -114,10 +134,13 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (interviewError || !interview) {
-      return NextResponse.json(
-        { success: false, message: "Erro ao criar entrevista." },
-        { status: 500 },
-      );
+      logger.error("interview.generate.insert_failed", interviewError, {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId: analysis.id,
+      });
+
+      return apiError("Erro ao criar entrevista.", 500);
     }
 
     const { error: pipelineError } = await supabase
@@ -136,21 +159,23 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", interview.id);
 
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Entrevista criada, mas houve erro ao atualizar a pipeline.",
-        },
-        { status: 500 },
-      );
+      logger.error("interview.generate.pipeline_update_failed", pipelineError, {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId: analysis.id,
+        interviewId: interview.id,
+      });
+
+      return apiError("Erro ao atualizar a pipeline da entrevista.", 500);
     }
 
-    const webhookResponse = await fetchWithTimeout(n8nWebhookUrl, {
-      method: "POST",
+    const webhookResult = await postWebhook({
+      url: n8nWebhookUrl,
+      operation: "interview.generate.webhook",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({
+      payload: {
         interview_id: interview.id,
         company_id: profile.company_id,
         analysis,
@@ -159,10 +184,16 @@ export async function POST(req: NextRequest) {
           id: user.id,
           name: profile.name,
         },
-      }),
+      },
+      metadata: {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId: analysis.id,
+        interviewId: interview.id,
+      },
     });
 
-    if (!webhookResponse.ok) {
+    if (!webhookResult.ok) {
       await supabase
         .from("interview_guides")
         .update({
@@ -170,13 +201,7 @@ export async function POST(req: NextRequest) {
         })
         .eq("id", interview.id);
 
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Serviço de entrevista retornou erro.",
-        },
-        { status: 500 },
-      );
+      return apiError("Serviço de entrevista indisponível. Tente novamente.", 500);
     }
 
     return NextResponse.json({
@@ -185,14 +210,8 @@ export async function POST(req: NextRequest) {
       already_exists: false,
     });
   } catch (error) {
-    console.error("Generate interview API error:", error);
+    logger.error("interview.generate.unhandled", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Erro interno ao gerar entrevista.",
-      },
-      { status: 500 },
-    );
+    return apiError("Erro interno ao gerar entrevista.", 500);
   }
 }

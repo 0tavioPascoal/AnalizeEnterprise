@@ -1,6 +1,7 @@
 "use server";
 
 import { createServerClient } from "@/lib/supabase/server";
+import { logger } from "@/lib/logger";
 
 export type AnalysisStatus = "pending" | "approved" | "rejected";
 
@@ -59,6 +60,8 @@ type AiFeedback = {
   interview_questions?: unknown;
 };
 
+const DEFAULT_SCORE = 0;
+
 function toStringArray(value: unknown): string[] {
   if (Array.isArray(value)) {
     return value.filter((item): item is string => typeof item === "string");
@@ -94,12 +97,49 @@ export async function getAnalysisById(
 
   const { data: analysis, error } = await supabase
     .from("candidate_analysis")
-    .select("*")
+    .select(
+      `
+      id,
+      company_id,
+      job_id,
+      candidate_name,
+      candidate_email,
+      candidate_phone,
+      score,
+      passed_minimum_score,
+      match,
+      recommendation,
+      summary,
+      status,
+      strengths,
+      weaknesses,
+      matched_skills,
+      missing_skills,
+      risks,
+      interview_questions,
+      seniority_assessment,
+      contract_fit,
+      final_opinion,
+      technical_score,
+      experience_score,
+      seniority_score,
+      context_fit_score,
+      communication_score,
+      ai_feedback,
+      created_at,
+      resume_file_path,
+      resume_file_name,
+      resume_file_size,
+      resume_mime_type
+      `,
+    )
     .eq("id", id)
     .single();
 
   if (error || !analysis) {
-    console.error("Erro ao buscar análise:", error);
+    logger.error("analysis.detail.failed", error, {
+      analysisId: id,
+    });
     return null;
   }
 
@@ -112,59 +152,60 @@ export async function getAnalysisById(
     .maybeSingle();
 
   return {
-  id: analysis.id,
-  company_id: analysis.company_id,
-  job_id: analysis.job_id,
+    id: analysis.id,
+    company_id: analysis.company_id,
+    job_id: analysis.job_id,
 
-  candidate_name: analysis.candidate_name,
-  candidate_email: analysis.candidate_email,
-  candidate_phone: analysis.candidate_phone,
+    candidate_name: analysis.candidate_name,
+    candidate_email: analysis.candidate_email,
+    candidate_phone: analysis.candidate_phone,
 
-  score: analysis.score,
-  passed_minimum_score: analysis.passed_minimum_score,
-  match: analysis.match,
-  recommendation: analysis.recommendation,
-  summary: analysis.summary,
-  status: analysis.status ?? "pending",
+    score: analysis.score ?? DEFAULT_SCORE,
+    passed_minimum_score: analysis.passed_minimum_score ?? false,
+    match: analysis.match ?? false,
+    recommendation: analysis.recommendation ?? "",
+    summary: analysis.summary ?? "",
+    status: analysis.status ?? "pending",
 
-  strengths: fallbackArray(analysis.strengths, aiFeedback, "strengths"),
-  weaknesses: fallbackArray(analysis.weaknesses, aiFeedback, "weaknesses"),
-  matched_skills: fallbackArray(
-    analysis.matched_skills,
-    aiFeedback,
-    "matched_skills",
-  ),
-  missing_skills: fallbackArray(
-    analysis.missing_skills,
-    aiFeedback,
-    "missing_skills",
-  ),
-  risks: fallbackArray(analysis.risks, aiFeedback, "risks"),
-  interview_questions: fallbackArray(
-    analysis.interview_questions,
-    aiFeedback,
-    "interview_questions",
-  ),
+    strengths: fallbackArray(analysis.strengths, aiFeedback, "strengths"),
+    weaknesses: fallbackArray(analysis.weaknesses, aiFeedback, "weaknesses"),
+    matched_skills: fallbackArray(
+      analysis.matched_skills,
+      aiFeedback,
+      "matched_skills",
+    ),
+    missing_skills: fallbackArray(
+      analysis.missing_skills,
+      aiFeedback,
+      "missing_skills",
+    ),
+    risks: fallbackArray(analysis.risks, aiFeedback, "risks"),
+    interview_questions: fallbackArray(
+      analysis.interview_questions,
+      aiFeedback,
+      "interview_questions",
+    ),
 
-  seniority_assessment: analysis.seniority_assessment,
-  contract_fit: analysis.contract_fit,
-  final_opinion: analysis.final_opinion,
+    seniority_assessment: analysis.seniority_assessment,
+    contract_fit: analysis.contract_fit,
+    final_opinion: analysis.final_opinion,
 
-  technical_score: analysis.technical_score,
-  experience_score: analysis.experience_score,
-  seniority_score: analysis.seniority_score,
-  context_fit_score: analysis.context_fit_score,
-  communication_score: analysis.communication_score,
+    technical_score: analysis.technical_score,
+    experience_score: analysis.experience_score,
+    seniority_score: analysis.seniority_score,
+    context_fit_score: analysis.context_fit_score,
+    communication_score: analysis.communication_score,
 
-  ai_feedback: analysis.ai_feedback,
-  created_at: analysis.created_at,
+    ai_feedback: analysis.ai_feedback,
+    created_at: analysis.created_at,
 
-  job_title: job?.title ?? null,
-  job_seniority: job?.seniority ?? null,
-  job_contract_type: job?.contract_type ?? null,
+    job_title: job?.title ?? null,
+    job_seniority: job?.seniority ?? null,
+    job_contract_type: job?.contract_type ?? null,
 
-  resume_file_path: analysis.resume_file_path ?? null,
-  resume_file_name: analysis.resume_file_name ?? null,
-  resume_file_size: analysis.resume_file_size ?? null,
-  resume_mime_type: analysis.resume_mime_type ?? null,
-};}
+    resume_file_path: analysis.resume_file_path ?? null,
+    resume_file_name: analysis.resume_file_name ?? null,
+    resume_file_size: analysis.resume_file_size ?? null,
+    resume_mime_type: analysis.resume_mime_type ?? null,
+  };
+}

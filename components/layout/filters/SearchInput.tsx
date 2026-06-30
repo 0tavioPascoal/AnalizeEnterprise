@@ -14,7 +14,7 @@ export function SearchInput({
   className,
 }: SearchInputProps) {
   return (
-    <div className={cn("relative w-full sm:w-80", className)}>
+    <div className={cn("relative w-full min-w-0 sm:w-72 xl:w-80", className)}>
       <Search
         className="
           pointer-events-none
@@ -32,7 +32,7 @@ export function SearchInput({
         onChange={(event) => onChange(event.target.value)}
         placeholder={placeholder}
         className="
-          h-11 w-full rounded-xl
+          h-10 w-full rounded-xl sm:h-11
 
           border-border
           bg-card

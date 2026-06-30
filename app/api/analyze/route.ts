@@ -1,8 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
+
 import { createServerClient } from "@/lib/supabase/server";
 import { getOptionalEnv } from "@/lib/env";
-import { fetchWithTimeout } from "@/lib/http";
 import { analysisRequestSchema } from "@/lib/validations";
+import { apiError } from "@/lib/api-response";
+import { logger } from "@/lib/logger";
+import { postWebhook } from "@/lib/webhook";
 
 const RESUME_BUCKET = "candidate-cvs";
 const MAX_RESUME_SIZE_BYTES = 10 * 1024 * 1024;
@@ -13,13 +16,8 @@ export async function POST(req: NextRequest) {
     const n8nWebhookUrl = getOptionalEnv("N8N_ANALYZE_WEBHOOK_URL");
 
     if (!n8nWebhookUrl) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Webhook do n8n não configurado.",
-        },
-        { status: 500 },
-      );
+      logger.warn("analysis.create.webhook_missing");
+      return apiError("Serviço de análise não configurado.", 500);
     }
 
     const {
@@ -27,13 +25,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Usuário não autenticado.",
-        },
-        { status: 401 },
-      );
+      return apiError("Usuário não autenticado.", 401);
     }
 
     const { data: profile } = await supabase
@@ -43,30 +35,17 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (!profile?.company_id) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Empresa do usuário não encontrada.",
-        },
-        { status: 403 },
-      );
+      return apiError("Empresa do usuário não encontrada.", 403);
     }
 
     const formData = await req.formData();
-
     const file = formData.get("file");
     const parsedBody = analysisRequestSchema.safeParse({
       job_id: formData.get("job_id"),
     });
 
     if (!(file instanceof File)) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Arquivo inválido.",
-        },
-        { status: 400 },
-      );
+      return apiError("Arquivo inválido.", 400);
     }
 
     const safeFileName = file.name
@@ -76,32 +55,17 @@ export async function POST(req: NextRequest) {
       .toLowerCase();
 
     if (file.type !== "application/pdf" || !safeFileName.endsWith(".pdf")) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Apenas arquivos PDF são permitidos.",
-        },
-        { status: 400 },
-      );
+      return apiError("Apenas arquivos PDF são permitidos.", 400);
     }
 
     if (file.size > MAX_RESUME_SIZE_BYTES) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "O arquivo deve ter no máximo 10MB.",
-        },
-        { status: 400 },
-      );
+      return apiError("O arquivo deve ter no máximo 10MB.", 400);
     }
 
     if (!parsedBody.success) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: parsedBody.error.issues[0]?.message ?? "Vaga inválida.",
-        },
-        { status: 400 },
+      return apiError(
+        parsedBody.error.issues[0]?.message ?? "Vaga inválida.",
+        400,
       );
     }
 
@@ -113,17 +77,10 @@ export async function POST(req: NextRequest) {
       .single();
 
     if (jobError || !job) {
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Vaga não encontrada.",
-        },
-        { status: 404 },
-      );
+      return apiError("Vaga não encontrada.", 404);
     }
 
     const analysisId = crypto.randomUUID();
-
     const filePath = `${profile.company_id}/${analysisId}/${Date.now()}-${safeFileName}`;
 
     const { error: uploadError } = await supabase.storage
@@ -134,13 +91,14 @@ export async function POST(req: NextRequest) {
       });
 
     if (uploadError) {
-      return NextResponse.json(
-        {
-          success: false,
-              message: "Erro ao enviar currículo.",
-        },
-        { status: 500 },
-      );
+      logger.error("analysis.create.upload_failed", uploadError, {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId,
+        filePath,
+      });
+
+      return apiError("Erro ao enviar currículo.", 500);
     }
 
     const n8nFormData = new FormData();
@@ -149,50 +107,43 @@ export async function POST(req: NextRequest) {
     n8nFormData.append("job", JSON.stringify(job));
     n8nFormData.append("analysis_id", analysisId);
     n8nFormData.append("company_id", profile.company_id);
-
     n8nFormData.append("pipeline_stage", "screening");
-
     n8nFormData.append("resume_file_path", filePath);
     n8nFormData.append("resume_file_name", file.name);
     n8nFormData.append("resume_file_size", String(file.size));
     n8nFormData.append("resume_mime_type", file.type);
 
-    let response: Response;
+    const webhookResult = await postWebhook({
+      url: n8nWebhookUrl,
+      operation: "analysis.create.webhook",
+      body: n8nFormData,
+      metadata: {
+        companyId: profile.company_id,
+        userId: user.id,
+        analysisId,
+      },
+    });
 
-    try {
-      response = await fetchWithTimeout(n8nWebhookUrl, {
-        method: "POST",
-        body: n8nFormData,
-      });
-    } catch {
-      await supabase.storage.from(RESUME_BUCKET).remove([filePath]);
+    if (!webhookResult.ok) {
+      const { error: cleanupError } = await supabase.storage
+        .from(RESUME_BUCKET)
+        .remove([filePath]);
 
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Erro de conexão com o serviço de análise.",
-        },
-        { status: 500 },
-      );
+      if (cleanupError) {
+        logger.error("analysis.create.cleanup_failed", cleanupError, {
+          companyId: profile.company_id,
+          userId: user.id,
+          analysisId,
+          filePath,
+        });
+      }
+
+      return apiError("Serviço de análise indisponível. Tente novamente.", 500);
     }
-
-    if (!response.ok) {
-      await supabase.storage.from(RESUME_BUCKET).remove([filePath]);
-
-      return NextResponse.json(
-        {
-          success: false,
-          message: "Serviço de análise retornou erro.",
-        },
-        { status: 500 },
-      );
-    }
-
-    const result = await response.json().catch(() => null);
 
     return NextResponse.json({
       success: true,
-      data: result,
+      data: webhookResult.data,
       resume: {
         analysis_id: analysisId,
         file_path: filePath,
@@ -202,14 +153,8 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
-    console.error("Analyze API error:", error);
+    logger.error("analysis.create.unhandled", error);
 
-    return NextResponse.json(
-      {
-        success: false,
-        message: "Erro interno do servidor.",
-      },
-      { status: 500 },
-    );
+    return apiError("Erro interno do servidor.", 500);
   }
 }

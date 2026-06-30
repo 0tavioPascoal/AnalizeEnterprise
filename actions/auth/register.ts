@@ -1,6 +1,7 @@
 "use server";
 
 import { createAdminClient } from "@/lib/supabase/admin";
+import { logger } from "@/lib/logger";
 
 export interface RegisterInput {
   companyName: string;
@@ -20,7 +21,13 @@ export async function registerCompany(data: RegisterInput) {
     });
 
   if (authError || !authUser?.user) {
-    throw new Error(authError?.message || "Erro ao criar usuário auth");
+    if (authError) {
+      logger.error("auth.register.auth_user_failed", authError, {
+        email: data.email,
+      });
+    }
+
+    throw new Error("Erro ao criar conta.");
   }
 
   const userId = authUser.user.id;
@@ -35,7 +42,14 @@ export async function registerCompany(data: RegisterInput) {
 
   if (companyError || !company) {
     await supabaseAdmin.auth.admin.deleteUser(userId);
-    throw new Error(companyError?.message ?? "Erro ao criar empresa");
+
+    if (companyError) {
+      logger.error("auth.register.company_failed", companyError, {
+        userId,
+      });
+    }
+
+    throw new Error("Erro ao criar empresa.");
   }
 
   const { error: profileError } = await supabaseAdmin.from("profiles").insert({
@@ -48,7 +62,13 @@ export async function registerCompany(data: RegisterInput) {
 
   if (profileError) {
     await supabaseAdmin.auth.admin.deleteUser(userId);
-    throw new Error(profileError.message);
+
+    logger.error("auth.register.profile_failed", profileError, {
+      userId,
+      companyId: company.id,
+    });
+
+    throw new Error("Erro ao criar perfil inicial.");
   }
 
   return {

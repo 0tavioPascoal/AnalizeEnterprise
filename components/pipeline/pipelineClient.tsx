@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useTransition } from "react";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -9,7 +9,7 @@ import {
   SearchCheck,
   XCircle,
 } from "lucide-react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
@@ -25,15 +25,13 @@ import { Button } from "@/components/ui/button";
 import { PipelineRow } from "@/components/pipeline/pipelineRow";
 
 import type {
-  PipelineAnalysis,
+  PipelineResult,
   PipelineStage,
 } from "@/actions/pipeline/pipeline";
 
 interface PipelineClientProps {
-  analyses: PipelineAnalysis[];
+  pipeline: PipelineResult;
 }
-
-const ITEMS_PER_PAGE = 8;
 
 const baseStageOptions: Array<{ label: string; value: PipelineStage }> = [
   { label: "Triagem", value: "screening" },
@@ -77,92 +75,41 @@ const emptyStateByStage: Record<
   },
 };
 
-export function PipelineClient({ analyses }: PipelineClientProps) {
+export function PipelineClient({ pipeline }: PipelineClientProps) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-  const [jobFilter, setJobFilter] = useState<string>("all");
-  const [activeStage, setActiveStage] =
-    useState<PipelineStage>("screening");
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
+  const stageOptions = baseStageOptions.map((option) => {
+    const total =
+      pipeline.stageCounts.find((item) => item.stage === option.value)?.total ??
+      0;
 
-  const stageOptions = useMemo(() => {
-    return baseStageOptions.map((option) => {
-      const total = analyses.filter(
-        (analysis) => analysis.pipeline_stage === option.value,
-      ).length;
+    return {
+      ...option,
+      label: `${option.label} (${total})`,
+    };
+  });
 
-      return {
-        ...option,
-        label: `${option.label} (${total})`,
-      };
+  const emptyState = emptyStateByStage[pipeline.filters.stage];
+
+  function updateFilter(key: string, value: string, resetPage = true): void {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (!value || value === "all" || (key === "stage" && value === "screening")) {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
+
+    if (resetPage) {
+      params.delete("page");
+    }
+
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`);
     });
-  }, [analyses]);
-
-  const jobOptions = useMemo(() => {
-    const uniqueJobs = Array.from(
-      new Set(
-        analyses
-          .map((analysis) => analysis.job_title)
-          .filter((title): title is string => Boolean(title)),
-      ),
-    );
-
-    return [
-      { label: "Todas as vagas", value: "all" },
-      ...uniqueJobs.map((title) => ({
-        label: title,
-        value: title,
-      })),
-    ];
-  }, [analyses]);
-
-  const filteredAnalyses = useMemo(() => {
-    const term = search.trim().toLowerCase();
-
-    return analyses.filter((item) => {
-      const matchesStage = item.pipeline_stage === activeStage;
-
-      const matchesJob =
-        jobFilter === "all" || item.job_title === jobFilter;
-
-      const matchesSearch =
-        !term ||
-        (item.candidate_name?.toLowerCase() ?? "").includes(term) ||
-        (item.candidate_email?.toLowerCase() ?? "").includes(term) ||
-        (item.job_title?.toLowerCase() ?? "").includes(term);
-
-      return matchesStage && matchesJob && matchesSearch;
-    });
-  }, [analyses, activeStage, jobFilter, search]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAnalyses.length / ITEMS_PER_PAGE),
-  );
-
-  const paginatedAnalyses = useMemo(() => {
-    const safePage = Math.min(page, totalPages);
-    const start = (safePage - 1) * ITEMS_PER_PAGE;
-
-    return filteredAnalyses.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredAnalyses, page, totalPages]);
-
-  const emptyState = emptyStateByStage[activeStage];
-
-  function handleStageChange(value: PipelineStage): void {
-    setActiveStage(value);
-    setPage(1);
-  }
-
-  function handleSearchChange(value: string): void {
-    setSearch(value);
-    setPage(1);
-  }
-
-  function handleJobChange(value: string): void {
-    setJobFilter(value);
-    setPage(1);
   }
 
   return (
@@ -174,21 +121,27 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
           action={
             <FilterBar className="xl:flex-nowrap">
               <StatusFilterTabs
-                value={activeStage}
+                value={pipeline.filters.stage}
                 options={stageOptions}
-                onChange={handleStageChange}
+                onChange={(value) => {
+                  updateFilter("stage", value);
+                }}
               />
 
               <SearchInput
-                value={search}
-                onChange={handleSearchChange}
+                value={pipeline.filters.search}
+                onChange={(value) => {
+                  updateFilter("search", value);
+                }}
                 placeholder="Buscar candidato, e-mail ou vaga..."
               />
 
               <FilterSelect
-                value={jobFilter}
-                onChange={handleJobChange}
-                options={jobOptions}
+                value={pipeline.filters.jobId}
+                onChange={(value) => {
+                  updateFilter("job", value);
+                }}
+                options={pipeline.jobOptions}
                 ariaLabel="Filtrar por vaga"
               />
 
@@ -205,21 +158,26 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
         />
       }
       pagination={
-        filteredAnalyses.length > ITEMS_PER_PAGE && (
+        pipeline.total > pipeline.pageSize && (
           <TablePagination
-            page={page}
-            totalPages={totalPages}
-            setPage={setPage}
-            totalItems={filteredAnalyses.length}
-            pageSize={ITEMS_PER_PAGE}
+            page={pipeline.page}
+            totalPages={pipeline.totalPages}
+            setPage={(nextPage) =>
+              updateFilter("page", String(nextPage), false)
+            }
+            totalItems={pipeline.total}
+            pageSize={pipeline.pageSize}
             itemLabel="candidatos"
           />
         )
       }
     >
-      <div className="flex flex-col gap-3 pb-4">
-        {paginatedAnalyses.length > 0 ? (
-          paginatedAnalyses.map((item) => (
+      <div
+        className="flex flex-col gap-3 pb-4 opacity-100 transition-opacity data-[pending=true]:opacity-60"
+        data-pending={isPending}
+      >
+        {pipeline.items.length > 0 ? (
+          pipeline.items.map((item) => (
             <PipelineRow key={item.id} item={item} />
           ))
         ) : (
