@@ -1,9 +1,10 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/client";
 import { revalidatePath } from "next/cache";
-import { JobFormData } from "@/components/jobs/JobForm";
+import { createServerClient } from "@/lib/supabase/server";
+import { jobFormSchema } from "@/lib/validations";
 import { getCurrentProfile } from "../auth/getCurrentProfile";
+import type { JobFormData } from "@/types/jobs/job";
 
 export interface CreateJobResponse {
   success: boolean;
@@ -13,25 +14,35 @@ export interface CreateJobResponse {
 export async function createJob(
   data: JobFormData
 ): Promise<CreateJobResponse> {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
 
   const currentProfile = await getCurrentProfile();
 
   if (!currentProfile) {
-  throw new Error("Usuário não autenticado.");
-}
+    return {
+      success: false,
+      message: "Usuário não autenticado.",
+    };
+  }
+
+  const parsed = jobFormSchema.safeParse(data);
+
+  if (!parsed.success) {
+    return {
+      success: false,
+      message: parsed.error.issues[0]?.message ?? "Dados inválidos.",
+    };
+  }
 
   const payload = {
-    title: data.title,
-    context: data.context,
-    score_min: Number(data.score_min ?? 0),
+    title: parsed.data.title,
+    context: parsed.data.context,
+    score_min: parsed.data.score_min,
     company_id: currentProfile.company_id,
-    seniority: data.seniority ?? "Pleno",
-    contract_type: data.contract_type ?? "CLT",
-    skills: data.skills?.trim() || null,
+    seniority: parsed.data.seniority,
+    contract_type: parsed.data.contract_type,
+    skills: parsed.data.skills || null,
   };
-
-  console.log("🚀 INSERT PAYLOAD:", payload);
 
   const { data: inserted, error } = await supabase
     .from("jobs")
@@ -39,19 +50,14 @@ export async function createJob(
     .select()
     .single();
 
-  console.log("📦 SUPABASE RESPONSE:", { inserted, error });
-
   if (error) {
-    return {
-      success: false,
-      message: error.message,
-    };
+    return { success: false, message: "Erro ao criar vaga." };
   }
 
   if (!inserted) {
     return {
       success: false,
-      message: "Nenhum dado retornado do insert",
+      message: "Erro ao criar vaga.",
     };
   }
 

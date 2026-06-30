@@ -1,18 +1,22 @@
 "use server";
 
-import { createClient } from "@/lib/supabase/client";
+import { createServerClient } from "@/lib/supabase/server";
+import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
 
 export async function getJobById(id: string) {
-  const supabase = await createClient();
+  const supabase = await createServerClient();
+  const currentProfile = await getCurrentProfile();
+
+  if (!currentProfile) return null;
 
   const { data, error } = await supabase
     .from("jobs")
     .select("*")
     .eq("id", id)
+    .eq("company_id", currentProfile.company_id)
     .single();
 
   if (error) {
-    console.log("GET JOB ERROR:", error);
     return null;
   }
 

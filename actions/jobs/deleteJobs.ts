@@ -2,6 +2,7 @@
 
 import { createServerClient } from "@/lib/supabase/server";
 import { revalidatePath } from "next/cache";
+import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
 
 export interface DeleteJobResponse {
   success: boolean;
@@ -10,8 +11,20 @@ export interface DeleteJobResponse {
 
 export async function deleteJob(id: string): Promise<DeleteJobResponse> {
   const supabase = await createServerClient();
+  const currentProfile = await getCurrentProfile();
 
-  const { error } = await supabase.from("jobs").delete().eq("id", id);
+  if (!currentProfile) {
+    return {
+      success: false,
+      message: "Usuário não autenticado.",
+    };
+  }
+
+  const { error } = await supabase
+    .from("jobs")
+    .delete()
+    .eq("id", id)
+    .eq("company_id", currentProfile.company_id);
 
   if (error) {
     console.error("Erro ao excluir vaga:", error);

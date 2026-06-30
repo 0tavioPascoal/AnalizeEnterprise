@@ -217,7 +217,7 @@ export function PipelineClient({ analyses }: PipelineClientProps) {
         )
       }
     >
-      <div className="mr-5 flex flex-col gap-3 pb-4">
+      <div className="flex flex-col gap-3 pb-4">
         {paginatedAnalyses.length > 0 ? (
           paginatedAnalyses.map((item) => (
             <PipelineRow key={item.id} item={item} />

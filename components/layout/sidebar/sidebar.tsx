@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
-import { ChevronDown, ChevronLeft, Settings } from "lucide-react";
+import { useEffect, useState, useTransition } from "react";
+import { ChevronDown, ChevronLeft, Menu, Settings, X } from "lucide-react";
 import { usePathname, useRouter } from "next/navigation";
 
 import { logout } from "@/actions/auth/logout";
@@ -23,10 +23,34 @@ interface SidebarProps {
 export function Sidebar({ user }: SidebarProps) {
   const [collapsed, setCollapsed] = useState<boolean>(false);
   const [settingsOpen, setSettingsOpen] = useState<boolean>(true);
+  const [mobileOpen, setMobileOpen] = useState<boolean>(false);
   const [isPending, startTransition] = useTransition();
 
   const pathname = usePathname();
   const router = useRouter();
+
+  useEffect(() => {
+    const frame = window.requestAnimationFrame(() => {
+      setCollapsed(
+        window.localStorage.getItem("dashboard-sidebar-collapsed") === "true",
+      );
+    });
+
+    return () => window.cancelAnimationFrame(frame);
+  }, []);
+
+  function handleCollapsedChange(): void {
+    setCollapsed((value) => {
+      const nextValue = !value;
+
+      window.localStorage.setItem(
+        "dashboard-sidebar-collapsed",
+        String(nextValue),
+      );
+
+      return nextValue;
+    });
+  }
 
   function handleLogout(): void {
     startTransition(async () => {
@@ -37,54 +61,85 @@ export function Sidebar({ user }: SidebarProps) {
   }
 
   return (
-    <aside
-      className={cn(
-        "relative flex h-screen shrink-0 flex-col overflow-hidden border-r bg-zinc-50/50 backdrop-blur-xl",
-        "transition-[width] duration-300 ease-in-out dark:bg-zinc-950/50",
-        collapsed ? "w-18" : "w-64",
-      )}
-    >
+    <>
       <button
         type="button"
-        onClick={() => setCollapsed((value) => !value)}
-        className="absolute -right-3 top-12 z-50 flex h-7 w-7 items-center justify-center rounded-full border bg-background shadow-md transition-all duration-200 hover:scale-105 hover:bg-muted active:scale-95"
-        aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+        onClick={() => setMobileOpen(true)}
+        className="fixed left-4 top-4 z-40 flex h-11 w-11 items-center justify-center rounded-xl border border-border bg-background shadow-sm md:hidden"
+        aria-label="Abrir menu"
       >
-        <ChevronLeft
-          className={cn(
-            "h-5 w-5 transition-transform duration-300 ease-in-out",
-            collapsed && "rotate-180",
-          )}
-        />
+        <Menu size={21} />
       </button>
 
-      <SidebarBrand collapsed={collapsed} />
+      {mobileOpen && (
+        <button
+          type="button"
+          className="fixed inset-0 z-40 bg-black/45 md:hidden"
+          aria-label="Fechar menu"
+          onClick={() => setMobileOpen(false)}
+        />
+      )}
 
-      <nav className="mt-4 min-h-0 flex-1 space-y-6 overflow-hidden px-3">
-        <SidebarSection title="Menu Principal" collapsed={collapsed}>
-          {mainItems.map((item) => (
-            <SidebarNavItem
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              collapsed={collapsed}
-              active={item.active(pathname)}
-            />
-          ))}
-        </SidebarSection>
+      <aside
+        className={cn(
+          "fixed inset-y-0 left-0 z-50 flex h-dvh w-64 shrink-0 flex-col overflow-hidden border-r bg-zinc-50/95 backdrop-blur-xl",
+          "transition-[transform,width] duration-300 ease-in-out dark:bg-zinc-950/95 md:relative md:z-auto md:translate-x-0 md:bg-zinc-50/50 md:dark:bg-zinc-950/50",
+          mobileOpen ? "translate-x-0" : "-translate-x-full",
+          collapsed ? "md:w-18" : "md:w-64",
+        )}
+      >
+        <button
+          type="button"
+          onClick={() => setMobileOpen(false)}
+          className="absolute right-3 top-3 z-50 flex h-9 w-9 items-center justify-center rounded-xl border bg-background shadow-sm md:hidden"
+          aria-label="Fechar menu"
+        >
+          <X size={19} />
+        </button>
 
-        <SidebarSection title="Gerenciamento" collapsed={collapsed}>
-          {managementItems.map((item) => (
-            <SidebarNavItem
-              key={item.href}
-              href={item.href}
-              icon={item.icon}
-              label={item.label}
-              collapsed={collapsed}
-              active={item.active(pathname)}
-            />
-          ))}
+        <button
+          type="button"
+          onClick={handleCollapsedChange}
+          className="absolute -right-3 top-12 z-50 hidden h-7 w-7 items-center justify-center rounded-full border bg-background shadow-md transition-all duration-200 hover:scale-105 hover:bg-muted active:scale-95 md:flex"
+          aria-label={collapsed ? "Expandir menu" : "Recolher menu"}
+        >
+          <ChevronLeft
+            className={cn(
+              "h-5 w-5 transition-transform duration-300 ease-in-out",
+              collapsed && "rotate-180",
+            )}
+          />
+        </button>
+
+        <SidebarBrand collapsed={collapsed} />
+
+        <nav className="custom-scrollbar mt-4 min-h-0 flex-1 space-y-6 overflow-y-auto px-3 pb-4">
+          <SidebarSection title="Menu Principal" collapsed={collapsed}>
+            {mainItems.map((item) => (
+              <SidebarNavItem
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+                collapsed={collapsed}
+                active={item.active(pathname)}
+                onNavigate={() => setMobileOpen(false)}
+              />
+            ))}
+          </SidebarSection>
+
+          <SidebarSection title="Gerenciamento" collapsed={collapsed}>
+            {managementItems.map((item) => (
+              <SidebarNavItem
+                key={item.href}
+                href={item.href}
+                icon={item.icon}
+                label={item.label}
+                collapsed={collapsed}
+                active={item.active(pathname)}
+                onNavigate={() => setMobileOpen(false)}
+              />
+            ))}
 
           <button
             type="button"
@@ -146,20 +201,22 @@ export function Sidebar({ user }: SidebarProps) {
                     label={item.label}
                     collapsed={false}
                     active={item.active(pathname)}
+                    onNavigate={() => setMobileOpen(false)}
                   />
                 ))}
               </div>
             </div>
           </div>
-        </SidebarSection>
-      </nav>
+          </SidebarSection>
+        </nav>
 
-      <SidebarFooter
-        user={user}
-        collapsed={collapsed}
-        isPending={isPending}
-        onLogout={handleLogout}
-      />
-    </aside>
+        <SidebarFooter
+          user={user}
+          collapsed={collapsed}
+          isPending={isPending}
+          onLogout={handleLogout}
+        />
+      </aside>
+    </>
   );
 }

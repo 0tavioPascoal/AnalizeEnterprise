@@ -74,11 +74,11 @@ export default async function InterviewDetailPage({ params }: Props) {
         />
       }
     >
-      <div className="flex h-full min-h-0 flex-col gap-6 overflow-hidden">
+      <div className="flex min-h-full flex-col gap-6">
         <InterviewHeroCard interview={interview} />
 
-        <div className="grid min-h-0 flex-1 gap-6 overflow-hidden xl:grid-cols-[minmax(0,0.95fr)_minmax(480px,0.75fr)] 2xl:grid-cols-[minmax(0,1fr)_560px]">
-          <div className="min-h-0 space-y-6 overflow-y-auto pr-2 scrollbar-hide">
+        <div className="grid min-h-0 flex-1 gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.75fr)] 2xl:grid-cols-[minmax(0,1fr)_560px]">
+          <div className="space-y-6">
             <InterviewObjectiveCard objective={content.interview_objective} />
 
             <InterviewSummaryCard summary={content.summary} />
@@ -88,7 +88,7 @@ export default async function InterviewDetailPage({ params }: Props) {
             />
           </div>
 
-          <div className="min-h-0 space-y-6 overflow-y-auto pr-1 scrollbar-hide">
+          <div className="space-y-6">
             <InterviewQuestionSection
               title="Perguntas Técnicas"
               icon={Target}

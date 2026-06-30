@@ -86,7 +86,7 @@ export function AnalyzeForm({ jobs }: AnalyzeFormProps) {
   }
 
   return (
-    <Card className="flex h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm">
+    <Card className="flex min-h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm">
       <CardHeader className="shrink-0 border-b border-border bg-muted/20">
         <CardTitle className="flex items-center gap-3">
           <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
@@ -105,10 +105,10 @@ export function AnalyzeForm({ jobs }: AnalyzeFormProps) {
         </CardTitle>
       </CardHeader>
 
-      <CardContent className="min-h-0 flex-1 p-6">
+      <CardContent className="min-h-0 flex-1 p-4 sm:p-6">
         <form
           onSubmit={handleSubmit}
-          className="flex h-full flex-col justify-between"
+          className="flex min-h-full flex-col justify-between"
         >
           <div className="space-y-8">
             <div className="space-y-3">
@@ -162,7 +162,7 @@ export function AnalyzeForm({ jobs }: AnalyzeFormProps) {
             <Button
               type="submit"
               disabled={loading || !file || !jobId}
-              className="h-11 rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
+              className="h-11 w-full rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95 sm:w-auto"
             >
               {loading ? (
                 <>

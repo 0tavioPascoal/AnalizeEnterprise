@@ -10,7 +10,7 @@ export function StatusFilterTabs<T extends string>({
   onChange,
 }: StatusFilterTabsProps<T>) {
   return (
-    <div className="flex rounded-xl border border-border bg-card p-1 shadow-sm">
+    <div className="flex w-full overflow-x-auto rounded-xl border border-border bg-card p-1 shadow-sm sm:w-auto">
       {options.map((option) => (
         <Button
           key={option.value}
@@ -19,7 +19,7 @@ export function StatusFilterTabs<T extends string>({
           size="sm"
           onClick={() => onChange(option.value)}
           className="
-            h-9 rounded-lg px-4
+            h-9 min-w-max flex-1 rounded-lg px-3 sm:flex-none sm:px-4
 
             text-sm
             font-bold

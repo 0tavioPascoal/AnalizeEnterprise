@@ -1,14 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase/server";
+import { getOptionalEnv } from "@/lib/env";
+import { fetchWithTimeout } from "@/lib/http";
+import { analysisRequestSchema } from "@/lib/validations";
 
-const N8N_WEBHOOK_URL = process.env.N8N_ANALYZE_WEBHOOK_URL!;
 const RESUME_BUCKET = "candidate-cvs";
+const MAX_RESUME_SIZE_BYTES = 10 * 1024 * 1024;
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerClient();
+    const n8nWebhookUrl = getOptionalEnv("N8N_ANALYZE_WEBHOOK_URL");
 
-    if (!N8N_WEBHOOK_URL) {
+    if (!n8nWebhookUrl) {
       return NextResponse.json(
         {
           success: false,
@@ -51,7 +55,9 @@ export async function POST(req: NextRequest) {
     const formData = await req.formData();
 
     const file = formData.get("file");
-    const jobId = formData.get("job_id");
+    const parsedBody = analysisRequestSchema.safeParse({
+      job_id: formData.get("job_id"),
+    });
 
     if (!(file instanceof File)) {
       return NextResponse.json(
@@ -63,7 +69,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (file.type !== "application/pdf") {
+    const safeFileName = file.name
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9._-]/g, "-")
+      .toLowerCase();
+
+    if (file.type !== "application/pdf" || !safeFileName.endsWith(".pdf")) {
       return NextResponse.json(
         {
           success: false,
@@ -73,11 +85,21 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (typeof jobId !== "string") {
+    if (file.size > MAX_RESUME_SIZE_BYTES) {
       return NextResponse.json(
         {
           success: false,
-          message: "Job inválido.",
+          message: "O arquivo deve ter no máximo 10MB.",
+        },
+        { status: 400 },
+      );
+    }
+
+    if (!parsedBody.success) {
+      return NextResponse.json(
+        {
+          success: false,
+          message: parsedBody.error.issues[0]?.message ?? "Vaga inválida.",
         },
         { status: 400 },
       );
@@ -85,8 +107,8 @@ export async function POST(req: NextRequest) {
 
     const { data: job, error: jobError } = await supabase
       .from("jobs")
-      .select("*")
-      .eq("id", jobId)
+      .select("id, title, context, score_min, seniority, contract_type, skills")
+      .eq("id", parsedBody.data.job_id)
       .eq("company_id", profile.company_id)
       .single();
 
@@ -102,12 +124,6 @@ export async function POST(req: NextRequest) {
 
     const analysisId = crypto.randomUUID();
 
-    const safeFileName = file.name
-      .normalize("NFD")
-      .replace(/[\u0300-\u036f]/g, "")
-      .replace(/[^a-zA-Z0-9._-]/g, "-")
-      .toLowerCase();
-
     const filePath = `${profile.company_id}/${analysisId}/${Date.now()}-${safeFileName}`;
 
     const { error: uploadError } = await supabase.storage
@@ -121,7 +137,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: uploadError.message,
+              message: "Erro ao enviar currículo.",
         },
         { status: 500 },
       );
@@ -144,7 +160,7 @@ export async function POST(req: NextRequest) {
     let response: Response;
 
     try {
-      response = await fetch(N8N_WEBHOOK_URL, {
+      response = await fetchWithTimeout(n8nWebhookUrl, {
         method: "POST",
         body: n8nFormData,
       });
@@ -154,7 +170,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: "Erro de conexão com o n8n.",
+          message: "Erro de conexão com o serviço de análise.",
         },
         { status: 500 },
       );
@@ -166,7 +182,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: `n8n retornou erro HTTP ${response.status}.`,
+          message: "Serviço de análise retornou erro.",
         },
         { status: 500 },
       );
@@ -186,13 +202,12 @@ export async function POST(req: NextRequest) {
       },
     });
   } catch (error) {
+    console.error("Analyze API error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erro interno do servidor.",
+        message: "Erro interno do servidor.",
       },
       { status: 500 },
     );

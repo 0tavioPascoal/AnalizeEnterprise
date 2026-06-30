@@ -11,7 +11,7 @@ export default async function DashboardPage() {
   const overview = await getDashboardOverview();
 
   return (
-    <div className="flex h-full w-full flex-col gap-6 overflow-hidden bg-zinc-50/50 p-6 dark:bg-zinc-950/50">
+    <div className="custom-scrollbar flex h-full w-full flex-col gap-5 overflow-y-auto bg-muted/40 p-4 pt-20 md:gap-6 md:p-6">
       <DashboardHeader />
 
       <section className="grid shrink-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
@@ -48,8 +48,8 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <main className="grid min-h-0 flex-1 grid-cols-12 gap-6 overflow-hidden">
-        <div className="col-span-12 flex min-h-0 flex-col gap-6 overflow-hidden xl:col-span-8">
+      <main className="grid min-h-0 flex-1 grid-cols-12 gap-6">
+        <div className="col-span-12 flex min-h-0 flex-col gap-6 xl:col-span-8">
           <WeeklyFlowCard data={overview.weeklyFlow} />
           <RecentActivityCard analyses={overview.recentAnalyses} />
         </div>

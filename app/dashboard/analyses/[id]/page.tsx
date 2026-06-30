@@ -82,8 +82,8 @@ export default async function AnalysisDetailPage({ params }: Props) {
                 />
               )}
 
-              <div className="rounded-xl border border-indigo-100 bg-indigo-50 px-4 py-2 dark:border-indigo-500/20 dark:bg-indigo-500/10">
-                <span className="text-xs font-extrabold uppercase tracking-wide text-indigo-600 dark:text-indigo-300">
+              <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-2">
+                <span className="text-xs font-extrabold uppercase tracking-wide text-primary">
                   Match: {analysis.score}%
                 </span>
               </div>
@@ -92,13 +92,13 @@ export default async function AnalysisDetailPage({ params }: Props) {
         />
       }
     >
-      <div className="grid h-full gap-6 overflow-hidden lg:grid-cols-3">
-        <div className="space-y-6 overflow-y-auto pr-2 scrollbar-hide lg:col-span-2">
+      <div className="grid min-h-full gap-6 lg:grid-cols-3">
+        <div className="space-y-6 lg:col-span-2">
           <AnalysisProfileCard analysis={analysis} />
 
           <AnalysisScoreCard analysis={analysis} />
 
-          <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+          <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
             <div className="mb-5 flex items-center gap-3">
               <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
                 <Sparkles size={20} />
@@ -115,13 +115,13 @@ export default async function AnalysisDetailPage({ params }: Props) {
               </div>
             </div>
 
-            <p className="text-base leading-relaxed text-zinc-700 dark:text-zinc-300">
+            <p className="text-base leading-relaxed text-foreground/80">
               {analysis.final_opinion ?? "-"}
             </p>
           </section>
         </div>
 
-        <div className="flex min-h-0 flex-col gap-6 overflow-y-auto pr-1 scrollbar-hide">
+        <div className="flex min-h-0 flex-col gap-6">
           <AnalysisResultCard analysis={analysis} />
 
           <AnalysisListCard

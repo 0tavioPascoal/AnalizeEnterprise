@@ -2,7 +2,7 @@ import NextAuth, { type AuthOptions } from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import type { AppUser, UserRole } from "@/types/auth";
 import type { JWT } from "next-auth/jwt";
-import { createSupabaseServerClient } from "@/lib/supabase/server";
+import { createServerClient } from "@/lib/supabase/server";
 
 export const authOptions: AuthOptions = {
   providers: [
@@ -15,17 +15,28 @@ export const authOptions: AuthOptions = {
       },
 
       async authorize(credentials): Promise<AppUser | null> {
-        if (!credentials?.email) return null;
+        if (!credentials?.email || !credentials.password) return null;
 
-        const supabase = createSupabaseServerClient();
+        const supabase = await createServerClient();
+
+        const { data: authData, error: authError } =
+          await supabase.auth.signInWithPassword({
+            email: credentials.email,
+            password: credentials.password,
+          });
+
+        if (authError || !authData.user) return null;
 
         const { data, error } = await supabase
           .from("profiles")
-          .select("id, email, name, role, company_id")
-          .eq("email", credentials.email)
+          .select("id, email, name, role, company_id, status")
+          .eq("id", authData.user.id)
           .single();
 
-        if (error || !data) return null;
+        if (error || !data || data.status === "inactive") {
+          await supabase.auth.signOut();
+          return null;
+        }
 
         return {
           id: data.id,

@@ -23,10 +23,10 @@ export function AnalysisRow({ analysis }: AnalysisRowProps) {
   return (
     <RowItem
       left={
-        <div className="flex min-w-0 items-center gap-4">
+        <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
           <div
             className={cn(
-              "flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border shadow-sm",
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border shadow-sm sm:h-12 sm:w-12",
               analysis.match
                 ? "border-emerald-500/20 bg-emerald-500/15 text-emerald-700 dark:text-emerald-300"
                 : "border-amber-500/20 bg-amber-500/15 text-amber-700 dark:text-amber-300",
@@ -37,7 +37,7 @@ export function AnalysisRow({ analysis }: AnalysisRowProps) {
 
           <div className="min-w-0">
             <div className="flex min-w-0 flex-wrap items-center gap-2">
-              <p className="truncate text-base font-bold text-foreground">
+              <p className="break-words text-base font-bold text-foreground">
                 {analysis.candidate_name ?? "Candidato sem nome"}
               </p>
 
@@ -47,7 +47,7 @@ export function AnalysisRow({ analysis }: AnalysisRowProps) {
             </div>
 
             <div className="mt-2 flex min-w-0 flex-wrap items-center gap-2">
-              <span className="max-w-55 truncate text-sm font-medium text-muted-foreground">
+              <span className="max-w-full break-all text-sm font-medium text-muted-foreground sm:max-w-55 sm:truncate">
                 {analysis.candidate_email ?? "E-mail não identificado"}
               </span>
 
@@ -61,8 +61,8 @@ export function AnalysisRow({ analysis }: AnalysisRowProps) {
         </div>
       }
       right={
-        <div className="flex items-center gap-4">
-          <div className="hidden min-w-28 text-right sm:block">
+        <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
+          <div className="text-left sm:min-w-28 sm:text-right">
             <StatusBadge
               variant={scoreVariant}
               className="px-3 py-1.5 text-sm font-semibold"

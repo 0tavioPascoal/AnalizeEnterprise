@@ -45,7 +45,7 @@ export function AnalysisListCard({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+        "rounded-xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
         style.card,
       )}
     >

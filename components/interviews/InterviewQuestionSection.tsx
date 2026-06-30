@@ -74,7 +74,7 @@ export function InterviewQuestionSection({
   const visibleItems = items.slice(0, 5);
 
   return (
-    <section className="rounded-2xl border border-zinc-200/80 bg-white p-5 shadow-lg shadow-zinc-900/3 dark:border-zinc-800 dark:bg-zinc-900/90">
+    <section className="rounded-xl border border-border bg-card p-5 shadow-sm">
       <div className="flex items-start justify-between gap-4">
         <div className="flex min-w-0 items-start gap-3">
           <div
@@ -115,7 +115,7 @@ export function InterviewQuestionSection({
                 key={`${item}-${index}`}
                 className={cn(
                   `
-                  group relative overflow-hidden rounded-2xl
+                  group relative overflow-hidden rounded-xl
                   border border-zinc-200/70 bg-white
                   px-5 py-5
                   transition-all duration-200

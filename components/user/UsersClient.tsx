@@ -116,7 +116,7 @@ export function UsersClient({ users }: UsersClientProps) {
         )
       }
     >
-      <div className="mr-5 flex flex-col gap-3 pb-4">
+      <div className="flex flex-col gap-3 pb-4">
         {paginatedUsers.length > 0 ? (
           paginatedUsers.map((user) => (
             <UserListRow key={user.id} user={user} />

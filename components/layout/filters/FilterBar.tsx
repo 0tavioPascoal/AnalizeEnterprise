@@ -5,7 +5,7 @@ export function FilterBar({ children, className }: FilterBarProps) {
   return (
     <div
       className={cn(
-        "flex flex-col gap-4 sm:flex-row sm:flex-wrap sm:items-center",
+        "flex w-full flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-center",
         className,
       )}
     >

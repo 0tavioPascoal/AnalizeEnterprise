@@ -1,11 +1,6 @@
 "use server";
 
-import { createClient } from "@supabase/supabase-js";
-
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_SERVICE_ROLE_KEY!
-);
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export interface RegisterInput {
   companyName: string;
@@ -15,6 +10,8 @@ export interface RegisterInput {
 }
 
 export async function registerCompany(data: RegisterInput) {
+  const supabaseAdmin = createAdminClient();
+
   const { data: authUser, error: authError } =
     await supabaseAdmin.auth.admin.createUser({
       email: data.email,
@@ -37,7 +34,8 @@ export async function registerCompany(data: RegisterInput) {
     .single();
 
   if (companyError || !company) {
-    throw new Error(companyError.message);
+    await supabaseAdmin.auth.admin.deleteUser(userId);
+    throw new Error(companyError?.message ?? "Erro ao criar empresa");
   }
 
   const { error: profileError } = await supabaseAdmin.from("profiles").insert({
@@ -49,6 +47,7 @@ export async function registerCompany(data: RegisterInput) {
   });
 
   if (profileError) {
+    await supabaseAdmin.auth.admin.deleteUser(userId);
     throw new Error(profileError.message);
   }
 

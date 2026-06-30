@@ -39,8 +39,8 @@ export function TablePagination({
   const endItem = hasItemsInfo ? Math.min(page * pageSize, totalItems) : 0;
 
   return (
-    <div className="flex flex-wrap items-center justify-center gap-8">
-      <div className="whitespace-nowrap text-sm font-semibold text-muted-foreground">
+    <div className="flex flex-col items-center justify-center gap-3 sm:flex-row sm:gap-8">
+      <div className="text-center text-sm font-semibold text-muted-foreground">
         {hasItemsInfo ? (
           <>
             Mostrando{" "}
@@ -58,7 +58,7 @@ export function TablePagination({
         )}
       </div>
 
-      <div className="flex items-center justify-center gap-2">
+      <div className="flex max-w-full items-center justify-center gap-2 overflow-x-auto">
         <PaginationButton
           disabled={page === 1}
           onClick={() => setPage(page - 1)}
@@ -73,7 +73,7 @@ export function TablePagination({
               return (
                 <div
                   key={`ellipsis-${index}`}
-                  className="flex h-10 min-w-10 items-center justify-center px-1 text-base font-bold text-muted-foreground"
+                  className="flex h-9 min-w-8 items-center justify-center px-1 text-sm font-bold text-muted-foreground sm:h-10 sm:min-w-10 sm:text-base"
                 >
                   ...
                 </div>
@@ -88,7 +88,7 @@ export function TablePagination({
                 type="button"
                 onClick={() => setPage(item)}
                 className={cn(
-                  "flex h-10 min-w-10 items-center justify-center rounded-xl border px-3 text-sm font-bold transition-all",
+                  "flex h-9 min-w-9 items-center justify-center rounded-lg border px-2 text-sm font-bold transition-all sm:h-10 sm:min-w-10 sm:rounded-xl sm:px-3",
                   isActive
                     ? "border-primary bg-primary text-primary-foreground shadow-sm"
                     : "border-border bg-background text-foreground hover:bg-muted",
@@ -132,7 +132,7 @@ function PaginationButton({
       onClick={onClick}
       aria-label={ariaLabel}
       className={cn(
-        "flex h-10 w-10 items-center justify-center rounded-xl border border-border bg-background text-foreground transition-all",
+        "flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-background text-foreground transition-all sm:h-10 sm:w-10 sm:rounded-xl",
         "hover:bg-muted",
         "disabled:pointer-events-none disabled:opacity-40",
       )}

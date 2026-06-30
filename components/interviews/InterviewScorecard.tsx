@@ -36,8 +36,8 @@ export function InterviewScorecard({
     <section
       className={
         compact
-          ? "rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-2 dark:border-zinc-800 dark:bg-zinc-950/40"
-          : "rounded-2xl border border-zinc-200/80 bg-white p-6 shadow-lg shadow-zinc-900/3 dark:border-zinc-800 dark:bg-zinc-900/90"
+          ? "rounded-xl border border-border bg-muted/40 p-2"
+          : "rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6"
       }
     >
       {!compact && (
@@ -104,7 +104,7 @@ export function InterviewScorecard({
           className={
             compact
               ? "flex min-h-20 items-center justify-center rounded-xl border border-dashed border-zinc-300 px-5 text-center text-sm font-semibold text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
-              : "rounded-2xl border border-dashed border-zinc-300 p-8 text-center text-sm text-zinc-500 dark:border-zinc-700 dark:text-zinc-400"
+              : "rounded-xl border border-dashed border-border p-8 text-center text-sm text-muted-foreground"
           }
         >
           Nenhum critério gerado.

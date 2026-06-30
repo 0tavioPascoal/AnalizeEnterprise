@@ -1,12 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { createServerClient } from "@/lib/supabase/server";
-
-const N8N_INTERVIEW_WEBHOOK_URL = process.env.N8N_INTERVIEW_WEBHOOK_URL!;
+import { getOptionalEnv } from "@/lib/env";
+import { fetchWithTimeout } from "@/lib/http";
+import { interviewGenerateSchema } from "@/lib/validations";
 
 export async function POST(req: NextRequest) {
   try {
     const supabase = await createServerClient();
+    const n8nWebhookUrl = getOptionalEnv("N8N_INTERVIEW_WEBHOOK_URL");
+
+    if (!n8nWebhookUrl) {
+      return NextResponse.json(
+        { success: false, message: "Webhook do n8n não configurado." },
+        { status: 500 },
+      );
+    }
 
     const {
       data: { user },
@@ -20,12 +29,15 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const body = await req.json();
-    const analysisId = body.analysis_id;
+    const body = await req.json().catch(() => null);
+    const parsedBody = interviewGenerateSchema.safeParse(body);
 
-    if (!analysisId || typeof analysisId !== "string") {
+    if (!parsedBody.success) {
       return NextResponse.json(
-        { success: false, message: "analysis_id inválido." },
+        {
+          success: false,
+          message: parsedBody.error.issues[0]?.message ?? "analysis_id inválido.",
+        },
         { status: 400 },
       );
     }
@@ -46,7 +58,7 @@ export async function POST(req: NextRequest) {
     const { data: analysis, error: analysisError } = await supabase
       .from("candidate_analysis")
       .select("*")
-      .eq("id", analysisId)
+      .eq("id", parsedBody.data.analysis_id)
       .eq("company_id", profile.company_id)
       .single();
 
@@ -133,14 +145,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (!N8N_INTERVIEW_WEBHOOK_URL) {
-      return NextResponse.json(
-        { success: false, message: "Webhook do n8n não configurado." },
-        { status: 500 },
-      );
-    }
-
-    const webhookResponse = await fetch(N8N_INTERVIEW_WEBHOOK_URL, {
+    const webhookResponse = await fetchWithTimeout(n8nWebhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -168,7 +173,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         {
           success: false,
-          message: `n8n retornou HTTP ${webhookResponse.status}.`,
+          message: "Serviço de entrevista retornou erro.",
         },
         { status: 500 },
       );
@@ -180,13 +185,12 @@ export async function POST(req: NextRequest) {
       already_exists: false,
     });
   } catch (error) {
+    console.error("Generate interview API error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erro interno ao gerar entrevista.",
+        message: "Erro interno ao gerar entrevista.",
       },
       { status: 500 },
     );

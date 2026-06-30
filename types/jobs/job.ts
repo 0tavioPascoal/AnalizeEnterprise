@@ -9,3 +9,12 @@ export interface Job {
   seniority: string | null;
   skills: string | null;
 }
+
+export interface JobFormData {
+  title: string;
+  seniority: string;
+  contract_type: string;
+  score_min: number;
+  skills?: string;
+  context: string;
+}

@@ -70,26 +70,26 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
   ];
 
   return (
-    <Card className="col-span-12 mr-5 flex min-h-0 flex-col overflow-hidden border-none bg-white shadow-sm dark:bg-zinc-900 xl:col-span-4">
-      <CardHeader className="shrink-0 border-b border-zinc-100 px-5 py-4 dark:border-zinc-800">
+    <Card className="col-span-12 flex min-h-96 flex-col overflow-hidden border border-border bg-card shadow-sm xl:col-span-4 xl:min-h-0">
+      <CardHeader className="shrink-0 border-b border-border px-5 py-4">
         <div className="flex items-center justify-between gap-4">
           <div className="min-w-0">
-            <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+            <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
               Fila Pendente
             </CardTitle>
 
-            <p className="mt-1 text-sm text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 text-sm text-muted-foreground">
               Resumo das análises que ainda aguardam decisão
             </p>
           </div>
 
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-indigo-50 text-indigo-600 dark:bg-indigo-500/10 dark:text-indigo-400">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
             <Clock size={20} />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="flex min-h-0 flex-1 flex-col overflow-y-auto p-5">
+      <CardContent className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto p-5">
         {totalPending > 0 ? (
           <>
             <div className="grid grid-cols-3 gap-3">
@@ -142,7 +142,7 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
             </div>
 
             <div className="mt-auto pt-6">
-              <div className="rounded-2xl bg-zinc-50 p-4 dark:bg-zinc-800/50">
+              <div className="rounded-xl bg-muted/50 p-4">
                 <div className="mb-2 flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
                   <AlertTriangle size={16} />
 
@@ -161,7 +161,7 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-2xl bg-zinc-100 text-zinc-400 dark:bg-zinc-800">
+            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
               <CheckCircle2 size={22} />
             </div>
 
@@ -187,7 +187,7 @@ interface MetricBoxProps {
 
 function MetricBox({ label, value, icon: Icon }: MetricBoxProps) {
   return (
-    <div className="rounded-2xl bg-zinc-50 p-3 dark:bg-zinc-800/50">
+    <div className="rounded-xl bg-muted/50 p-3">
       <div className="mb-3 flex items-center justify-between gap-2">
         <span className="truncate text-xs font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
           {label}

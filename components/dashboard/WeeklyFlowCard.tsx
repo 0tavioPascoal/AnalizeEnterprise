@@ -46,7 +46,7 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
   const hasData = total > 0;
 
   return (
-    <Card className="flex min-h-0 flex-[0.45] flex-col overflow-hidden border border-border bg-card shadow-sm">
+    <Card className="flex min-h-80 flex-col overflow-hidden border border-border bg-card shadow-sm xl:min-h-0 xl:flex-[0.45]">
       <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border px-5 py-4">
         <div>
           <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
@@ -137,7 +137,7 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-2xl border border-dashed border-border bg-muted/30 px-6 text-center">
+          <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-6 text-center">
             <p className="text-base font-bold text-foreground">
               Sem análises nesta semana
             </p>

@@ -18,7 +18,5 @@ export async function getInterviewByAnalysisId(analysisId: string) {
     return null;
   }
 
-  console.log("Interview encontrada:", data);
-
   return data;
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useTransition } from "react";
 import { FileText } from "lucide-react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 
 import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
@@ -14,16 +15,27 @@ import { FilterSelect } from "@/components/layout/filters/FilterSelect";
 
 import { AnalysisRow } from "@/components/analyses/listing/AnalysisRow";
 
-import type { AnalysisListItem } from "@/actions/analyzes/getAnalyzes";
+import type {
+  AnalysisJobOption,
+  AnalysisListItem,
+  MatchFilter,
+  ScoreFilter,
+} from "@/actions/analyzes/getAnalyzes";
 
 interface AnalysesClientProps {
   analyses: AnalysisListItem[];
+  total: number;
+  page: number;
+  pageSize: number;
+  totalPages: number;
+  jobOptions: AnalysisJobOption[];
+  filters: {
+    search: string;
+    job: string;
+    match: MatchFilter;
+    score: ScoreFilter;
+  };
 }
-
-type MatchFilter = "all" | "match" | "no_match";
-type ScoreFilter = "all" | "low" | "medium" | "high";
-
-const ITEMS_PER_PAGE = 8;
 
 const matchOptions: Array<{ label: string; value: MatchFilter }> = [
   { label: "Todos", value: "all" },
@@ -38,77 +50,41 @@ const scoreOptions: Array<{ label: string; value: ScoreFilter }> = [
   { label: "Alto", value: "high" },
 ];
 
-export function AnalysesClient({ analyses }: AnalysesClientProps) {
-  const [search, setSearch] = useState<string>("");
-  const [page, setPage] = useState<number>(1);
+export function AnalysesClient({
+  analyses,
+  total,
+  page,
+  pageSize,
+  totalPages,
+  jobOptions,
+  filters,
+}: AnalysesClientProps) {
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const [isPending, startTransition] = useTransition();
 
-  const [jobFilter, setJobFilter] = useState<string>("all");
-  const [matchFilter, setMatchFilter] = useState<MatchFilter>("all");
-  const [scoreFilter, setScoreFilter] = useState<ScoreFilter>("all");
+  const allJobOptions = [
+    { label: "Todas as vagas", value: "all" },
+    ...jobOptions,
+  ];
 
-  const jobOptions = useMemo(() => {
-    const uniqueJobs = Array.from(
-      new Set(
-        analyses
-          .map((analysis) => analysis.job_title)
-          .filter((title): title is string => Boolean(title)),
-      ),
-    );
+  function updateFilter(key: string, value: string, resetPage = true): void {
+    const params = new URLSearchParams(searchParams.toString());
 
-    return [
-      { label: "Todas as vagas", value: "all" },
-      ...uniqueJobs.map((title) => ({
-        label: title,
-        value: title,
-      })),
-    ];
-  }, [analyses]);
+    if (!value || value === "all") {
+      params.delete(key);
+    } else {
+      params.set(key, value);
+    }
 
-  const filteredAnalyses = useMemo(() => {
-    const term = search.trim().toLowerCase();
+    if (resetPage) {
+      params.delete("page");
+    }
 
-    return analyses.filter((analysis) => {
-      const matchesSearch =
-        !term ||
-        (analysis.candidate_name?.toLowerCase() ?? "").includes(term) ||
-        (analysis.candidate_email?.toLowerCase() ?? "").includes(term) ||
-        (analysis.job_title?.toLowerCase() ?? "").includes(term) ||
-        analysis.recommendation.toLowerCase().includes(term);
-
-      const matchesJob =
-        jobFilter === "all" || analysis.job_title === jobFilter;
-
-      const matchesMatch =
-        matchFilter === "all" ||
-        (matchFilter === "match" && analysis.match) ||
-        (matchFilter === "no_match" && !analysis.match);
-
-      const matchesScore =
-        scoreFilter === "all" ||
-        (scoreFilter === "low" && analysis.score <= 50) ||
-        (scoreFilter === "medium" &&
-          analysis.score > 50 &&
-          analysis.score <= 70) ||
-        (scoreFilter === "high" && analysis.score > 70);
-
-      return matchesSearch && matchesJob && matchesMatch && matchesScore;
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`);
     });
-  }, [analyses, search, jobFilter, matchFilter, scoreFilter]);
-
-  const totalPages = Math.max(
-    1,
-    Math.ceil(filteredAnalyses.length / ITEMS_PER_PAGE),
-  );
-
-  const paginatedAnalyses = useMemo(() => {
-    const safePage = Math.min(page, totalPages);
-    const start = (safePage - 1) * ITEMS_PER_PAGE;
-
-    return filteredAnalyses.slice(start, start + ITEMS_PER_PAGE);
-  }, [filteredAnalyses, page, totalPages]);
-
-  function resetPage(): void {
-    setPage(1);
   }
 
   return (
@@ -120,38 +96,34 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
           action={
             <FilterBar className="xl:flex-nowrap">
               <StatusFilterTabs
-                value={matchFilter}
+                value={filters.match}
                 options={matchOptions}
                 onChange={(value) => {
-                  setMatchFilter(value);
-                  resetPage();
+                  updateFilter("match", value);
                 }}
               />
 
               <SearchInput
-                value={search}
+                value={filters.search}
                 onChange={(value) => {
-                  setSearch(value);
-                  resetPage();
+                  updateFilter("search", value);
                 }}
                 placeholder="Buscar candidato..."
               />
 
               <FilterSelect
-                value={jobFilter}
+                value={filters.job}
                 onChange={(value) => {
-                  setJobFilter(value);
-                  resetPage();
+                  updateFilter("job", value);
                 }}
-                options={jobOptions}
+                options={allJobOptions}
                 ariaLabel="Filtrar por vaga"
               />
 
               <FilterSelect
-                value={scoreFilter}
+                value={filters.score}
                 onChange={(value) => {
-                  setScoreFilter(value as ScoreFilter);
-                  resetPage();
+                  updateFilter("score", value);
                 }}
                 options={scoreOptions}
                 ariaLabel="Filtrar por score"
@@ -161,18 +133,24 @@ export function AnalysesClient({ analyses }: AnalysesClientProps) {
         />
       }
       pagination={
-        filteredAnalyses.length > ITEMS_PER_PAGE && (
+        total > pageSize && (
           <TablePagination
             page={page}
             totalPages={totalPages}
-            setPage={setPage}
+            setPage={(nextPage) => updateFilter("page", String(nextPage), false)}
+            totalItems={total}
+            pageSize={pageSize}
+            itemLabel="análises"
           />
         )
       }
     >
-      <div className="mr-5 flex flex-col gap-3 pb-4">
-        {paginatedAnalyses.length > 0 ? (
-          paginatedAnalyses.map((analysis) => (
+      <div
+        className="flex flex-col gap-3 pb-4 opacity-100 transition-opacity data-[pending=true]:opacity-60"
+        data-pending={isPending}
+      >
+        {analyses.length > 0 ? (
+          analyses.map((analysis) => (
             <AnalysisRow key={analysis.id} analysis={analysis} />
           ))
         ) : (

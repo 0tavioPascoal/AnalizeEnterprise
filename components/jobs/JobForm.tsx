@@ -13,20 +13,11 @@ import { Textarea } from "@/components/ui/textarea";
 import { deleteJob } from "@/actions/jobs/deleteJobs";
 import { createJob } from "@/actions/jobs/createjob";
 import { updateJob } from "@/actions/jobs/updateJobs";
-
-export interface JobFormData {
-  title: string;
-  seniority: string;
-  contract_type: string;
-  score_min: number;
-  skills?: string;
-  context: string;
-}
+import type { JobFormData } from "@/types/jobs/job";
 
 interface Props {
   initialData?: JobFormData & { id?: string };
   isEdit?: boolean;
-  onSubmit: (data: JobFormData) => void;
 }
 
 export function JobForm({ initialData, isEdit = false }: Props) {
@@ -116,10 +107,10 @@ export function JobForm({ initialData, isEdit = false }: Props) {
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-full max-h-full flex-col overflow-hidden rounded-2xl border border-border bg-card shadow-sm"
+      className="flex min-h-full flex-col overflow-hidden rounded-xl border border-border bg-card shadow-sm"
     >
-      <div className="scrollbar-hide flex-1 space-y-5 overflow-y-auto p-6">
-        <div className="rounded-2xl border border-border bg-muted/30 px-4 py-3">
+      <div className="custom-scrollbar flex-1 space-y-5 overflow-y-auto p-4 sm:p-6">
+        <div className="rounded-xl border border-border bg-muted/30 px-4 py-3">
           <h2 className="text-lg font-bold text-foreground">
             Parâmetros da Vaga
           </h2>
@@ -227,7 +218,7 @@ export function JobForm({ initialData, isEdit = false }: Props) {
         </div>
       </div>
 
-      <div className="flex shrink-0 flex-wrap items-center justify-end gap-3 border-t border-border bg-muted/30 p-4 backdrop-blur-sm">
+      <div className="flex shrink-0 flex-col-reverse gap-3 border-t border-border bg-muted/30 p-4 backdrop-blur-sm sm:flex-row sm:flex-wrap sm:items-center sm:justify-end">
         {isEdit && initialData?.id && (
           <Button
             type="button"
@@ -236,8 +227,8 @@ export function JobForm({ initialData, isEdit = false }: Props) {
             onClick={handleDelete}
             className={
               confirmDelete
-                ? "h-11 rounded-xl border-destructive bg-destructive px-6 text-xs font-extrabold uppercase tracking-wide text-white transition-all hover:bg-destructive/90"
-                : "h-11 rounded-xl border-red-500/20 bg-red-500/10 px-6 text-xs font-extrabold uppercase tracking-wide text-red-600 transition-all hover:bg-red-500/15 hover:text-red-700 dark:text-red-400"
+                ? "h-11 w-full rounded-xl border-destructive bg-destructive px-6 text-xs font-extrabold uppercase tracking-wide text-white transition-all hover:bg-destructive/90 sm:w-auto"
+                : "h-11 w-full rounded-xl border-red-500/20 bg-red-500/10 px-6 text-xs font-extrabold uppercase tracking-wide text-red-600 transition-all hover:bg-red-500/15 hover:text-red-700 dark:text-red-400 sm:w-auto"
             }
           >
             <Trash2 size={16} className="mr-2" />
@@ -250,7 +241,7 @@ export function JobForm({ initialData, isEdit = false }: Props) {
           variant="outline"
           disabled={loading}
           onClick={() => router.push("/dashboard/jobs")}
-          className="h-11 rounded-xl border-border bg-card px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground"
+          className="h-11 w-full rounded-xl border-border bg-card px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground sm:w-auto"
         >
           <X size={16} className="mr-2" />
           Cancelar
@@ -259,7 +250,7 @@ export function JobForm({ initialData, isEdit = false }: Props) {
         <Button
           type="submit"
           disabled={loading}
-          className="h-11 rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90"
+          className="h-11 w-full rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 sm:w-auto"
         >
           {loading ? (
             <Loader2 className="mr-2 h-4 w-4 animate-spin" />

@@ -32,7 +32,7 @@ export default async function EditJobPage({
         />
       }
     >
-      <div className="grid gap-6 lg:grid-cols-3 items-stretch h-full">
+      <div className="grid min-h-full items-stretch gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <JobForm initialData={{ ...job, id }} isEdit />
         </div>

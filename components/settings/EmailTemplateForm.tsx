@@ -166,9 +166,9 @@ export function EmailTemplateForm({
   }
 
   return (
-    <div className="grid h-full max-h-full grid-cols-1 gap-6 overflow-hidden xl:grid-cols-[minmax(0,1fr)_380px]">
+    <div className="grid min-h-full grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr)_380px]">
       {/* LEFT */}
-      <Card className="flex h-full max-h-full flex-col overflow-hidden border-border bg-card text-card-foreground shadow-sm">
+      <Card className="flex min-h-0 flex-col border-border bg-card text-card-foreground shadow-sm">
         <CardHeader className="shrink-0 border-b border-border">
           <CardTitle className="flex items-center gap-3 text-lg font-bold">
             {selectedType === "approved" ? (
@@ -181,8 +181,8 @@ export function EmailTemplateForm({
           </CardTitle>
         </CardHeader>
 
-        <CardContent className="flex min-h-0 flex-1 flex-col overflow-hidden p-6">
-          <div className="flex min-h-0 flex-1 flex-col gap-5 overflow-hidden">
+        <CardContent className="flex min-h-0 flex-1 flex-col p-4 sm:p-6">
+          <div className="flex min-h-0 flex-1 flex-col gap-5">
             {/* TYPE */}
             <div className="grid shrink-0 grid-cols-1 gap-3 sm:grid-cols-2">
               <Button
@@ -234,7 +234,7 @@ export function EmailTemplateForm({
             </div>
 
             {/* BODY */}
-            <div className="flex min-h-0 flex-1 flex-col space-y-2 overflow-hidden">
+            <div className="flex min-h-96 flex-1 flex-col space-y-2">
               <Label className="shrink-0 text-xs font-extrabold uppercase tracking-wide">
                 Mensagem
               </Label>
@@ -244,10 +244,7 @@ export function EmailTemplateForm({
                 onChange={(event) =>
                   setBody(event.target.value)
                 }
-                className="
-                  min-h-0 flex-1 resize-none rounded-xl
-                  text-sm leading-relaxed
-                "
+                className="min-h-80 flex-1 resize-y rounded-xl text-sm leading-relaxed xl:resize-none"
               />
             </div>
 
@@ -285,7 +282,7 @@ export function EmailTemplateForm({
                     (current) => !current,
                   )
                 }
-                className="h-10 gap-2 rounded-xl text-sm font-bold"
+                className="h-10 w-full gap-2 rounded-xl text-sm font-bold sm:w-auto"
               >
                 <Eye className="h-4 w-4" />
 
@@ -298,7 +295,7 @@ export function EmailTemplateForm({
                 type="button"
                 onClick={handleSubmit}
                 disabled={isPending}
-                className="h-10 gap-2 rounded-xl text-sm font-bold"
+                className="h-10 w-full gap-2 rounded-xl text-sm font-bold sm:w-auto"
               >
                 {isPending ? (
                   <Loader2 className="h-4 w-4 animate-spin" />
@@ -317,14 +314,14 @@ export function EmailTemplateForm({
 
       {/* RIGHT */}
       {showPreview && (
-        <Card className="flex h-full max-h-full flex-col overflow-hidden border-border bg-card text-card-foreground shadow-sm">
+        <Card className="flex min-h-96 flex-col border-border bg-card text-card-foreground shadow-sm">
           <CardHeader className="shrink-0 border-b border-border">
             <CardTitle className="text-lg font-bold">
               Preview
             </CardTitle>
           </CardHeader>
 
-          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 overflow-hidden p-5">
+          <CardContent className="flex min-h-0 flex-1 flex-col gap-4 p-4 sm:p-5">
             <div className="shrink-0 rounded-xl border border-border bg-background p-4">
               <p className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
                 Assunto
@@ -335,12 +332,12 @@ export function EmailTemplateForm({
               </p>
             </div>
 
-            <div className="min-h-0 flex-1 overflow-hidden rounded-xl border border-border bg-background p-4">
+            <div className="min-h-80 flex-1 rounded-xl border border-border bg-background p-4">
               <p className="mb-3 text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
                 Corpo
               </p>
 
-              <div className="h-full overflow-y-auto whitespace-pre-wrap pr-1 text-sm leading-6 text-foreground scrollbar-hide">
+              <div className="custom-scrollbar h-full overflow-y-auto whitespace-pre-wrap pr-1 text-sm leading-6 text-foreground">
                 {getPreviewText(body)}
               </div>
             </div>

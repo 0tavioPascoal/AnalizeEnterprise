@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-dvh w-full overflow-hidden bg-background">
       <Sidebar
         user={{
           name: currentProfile.name,
@@ -25,7 +25,7 @@ export default async function DashboardLayout({
         }}
       />
 
-      <main className="relative h-full flex-1 overflow-hidden bg-muted/40">
+      <main className="relative h-full min-w-0 flex-1 overflow-hidden bg-muted/40">
         {children}
       </main>
     </div>

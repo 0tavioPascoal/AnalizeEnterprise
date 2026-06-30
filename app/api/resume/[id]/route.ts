@@ -83,7 +83,7 @@ export async function GET(_req: NextRequest, { params }: Props) {
         {
           success: false,
           message:
-            signedUrlError?.message ?? "Erro ao gerar link do currículo.",
+            "Erro ao gerar link do currículo.",
         },
         { status: 500 },
       );
@@ -94,13 +94,12 @@ export async function GET(_req: NextRequest, { params }: Props) {
       url: data.signedUrl,
     });
   } catch (error) {
+    console.error("Resume API error:", error);
+
     return NextResponse.json(
       {
         success: false,
-        message:
-          error instanceof Error
-            ? error.message
-            : "Erro interno ao gerar download.",
+        message: "Erro interno ao gerar download.",
       },
       { status: 500 },
     );

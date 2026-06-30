@@ -10,7 +10,7 @@ export function InterviewObjectiveCard({
   return (
     <section
       className="
-        rounded-2xl
+        rounded-xl
         border border-zinc-200/80
 
         bg-white

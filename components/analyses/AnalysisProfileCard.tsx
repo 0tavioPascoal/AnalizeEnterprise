@@ -13,7 +13,7 @@ interface AnalysisProfileCardProps {
 
 export function AnalysisProfileCard({ analysis }: AnalysisProfileCardProps) {
   return (
-    <section className="rounded-2xl border border-border bg-card p-6 shadow-sm">
+    <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
       <div className="mb-6 flex items-center gap-3">
         <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
           <FileText size={20} />
@@ -30,7 +30,7 @@ export function AnalysisProfileCard({ analysis }: AnalysisProfileCardProps) {
         </div>
       </div>
 
-      <div className="rounded-2xl border border-border bg-muted/30 p-5">
+      <div className="rounded-xl border border-border bg-muted/30 p-4 sm:p-5">
         <p className="text-base leading-relaxed text-foreground/90">
           {analysis.summary ?? "Nenhum resumo gerado."}
         </p>
@@ -72,7 +72,7 @@ function Info({
   return (
     <div
       className={cn(
-        "rounded-2xl border p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
+        "rounded-xl border p-4 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
         highlight
           ? "border-primary/20 bg-primary/6"
           : "border-border bg-muted/30",

@@ -145,11 +145,11 @@ export function UserForm({
   return (
     <form
       onSubmit={handleSubmit}
-      className="flex h-full flex-col justify-between rounded-2xl border border-border bg-card p-8 shadow-sm transition-all"
+      className="flex min-h-full flex-col justify-between rounded-xl border border-border bg-card p-4 shadow-sm transition-all sm:p-6 lg:p-8"
     >
       <div className="space-y-6">
         {isEdit && (
-          <div className="rounded-2xl border border-border bg-muted/30 p-4">
+          <div className="rounded-xl border border-border bg-muted/30 p-4">
             <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div>
                 <p className="text-xs font-extrabold uppercase tracking-wide text-muted-foreground">
@@ -303,13 +303,13 @@ export function UserForm({
         </div>
       </div>
 
-      <div className="mt-8 flex shrink-0 items-center justify-end gap-3 border-t border-border pt-6">
+      <div className="mt-8 flex shrink-0 flex-col-reverse gap-3 border-t border-border pt-6 sm:flex-row sm:items-center sm:justify-end">
         <Button
           type="button"
           variant="outline"
           disabled={loading || statusLoading}
           onClick={() => router.push("/dashboard/users")}
-          className="h-11 rounded-xl border-border bg-card px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95"
+          className="h-11 w-full rounded-xl border-border bg-card px-6 text-xs font-bold uppercase tracking-wide text-muted-foreground shadow-sm transition-all hover:bg-muted hover:text-foreground active:scale-95 sm:w-auto"
         >
           Cancelar
         </Button>
@@ -317,7 +317,7 @@ export function UserForm({
         <Button
           type="submit"
           disabled={loading || statusLoading || !canEditForm}
-          className="h-11 gap-2 rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95"
+          className="h-11 w-full gap-2 rounded-xl bg-primary px-8 text-xs font-extrabold uppercase tracking-wide text-primary-foreground shadow-lg shadow-primary/20 transition-all hover:bg-primary/90 active:scale-95 sm:w-auto"
         >
           {loading ? (
             <Loader2 className="animate-spin" size={16} />

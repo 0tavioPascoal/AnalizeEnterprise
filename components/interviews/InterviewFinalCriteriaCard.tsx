@@ -10,7 +10,7 @@ export function InterviewFinalCriteriaCard({
   return (
     <section
       className="
-    rounded-2xl
+    rounded-xl
     border border-emerald-500/10
 
     bg-emerald-500/4.5

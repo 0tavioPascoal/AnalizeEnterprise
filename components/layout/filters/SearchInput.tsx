@@ -14,7 +14,7 @@ export function SearchInput({
   className,
 }: SearchInputProps) {
   return (
-    <div className={cn("relative", className)}>
+    <div className={cn("relative w-full sm:w-80", className)}>
       <Search
         className="
           pointer-events-none
@@ -53,8 +53,6 @@ export function SearchInput({
           focus-visible:border-primary/30
           focus-visible:ring-2
           focus-visible:ring-primary/30
-
-          sm:w-80
         "
       />
     </div>

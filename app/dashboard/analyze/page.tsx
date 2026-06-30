@@ -26,7 +26,7 @@ export default async function AnalyzePage() {
         />
       }
     >
-      <div className="grid h-full gap-6 lg:grid-cols-3">
+      <div className="grid min-h-full gap-6 lg:grid-cols-3">
         <div className="min-h-0 lg:col-span-2">
           <AnalyzeForm jobs={jobs} />
         </div>

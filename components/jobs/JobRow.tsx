@@ -27,13 +27,13 @@ export function JobRow({ job }: JobRowProps) {
   return (
     <RowItem
       left={
-        <div className="flex min-w-0 items-center gap-4">
-          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl border border-primary/10 bg-primary/10 text-primary shadow-sm">
+        <div className="flex min-w-0 items-start gap-3 sm:items-center sm:gap-4">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-primary/10 text-primary shadow-sm sm:h-12 sm:w-12">
             <Briefcase size={22} />
           </div>
 
           <div className="min-w-0">
-            <p className="truncate text-base font-bold text-foreground">
+            <p className="break-words text-base font-bold text-foreground">
               {job.title}
             </p>
 
@@ -54,8 +54,8 @@ export function JobRow({ job }: JobRowProps) {
         </div>
       }
       right={
-        <div className="flex items-center gap-4">
-          <div className="hidden text-right sm:block">
+        <div className="flex w-full items-center justify-between gap-4 sm:w-auto sm:justify-end">
+          <div className="text-left sm:text-right">
             <StatusBadge
               variant={scoreVariant}
               className="px-3 py-1.5 text-sm font-semibold"
