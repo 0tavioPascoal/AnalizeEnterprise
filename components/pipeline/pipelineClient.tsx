@@ -35,9 +35,9 @@ interface PipelineClientProps {
 
 const baseStageOptions: Array<{ label: string; value: PipelineStage }> = [
   { label: "Triagem", value: "screening" },
-  { label: "Entrevista", value: "interview" },
   { label: "Aprovados", value: "approved" },
   { label: "Reprovados", value: "rejected" },
+  { label: "Entrevista", value: "interview" },
 ];
 
 const emptyStateByStage: Record<

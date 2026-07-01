@@ -1,12 +1,13 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
+
 import { ArrowLeft, Sparkles } from "lucide-react";
 
 import { getAnalysisById } from "@/actions/analyzes/getAnalysisById";
 import { getInterviewByAnalysisId } from "@/actions/interviews/getInterviewByAnalysisId";
 
-import { PageLayout } from "@/components/layout/PageLayout";
 import { PageHeader } from "@/components/layout/Pageheader";
+import { PageLayout } from "@/components/layout/PageLayout";
 
 import { Button } from "@/components/ui/button";
 
@@ -49,27 +50,11 @@ export default async function AnalysisDetailPage({ params }: Props) {
             </>
           }
           action={
-            <div className="flex flex-wrap items-center gap-3">
-              <Button
-                asChild
-                variant="outline"
-                className="h-10 rounded-xl text-sm font-semibold"
-              >
-                <Link href="/dashboard/analyses">
-                  <ArrowLeft size={17} />
-                  Voltar
-                </Link>
-              </Button>
-
-              <DownloadResumeButton
-                analysisId={analysis.id}
-                disabled={!analysis.resume_file_path}
-              />
-
+            <div className="flex flex-wrap items-center justify-end gap-3">
               {interview ? (
                 <Button
                   asChild
-                  className="h-10 rounded-xl text-sm font-bold shadow-lg shadow-primary/20"
+                  className="h-11 rounded-xl px-4 text-sm font-black shadow-lg shadow-primary/20"
                 >
                   <Link href={`/dashboard/interviews/${interview.id}`}>
                     Ver entrevista
@@ -82,85 +67,130 @@ export default async function AnalysisDetailPage({ params }: Props) {
                 />
               )}
 
-              <div className="rounded-xl border border-primary/20 bg-primary/10 px-4 py-2">
-                <span className="text-xs font-extrabold uppercase tracking-wide text-primary">
-                  Match: {analysis.score}%
-                </span>
-              </div>
+              <DownloadResumeButton
+                analysisId={analysis.id}
+                disabled={!analysis.resume_file_path}
+              />
+
+              <Button
+                asChild
+                variant="outline"
+                className="h-11 rounded-xl px-4 text-sm font-semibold"
+              >
+                <Link href="/dashboard/analyses">
+                  <ArrowLeft size={17} />
+                  Voltar
+                </Link>
+              </Button>
             </div>
           }
         />
       }
     >
-      <div className="grid min-h-full gap-6 lg:grid-cols-3">
-        <div className="space-y-6 lg:col-span-2">
-          <AnalysisProfileCard analysis={analysis} />
+      <div className="flex w-full flex-col gap-8">
+        <section className="grid w-full items-stretch gap-8 xl:grid-cols-[minmax(0,1fr)_420px] 2xl:grid-cols-[minmax(0,1fr)_460px]">
+          <div className="min-w-0 [&>section]:h-full">
+            <AnalysisProfileCard analysis={analysis} />
+          </div>
 
-          <AnalysisScoreCard analysis={analysis} />
+          <div className="min-w-0 [&>section]:h-full">
+            <AnalysisResultCard analysis={analysis} />
+          </div>
+        </section>
 
-          <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
-            <div className="mb-5 flex items-center gap-3">
-              <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-                <Sparkles size={20} />
-              </div>
+        <section className="grid w-full items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(420px,480px)] 2xl:grid-cols-[minmax(0,1fr)_520px]">
+          <main className="min-w-0 space-y-8">
+            <AnalysisScoreCard analysis={analysis} />
 
-              <div>
-                <p className="text-sm font-extrabold uppercase tracking-wide text-primary">
-                  Parecer Final
-                </p>
+            <FinalOpinionCard text={analysis.final_opinion} />
+          </main>
 
-                <p className="mt-1 text-sm text-muted-foreground">
-                  Conclusão consolidada da IA sobre o candidato
-                </p>
-              </div>
-            </div>
+          <aside
+            className="
+              min-w-0 space-y-4
+              xl:sticky xl:top-8 xl:self-start
+              xl:max-h-[calc(100vh-8rem)]
+              xl:overflow-y-auto
+              xl:pr-2
+            "
+          >
+            <AnalysisListCard
+              title="Skills encontradas"
+              items={analysis.matched_skills}
+              type="success"
+            />
 
-            <p className="text-base leading-relaxed text-foreground/80">
-              {analysis.final_opinion ?? "-"}
-            </p>
-          </section>
-        </div>
+            <AnalysisListCard
+              title="Skills ausentes"
+              items={analysis.missing_skills}
+              type="warning"
+            />
 
-        <div className="flex min-h-0 flex-col gap-6">
-          <AnalysisResultCard analysis={analysis} />
+            <AnalysisListCard
+              title="Destaques"
+              items={analysis.strengths}
+              type="success"
+            />
 
-          <AnalysisListCard
-            title="Destaques"
-            items={analysis.strengths}
-            type="success"
-          />
+            <AnalysisListCard
+              title="Pontos de atenção"
+              items={analysis.weaknesses}
+              type="warning"
+            />
 
-          <AnalysisListCard
-            title="Pontos de Atenção"
-            items={analysis.weaknesses}
-            type="warning"
-          />
+            <AnalysisListCard
+              title="Riscos"
+              items={analysis.risks}
+              type="warning"
+            />
 
-          <AnalysisListCard
-            title="Skills Encontradas"
-            items={analysis.matched_skills}
-            type="success"
-          />
-
-          <AnalysisListCard
-            title="Skills Ausentes"
-            items={analysis.missing_skills}
-            type="warning"
-          />
-
-          <AnalysisListCard
-            title="Riscos"
-            items={analysis.risks}
-            type="warning"
-          />
-
-          <AnalysisListCard
-            title="Perguntas para Entrevista"
-            items={analysis.interview_questions}
-            type="question"
-          />
-        </div>
+            <AnalysisListCard
+              title="Perguntas iniciais"
+              items={analysis.interview_questions}
+              type="question"
+            />
+          </aside>
+        </section>
       </div>
     </PageLayout>
+  );
+}
+
+function FinalOpinionCard({ text }: { text?: string | null }) {
+  const formattedText = text?.trim();
+
+  return (
+    <section className="overflow-hidden rounded-[28px] border border-zinc-200/80 bg-white shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+      <div className="border-b border-zinc-200/80 bg-zinc-50/80 p-6 dark:border-zinc-800 dark:bg-zinc-950/40">
+        <div className="flex items-start gap-4">
+          <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-500/[0.08] text-violet-600 dark:bg-violet-500/[0.12] dark:text-violet-300">
+            <Sparkles size={21} />
+          </div>
+
+          <div className="min-w-0">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+              Parecer da IA
+            </p>
+
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+              Parecer final
+            </h2>
+
+            <p className="mt-1.5 text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
+              Conclusão consolidada da triagem sobre aderência, senioridade,
+              riscos e próximos passos.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      <div className="p-6">
+        <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-950/40">
+          <p className="text-[16px] font-medium leading-8 text-zinc-700 dark:text-zinc-300">
+            {formattedText || "Parecer final não disponível."}
+          </p>
+        </div>
+      </div>
+    </section>
   );
 }

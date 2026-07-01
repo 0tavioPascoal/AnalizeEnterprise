@@ -1,30 +1,60 @@
-import { CheckCircle2, AlertTriangle, MessageCircle } from "lucide-react";
+import {
+  AlertTriangle,
+  CheckCircle2,
+  MessageCircle,
+  XCircle,
+  type LucideIcon,
+} from "lucide-react";
+
 import { cn } from "@/lib/supabase/utils";
 
 interface AnalysisListCardProps {
   title: string;
-  items: string[];
+  items?: string[] | null;
   type: "success" | "warning" | "question";
 }
 
-const styles = {
-  success: {
-    card: "border-emerald-500/20 bg-emerald-500/[0.04] dark:bg-emerald-500/[0.06]",
-    iconBox: "bg-emerald-500/15 text-emerald-700 dark:text-emerald-300",
-    title: "text-emerald-700 dark:text-emerald-300",
-    itemIcon: "text-emerald-600 dark:text-emerald-400",
+type ListTone = "emerald" | "amber" | "sky" | "rose";
+
+const styles: Record<
+  ListTone,
+  {
+    iconBox: string;
+    badge: string;
+    chip: string;
+  }
+> = {
+  emerald: {
+    iconBox:
+      "bg-emerald-500/[0.08] text-emerald-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
+    badge:
+      "border-emerald-500/15 bg-emerald-500/[0.08] text-emerald-700 dark:text-emerald-300",
+    chip:
+      "border-emerald-500/15 bg-emerald-500/[0.08] text-emerald-700 dark:text-emerald-300",
   },
-  warning: {
-    card: "border-amber-500/20 bg-amber-500/[0.05] dark:bg-amber-500/[0.06]",
-    iconBox: "bg-amber-500/15 text-amber-700 dark:text-amber-300",
-    title: "text-amber-700 dark:text-amber-300",
-    itemIcon: "text-amber-600 dark:text-amber-400",
+  amber: {
+    iconBox:
+      "bg-amber-500/[0.08] text-amber-600 dark:bg-amber-500/[0.12] dark:text-amber-300",
+    badge:
+      "border-amber-500/15 bg-amber-500/[0.08] text-amber-700 dark:text-amber-300",
+    chip:
+      "border-amber-500/15 bg-amber-500/[0.08] text-amber-700 dark:text-amber-300",
   },
-  question: {
-    card: "border-sky-500/20 bg-sky-500/[0.05] dark:bg-sky-500/[0.06]",
-    iconBox: "bg-sky-500/15 text-sky-700 dark:text-sky-300",
-    title: "text-sky-700 dark:text-sky-300",
-    itemIcon: "text-sky-600 dark:text-sky-400",
+  sky: {
+    iconBox:
+      "bg-sky-500/[0.08] text-sky-600 dark:bg-sky-500/[0.12] dark:text-sky-300",
+    badge:
+      "border-sky-500/15 bg-sky-500/[0.08] text-sky-700 dark:text-sky-300",
+    chip:
+      "border-sky-500/15 bg-sky-500/[0.08] text-sky-700 dark:text-sky-300",
+  },
+  rose: {
+    iconBox:
+      "bg-rose-500/[0.08] text-rose-600 dark:bg-rose-500/[0.12] dark:text-rose-300",
+    badge:
+      "border-rose-500/15 bg-rose-500/[0.08] text-rose-700 dark:text-rose-300",
+    chip:
+      "border-rose-500/15 bg-rose-500/[0.08] text-rose-700 dark:text-rose-300",
   },
 };
 
@@ -33,73 +63,201 @@ export function AnalysisListCard({
   items,
   type,
 }: AnalysisListCardProps) {
-  const Icon =
-    type === "success"
-      ? CheckCircle2
-      : type === "warning"
-        ? AlertTriangle
-        : MessageCircle;
-
-  const style = styles[type];
+  const normalizedItems = normalizeItems(items);
+  const config = getCardConfig(title, type);
+  const style = styles[config.tone];
+  const Icon = config.icon;
 
   return (
-    <div
-      className={cn(
-        "rounded-xl border p-5 shadow-sm transition-all hover:-translate-y-0.5 hover:shadow-md",
-        style.card,
-      )}
-    >
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <div
-            className={cn(
-              "flex h-11 w-11 items-center justify-center rounded-xl",
-              style.iconBox,
-            )}
-          >
-            <Icon size={20} />
-          </div>
-
-          <div>
-            <p
+    <section className="overflow-hidden rounded-2xl border border-zinc-200/80 bg-white shadow-sm dark:border-zinc-800 dark:bg-zinc-900/90">
+      <div className="border-b border-zinc-200/80 bg-zinc-50/80 p-3.5 dark:border-zinc-800 dark:bg-zinc-950/40">
+        <div className="flex items-start justify-between gap-3">
+          <div className="flex min-w-0 items-start gap-3">
+            <div
               className={cn(
-                "text-sm font-extrabold uppercase tracking-wide",
-                style.title,
+                "flex h-9 w-9 shrink-0 items-center justify-center rounded-lg",
+                style.iconBox,
               )}
             >
-              {title}
-            </p>
+              <Icon size={17} />
+            </div>
 
-            <p className="mt-1 text-sm text-muted-foreground">
-              {items.length} {items.length === 1 ? "item" : "itens"}
-            </p>
+            <div className="min-w-0">
+              <p className="text-[10px] font-black uppercase tracking-[0.16em] text-zinc-500 dark:text-zinc-400">
+                {config.category}
+              </p>
+
+              <h3 className="mt-0.5 text-base font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+                {title}
+              </h3>
+
+              <p className="mt-0.5 line-clamp-1 text-xs leading-5 text-zinc-500 dark:text-zinc-400">
+                {config.description}
+              </p>
+            </div>
+          </div>
+
+          <div
+            className={cn(
+              "shrink-0 rounded-lg border px-2 py-0.5 text-[11px] font-black",
+              style.badge,
+            )}
+          >
+            {normalizedItems.length}
           </div>
         </div>
       </div>
 
-      {items.length > 0 ? (
-        <div className="space-y-2">
-          {items.map((item, i) => (
-            <div
-              key={i}
-              className="flex gap-3 rounded-xl border border-border/60 bg-card/70 p-3 text-sm text-foreground"
-            >
-              <Icon
-                size={17}
-                className={cn("mt-0.5 shrink-0", style.itemIcon)}
-              />
+      <div className="p-3.5">
+        {normalizedItems.length > 0 ? (
+          <CompactItems
+            items={normalizedItems}
+            icon={Icon}
+            style={style}
+            numbered={type === "question"}
+          />
+        ) : (
+          <EmptyState message={config.emptyMessage} />
+        )}
+      </div>
+    </section>
+  );
+}
 
-              <span className="leading-relaxed">{item}</span>
-            </div>
-          ))}
-        </div>
-      ) : (
-        <div className="rounded-xl border border-dashed border-border bg-card/60 p-4 text-center">
-          <p className="text-sm font-medium text-muted-foreground">
-            Nenhum item encontrado.
-          </p>
-        </div>
-      )}
+function CompactItems({
+  items,
+  icon: Icon,
+  style,
+  numbered,
+}: {
+  items: string[];
+  icon: LucideIcon;
+  style: (typeof styles)[ListTone];
+  numbered?: boolean;
+}) {
+  return (
+    <div className="flex flex-wrap gap-2">
+      {items.map((item, index) => (
+        <span
+          key={`${item}-${index}`}
+          className={cn(
+            `
+            inline-flex max-w-full items-center gap-1.5
+            rounded-lg border px-2.5 py-1.5
+            text-xs font-black leading-5
+            transition-all duration-200
+            hover:-translate-y-0.5 hover:shadow-sm
+            `,
+            style.chip,
+          )}
+          title={item}
+        >
+          {numbered ? (
+            <span className="flex h-5 min-w-5 items-center justify-center rounded-md bg-white/60 px-1 text-[10px] font-black dark:bg-zinc-950/30">
+              {index + 1}
+            </span>
+          ) : (
+            <Icon size={13} className="shrink-0" />
+          )}
+
+          <span className="max-w-[220px] truncate">{item}</span>
+        </span>
+      ))}
     </div>
   );
+}
+
+function EmptyState({ message }: { message: string }) {
+  return (
+    <div className="rounded-xl border border-dashed border-zinc-300 bg-zinc-50/70 p-3.5 text-center dark:border-zinc-700 dark:bg-zinc-950/40">
+      <p className="text-xs font-semibold leading-5 text-zinc-500 dark:text-zinc-400">
+        {message}
+      </p>
+    </div>
+  );
+}
+
+function getCardConfig(
+  title: string,
+  type: AnalysisListCardProps["type"],
+): {
+  icon: LucideIcon;
+  tone: ListTone;
+  category: string;
+  description: string;
+  emptyMessage: string;
+} {
+  const normalizedTitle = title.toLowerCase();
+
+  if (type === "question") {
+    return {
+      icon: MessageCircle,
+      tone: "sky",
+      category: "Entrevista",
+      description: "Perguntas iniciais para validação.",
+      emptyMessage: "Nenhuma pergunta inicial foi gerada.",
+    };
+  }
+
+  if (normalizedTitle.includes("ausente")) {
+    return {
+      icon: XCircle,
+      tone: "rose",
+      category: "Gaps",
+      description: "Competências não evidenciadas.",
+      emptyMessage: "Nenhuma skill ausente foi identificada.",
+    };
+  }
+
+  if (normalizedTitle.includes("risco")) {
+    return {
+      icon: AlertTriangle,
+      tone: "rose",
+      category: "Riscos",
+      description: "Pontos que podem impactar a aderência.",
+      emptyMessage: "Nenhum risco relevante foi identificado.",
+    };
+  }
+
+  if (
+    normalizedTitle.includes("atenção") ||
+    normalizedTitle.includes("fraco") ||
+    normalizedTitle.includes("fraqueza")
+  ) {
+    return {
+      icon: AlertTriangle,
+      tone: "amber",
+      category: "Atenção",
+      description: "Lacunas para validar com cuidado.",
+      emptyMessage: "Nenhum ponto de atenção foi identificado.",
+    };
+  }
+
+  if (type === "success") {
+    return {
+      icon: CheckCircle2,
+      tone: "emerald",
+      category: "Evidências",
+      description: "Pontos positivos encontrados.",
+      emptyMessage: "Nenhum item positivo foi identificado.",
+    };
+  }
+
+  return {
+    icon: AlertTriangle,
+    tone: "amber",
+    category: "Atenção",
+    description: "Itens que exigem validação.",
+    emptyMessage: "Nenhum item encontrado.",
+  };
+}
+
+function normalizeItems(items?: string[] | null) {
+  if (!Array.isArray(items)) {
+    return [];
+  }
+
+  return items
+    .map((item) => item?.trim())
+    .filter((item): item is string => Boolean(item));
 }

@@ -1,14 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
-import {
-  AlertTriangle,
-  ArrowLeft,
-  BrainCircuit,
-  ClipboardList,
-  MessageCircle,
-  Target,
-} from "lucide-react";
+import { ArrowLeft, BrainCircuit } from "lucide-react";
 
 import { getInterviewById } from "@/actions/interviews/getInterviewById";
 
@@ -17,12 +10,12 @@ import { PageLayout } from "@/components/layout/PageLayout";
 
 import { Button } from "@/components/ui/button";
 
-import { InterviewHeroCard } from "@/components/interviews/InterviewHeroCard";
-import { InterviewObjectiveCard } from "@/components/interviews/InterviewObjectiveCard";
-import { InterviewSummaryCard } from "@/components/interviews/InterviewSummaryCard";
-import { InterviewQuestionSection } from "@/components/interviews/InterviewQuestionSection";
-import { InterviewFinalCriteriaCard } from "@/components/interviews/InterviewFinalCriteriaCard";
 import { ExportInterviewPdfButton } from "@/components/interviews/ExportInterviewPdfButton";
+import { InterviewFinalCriteriaCard } from "@/components/interviews/InterviewFinalCriteriaCard";
+import { InterviewHeroCard } from "@/components/interviews/InterviewHeroCard";
+import { InterviewInsightsGrid } from "@/components/interviews/InterviewInsightsGrid";
+import { InterviewObjectiveCard } from "@/components/interviews/InterviewObjectiveCard";
+import { InterviewQuestionTabs } from "@/components/interviews/InterviewQuestionTabs";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -62,9 +55,9 @@ export default async function InterviewDetailPage({ params }: Props) {
               <Button
                 asChild
                 variant="outline"
-                className="h-10 rounded-xl text-sm font-semibold"
+                className="h-10 rounded-xl px-4 text-sm font-semibold"
               >
-                <Link href={`/dashboard/pipeline`}>
+                <Link href="/dashboard/pipeline">
                   <ArrowLeft size={17} />
                   Voltar para Pipeline
                 </Link>
@@ -74,50 +67,24 @@ export default async function InterviewDetailPage({ params }: Props) {
         />
       }
     >
-      <div className="flex min-h-full flex-col gap-6">
+      <div className="flex w-full flex-col gap-8">
         <InterviewHeroCard interview={interview} />
 
-        <div className="grid min-h-0 flex-1 gap-6 xl:grid-cols-[minmax(0,0.95fr)_minmax(420px,0.75fr)] 2xl:grid-cols-[minmax(0,1fr)_560px]">
-          <div className="space-y-6">
+        <section className="grid w-full items-start gap-8 xl:grid-cols-[minmax(0,1fr)_minmax(460px,520px)] 2xl:grid-cols-[minmax(0,1fr)_560px]">
+          <div className="min-w-0 space-y-8">
             <InterviewObjectiveCard objective={content.interview_objective} />
 
-            <InterviewSummaryCard summary={content.summary} />
+            <InterviewInsightsGrid content={content} />
 
             <InterviewFinalCriteriaCard
               text={content.final_recommendation_criteria}
             />
           </div>
 
-          <div className="space-y-6">
-            <InterviewQuestionSection
-              title="Perguntas Técnicas"
-              icon={Target}
-              items={content.technical_questions ?? []}
-              tone="indigo"
-            />
-
-            <InterviewQuestionSection
-              title="Perguntas Comportamentais"
-              icon={MessageCircle}
-              items={content.behavioral_questions ?? []}
-              tone="emerald"
-            />
-
-            <InterviewQuestionSection
-              title="Perguntas de Risco"
-              icon={AlertTriangle}
-              items={content.risk_questions ?? []}
-              tone="amber"
-            />
-
-            <InterviewQuestionSection
-              title="Skills Ausentes"
-              icon={ClipboardList}
-              items={content.missing_skill_questions ?? []}
-              tone="rose"
-            />
-          </div>
-        </div>
+          <aside className="min-w-0 xl:sticky xl:top-8 xl:self-start">
+            <InterviewQuestionTabs content={content} />
+          </aside>
+        </section>
       </div>
     </PageLayout>
   );

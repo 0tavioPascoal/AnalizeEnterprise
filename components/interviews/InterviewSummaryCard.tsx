@@ -1,116 +1,93 @@
-import Link from "next/link";
+import {
+  CheckCircle2,
+  Clock,
+  FileText,
+  Loader2,
+  XCircle,
+} from "lucide-react";
 
-import { ExternalLink, Sparkles } from "lucide-react";
+import { cn } from "@/lib/supabase/utils";
 
-interface InterviewSummaryCardProps {
-  summary?: string;
-  analysisId?: string;
+interface InterviewStatusBadgeProps {
+  status?: string | null;
 }
 
-export function InterviewSummaryCard({
-  summary,
-  analysisId,
-}: InterviewSummaryCardProps) {
+type StatusVariant = "ready" | "generating" | "failed" | "draft";
+
+const statusConfig: Record<
+  StatusVariant,
+  {
+    label: string;
+    icon: typeof CheckCircle2;
+    className: string;
+  }
+> = {
+  ready: {
+    label: "Pronta",
+    icon: CheckCircle2,
+    className:
+      "border-emerald-500/20 bg-emerald-500/[0.10] text-emerald-700 dark:text-emerald-300",
+  },
+  generating: {
+    label: "Gerando",
+    icon: Loader2,
+    className:
+      "border-amber-500/20 bg-amber-500/[0.10] text-amber-700 dark:text-amber-300",
+  },
+  failed: {
+    label: "Falhou",
+    icon: XCircle,
+    className:
+      "border-rose-500/20 bg-rose-500/[0.10] text-rose-700 dark:text-rose-300",
+  },
+  draft: {
+    label: "Rascunho",
+    icon: FileText,
+    className:
+      "border-zinc-500/20 bg-zinc-500/[0.10] text-zinc-700 dark:text-zinc-300",
+  },
+};
+
+export function InterviewStatusBadge({ status }: InterviewStatusBadgeProps) {
+  const variant = getStatusVariant(status);
+  const config = statusConfig[variant];
+  const Icon = config.icon;
+
   return (
-    <section
-      className="
-        rounded-xl
-        border border-zinc-200/80
-
-        bg-white
-        p-6
-
-        shadow-lg shadow-zinc-900/3
-
-        dark:border-zinc-800
-        dark:bg-zinc-900/90
-      "
+    <span
+      className={cn(
+        `
+        inline-flex items-center gap-1.5 rounded-xl border
+        px-3 py-1.5
+        text-xs font-black uppercase tracking-[0.12em]
+        `,
+        config.className,
+      )}
     >
-      <div className="flex items-start gap-4">
-        {/* ICON */}
-        <div
-          className="
-            flex h-11 w-11 shrink-0
-            items-center justify-center
+      <Icon
+        size={13}
+        className={cn(variant === "generating" && "animate-spin")}
+      />
 
-            rounded-xl
-
-            bg-violet-500/8
-
-            text-violet-600
-
-            dark:bg-violet-500/12
-            dark:text-violet-300
-          "
-        >
-          <Sparkles size={18} />
-        </div>
-
-        {/* CONTENT */}
-        <div className="min-w-0 flex-1">
-          {/* TITLE */}
-          <p
-            className="
-              text-xl font-black
-              tracking-tight
-
-              text-zinc-900
-              dark:text-zinc-100
-            "
-          >
-            Resumo do Candidato (IA)
-          </p>
-
-          {/* TEXT */}
-          <p
-            className="
-              mt-3
-
-              text-[16px]
-              leading-8
-
-              text-zinc-700
-              dark:text-zinc-300
-            "
-          >
-            {summary ??
-              "Resumo do candidato não disponível."}
-          </p>
-
-          {/* ACTION */}
-          {analysisId && (
-            <div className="mt-5">
-              <Link
-                href={`/dashboard/analyses/${analysisId}`}
-                className="
-                  inline-flex items-center gap-2
-
-                  rounded-full
-
-                  bg-violet-500/8
-                  px-4 py-2
-
-                  text-sm font-black
-
-                  text-violet-700
-
-                  transition-all
-
-                  hover:bg-violet-500/12
-
-                  dark:bg-violet-500/12
-                  dark:text-violet-300
-                  dark:hover:bg-violet-500/18
-                "
-              >
-                Ver análise completa
-
-                <ExternalLink size={14} />
-              </Link>
-            </div>
-          )}
-        </div>
-      </div>
-    </section>
+      {config.label}
+    </span>
   );
+}
+
+function getStatusVariant(status?: string | null): StatusVariant {
+  const normalized = status?.trim().toLowerCase();
+
+  if (normalized === "ready") {
+    return "ready";
+  }
+
+  if (normalized === "generating") {
+    return "generating";
+  }
+
+  if (normalized === "failed") {
+    return "failed";
+  }
+
+  return "draft";
 }

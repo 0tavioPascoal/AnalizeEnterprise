@@ -1,4 +1,11 @@
-import { Target } from "lucide-react";
+import {
+  BriefcaseBusiness,
+  MessageCircle,
+  Target,
+  TrendingUp,
+  UserCheck,
+} from "lucide-react";
+
 import { cn } from "@/lib/supabase/utils";
 
 interface AnalysisScoreCardProps {
@@ -12,107 +19,219 @@ interface AnalysisScoreCardProps {
 }
 
 export function AnalysisScoreCard({ analysis }: AnalysisScoreCardProps) {
+  const scores = [
+    {
+      label: "Técnico",
+      description: "Aderência às skills técnicas da vaga.",
+      value: analysis.technical_score,
+      max: 30,
+      icon: Target,
+      tone: "indigo" as const,
+    },
+    {
+      label: "Experiência",
+      description: "Evidência prática relacionada à vaga.",
+      value: analysis.experience_score,
+      max: 25,
+      icon: BriefcaseBusiness,
+      tone: "blue" as const,
+    },
+    {
+      label: "Senioridade",
+      description: "Compatibilidade com o nível esperado.",
+      value: analysis.seniority_score,
+      max: 20,
+      icon: UserCheck,
+      tone: "purple" as const,
+    },
+    {
+      label: "Contexto",
+      description: "Fit com responsabilidades e cenário da vaga.",
+      value: analysis.context_fit_score,
+      max: 15,
+      icon: TrendingUp,
+      tone: "emerald" as const,
+    },
+    {
+      label: "Comunicação",
+      description: "Clareza e qualidade das informações do currículo.",
+      value: analysis.communication_score,
+      max: 10,
+      icon: MessageCircle,
+      tone: "amber" as const,
+    },
+  ];
+
+  const total = scores.reduce(
+    (sum, item) => sum + normalizeScore(item.value, item.max),
+    0,
+  );
+
   return (
-    <section className="rounded-xl border border-border bg-card p-5 shadow-sm sm:p-6">
-      <div className="mb-7 flex items-center justify-between gap-4">
-        <div className="flex items-center gap-3">
-          <div className="flex h-11 w-11 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Target size={20} />
+    <section className="overflow-hidden rounded-[28px] border border-zinc-200/80 bg-white shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900/90">
+      <div className="border-b border-zinc-200/80 bg-zinc-50/80 p-6 dark:border-zinc-800 dark:bg-zinc-950/40">
+        <div className="flex items-start justify-between gap-4">
+          <div className="flex items-start gap-4">
+            <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-indigo-500/[0.08] text-indigo-600 dark:bg-indigo-500/[0.12] dark:text-indigo-300">
+              <Target size={21} />
+            </div>
+
+            <div className="min-w-0">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+                Pontuação por categoria
+              </p>
+
+              <h2 className="mt-1 text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+                Distribuição da avaliação
+              </h2>
+
+              <p className="mt-1.5 text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
+                Breakdown da pontuação usada pela IA para compor o score final
+                da triagem.
+              </p>
+            </div>
           </div>
 
-          <div>
-            <p className="text-sm font-extrabold uppercase tracking-wide text-primary">
-              Pontuação por Categoria
-            </p>
-
-            <p className="mt-1 text-sm text-muted-foreground">
-              Distribuição da avaliação feita pela IA
+          <div className="hidden shrink-0 rounded-2xl border border-indigo-500/15 bg-indigo-500/[0.08] px-4 py-3 text-right text-indigo-700 dark:text-indigo-300 sm:block">
+            <p className="text-2xl font-black leading-none">{total}</p>
+            <p className="mt-1 text-[10px] font-black uppercase tracking-[0.16em]">
+              de 100
             </p>
           </div>
         </div>
       </div>
 
-      <div className="grid gap-5">
-        <Bar
-          label="Técnico"
-          value={analysis.technical_score ?? 0}
-          tone="indigo"
-        />
-        <Bar
-          label="Experiência"
-          value={analysis.experience_score ?? 0}
-          tone="blue"
-        />
-        <Bar
-          label="Senioridade"
-          value={analysis.seniority_score ?? 0}
-          tone="purple"
-        />
-        <Bar
-          label="Contexto"
-          value={analysis.context_fit_score ?? 0}
-          tone="emerald"
-        />
-        <Bar
-          label="Comunicação"
-          value={analysis.communication_score ?? 0}
-          tone="amber"
-        />
+      <div className="p-6">
+        <div className="grid gap-4">
+          {scores.map((item) => (
+            <ScoreBar
+              key={item.label}
+              label={item.label}
+              description={item.description}
+              value={item.value}
+              max={item.max}
+              icon={item.icon}
+              tone={item.tone}
+            />
+          ))}
+        </div>
       </div>
     </section>
   );
 }
 
-function Bar({
+function ScoreBar({
   label,
+  description,
   value,
+  max,
+  icon: Icon,
   tone,
 }: {
   label: string;
-  value: number;
+  description: string;
+  value?: number | null;
+  max: number;
+  icon: React.ElementType;
   tone: "indigo" | "blue" | "purple" | "emerald" | "amber";
 }) {
-  const safeValue = Math.min(Math.max(value, 0), 100);
-
-  const colors = {
-    indigo: {
-      bar: "bg-indigo-500",
-      text: "text-indigo-600 dark:text-indigo-300",
-    },
-    blue: {
-      bar: "bg-blue-500",
-      text: "text-blue-600 dark:text-blue-300",
-    },
-    purple: {
-      bar: "bg-purple-500",
-      text: "text-purple-600 dark:text-purple-300",
-    },
-    emerald: {
-      bar: "bg-emerald-500",
-      text: "text-emerald-600 dark:text-emerald-300",
-    },
-    amber: {
-      bar: "bg-amber-500",
-      text: "text-amber-600 dark:text-amber-300",
-    },
-  };
+  const safeValue = normalizeScore(value, max);
+  const percentage = max > 0 ? Math.round((safeValue / max) * 100) : 0;
+  const style = toneStyles[tone];
 
   return (
-    <div className="rounded-xl border border-border bg-muted/30 p-4">
-      <div className="mb-3 flex items-center justify-between gap-3">
-        <span className="text-sm font-bold text-foreground">{label}</span>
+    <div className="rounded-2xl border border-zinc-200/80 bg-zinc-50/70 p-5 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg hover:shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-950/40">
+      <div className="mb-4 flex items-start justify-between gap-4">
+        <div className="flex min-w-0 items-start gap-3">
+          <div
+            className={cn(
+              "flex h-11 w-11 shrink-0 items-center justify-center rounded-xl",
+              style.iconBox,
+            )}
+          >
+            <Icon size={19} />
+          </div>
 
-        <span className={cn("text-sm font-black", colors[tone].text)}>
-          {safeValue}%
-        </span>
+          <div className="min-w-0">
+            <p className="text-[16px] font-black leading-6 text-zinc-900 dark:text-zinc-100">
+              {label}
+            </p>
+
+            <p className="mt-1 text-sm font-medium leading-6 text-zinc-500 dark:text-zinc-400">
+              {description}
+            </p>
+          </div>
+        </div>
+
+        <div className="shrink-0 text-right">
+          <p className={cn("text-xl font-black leading-none", style.text)}>
+            {safeValue}/{max}
+          </p>
+
+          <p className="mt-1 text-[10px] font-black uppercase tracking-[0.14em] text-zinc-500 dark:text-zinc-400">
+            {percentage}%
+          </p>
+        </div>
       </div>
 
-      <div className="h-3 overflow-hidden rounded-full bg-muted">
+      <div className="h-3 overflow-hidden rounded-full bg-zinc-200 dark:bg-zinc-800">
         <div
-          className={cn("h-full rounded-full transition-all", colors[tone].bar)}
-          style={{ width: `${safeValue}%` }}
+          className={cn(
+            "h-full rounded-full transition-all duration-500",
+            style.bar,
+          )}
+          style={{ width: `${percentage}%` }}
         />
       </div>
     </div>
   );
 }
+
+function normalizeScore(value: number | null | undefined, max: number) {
+  if (typeof value !== "number" || Number.isNaN(value)) {
+    return 0;
+  }
+
+  if (value < 0) {
+    return 0;
+  }
+
+  if (value > max) {
+    return max;
+  }
+
+  return Math.round(value);
+}
+
+const toneStyles = {
+  indigo: {
+    bar: "bg-indigo-500",
+    text: "text-indigo-700 dark:text-indigo-300",
+    iconBox:
+      "bg-indigo-500/[0.08] text-indigo-600 dark:bg-indigo-500/[0.12] dark:text-indigo-300",
+  },
+  blue: {
+    bar: "bg-blue-500",
+    text: "text-blue-700 dark:text-blue-300",
+    iconBox:
+      "bg-blue-500/[0.08] text-blue-600 dark:bg-blue-500/[0.12] dark:text-blue-300",
+  },
+  purple: {
+    bar: "bg-purple-500",
+    text: "text-purple-700 dark:text-purple-300",
+    iconBox:
+      "bg-purple-500/[0.08] text-purple-600 dark:bg-purple-500/[0.12] dark:text-purple-300",
+  },
+  emerald: {
+    bar: "bg-emerald-500",
+    text: "text-emerald-700 dark:text-emerald-300",
+    iconBox:
+      "bg-emerald-500/[0.08] text-emerald-600 dark:bg-emerald-500/[0.12] dark:text-emerald-300",
+  },
+  amber: {
+    bar: "bg-amber-500",
+    text: "text-amber-700 dark:text-amber-300",
+    iconBox:
+      "bg-amber-500/[0.08] text-amber-600 dark:bg-amber-500/[0.12] dark:text-amber-300",
+  },
+};
