@@ -70,29 +70,29 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
   ];
 
   return (
-    <Card className="col-span-12 flex min-h-96 flex-col overflow-hidden border border-border bg-card shadow-sm xl:col-span-4 xl:min-h-0">
-      <CardHeader className="shrink-0 border-b border-border px-5 py-4">
-        <div className="flex items-center justify-between gap-4">
+    <Card className="col-span-12 flex min-h-80 flex-col overflow-hidden border border-border/70 bg-card/95 py-0 shadow-sm xl:col-span-4 xl:min-h-0">
+      <CardHeader className="shrink-0 border-b border-border/70 px-4 py-3 md:px-5">
+        <div className="flex items-center justify-between gap-3">
           <div className="min-w-0">
-            <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+            <CardTitle className="text-xs font-extrabold uppercase text-muted-foreground">
               Fila Pendente
             </CardTitle>
 
-            <p className="mt-1 text-sm text-muted-foreground">
+            <p className="mt-1 truncate text-sm font-medium text-foreground">
               Resumo das análises que ainda aguardam decisão
             </p>
           </div>
 
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-xl bg-primary/10 text-primary">
-            <Clock size={20} />
+          <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg border border-primary/15 bg-primary/10 text-primary">
+            <Clock size={18} />
           </div>
         </div>
       </CardHeader>
 
-      <CardContent className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto p-5">
+      <CardContent className="custom-scrollbar flex min-h-0 flex-1 flex-col overflow-y-auto p-4 md:p-5">
         {totalPending > 0 ? (
           <>
-            <div className="grid grid-cols-3 gap-3">
+            <div className="grid grid-cols-3 gap-2">
               <MetricBox label="Pendentes" value={totalPending} icon={Clock} />
               <MetricBox
                 label="Média"
@@ -106,32 +106,32 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
               />
             </div>
 
-            <div className="mt-6 space-y-4">
+            <div className="mt-5 space-y-3.5">
               {ranges.map((range) => (
                 <div key={range.label}>
                   <div className="mb-2 flex items-center justify-between gap-3">
                     <div className="min-w-0">
-                      <p className="truncate text-sm font-bold text-zinc-900 dark:text-zinc-100">
+                      <p className="truncate text-sm font-bold text-foreground">
                         {range.label}
                       </p>
 
-                      <p className="truncate text-xs text-zinc-500 dark:text-zinc-400">
+                      <p className="truncate text-xs text-muted-foreground">
                         {range.description}
                       </p>
                     </div>
 
                     <div className="shrink-0 text-right">
-                      <p className="text-sm font-black text-zinc-900 dark:text-zinc-100">
+                      <p className="text-sm font-black text-foreground">
                         {range.total}
                       </p>
 
-                      <p className="text-xs font-medium text-zinc-400">
+                      <p className="text-xs font-medium text-muted-foreground">
                         {range.percentage}%
                       </p>
                     </div>
                   </div>
 
-                  <div className="h-2.5 overflow-hidden rounded-full bg-zinc-100 dark:bg-zinc-800">
+                  <div className="h-2 overflow-hidden rounded-full bg-muted">
                     <div
                       className={cn("h-full rounded-full", range.className)}
                       style={{ width: `${range.percentage}%` }}
@@ -141,17 +141,17 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
               ))}
             </div>
 
-            <div className="mt-auto pt-6">
-              <div className="rounded-xl bg-muted/50 p-4">
-                <div className="mb-2 flex items-center gap-2 text-zinc-500 dark:text-zinc-400">
+            <div className="mt-auto pt-5">
+              <div className="rounded-lg border border-border/70 bg-muted/35 p-3">
+                <div className="mb-2 flex items-center gap-2 text-muted-foreground">
                   <AlertTriangle size={16} />
 
-                  <span className="text-xs font-extrabold uppercase tracking-wide">
+                  <span className="text-[11px] font-extrabold uppercase">
                     Leitura rápida
                   </span>
                 </div>
 
-                <p className="text-sm leading-relaxed text-zinc-600 dark:text-zinc-300">
+                <p className="text-sm leading-relaxed text-muted-foreground">
                   {highScore > 0
                     ? `${highScore} candidato(s) pendente(s) estão acima de 70% de aderência.`
                     : "Nenhum candidato pendente está acima de 70% de aderência no momento."}
@@ -161,15 +161,15 @@ export function DecisionQueueCard({ candidates }: DecisionQueueCardProps) {
           </>
         ) : (
           <div className="flex flex-1 flex-col items-center justify-center text-center">
-            <div className="mb-3 flex h-12 w-12 items-center justify-center rounded-xl bg-muted text-muted-foreground">
-              <CheckCircle2 size={22} />
+            <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-lg bg-muted text-muted-foreground">
+              <CheckCircle2 size={20} />
             </div>
 
-            <p className="text-base font-bold text-zinc-900 dark:text-zinc-100">
+            <p className="text-sm font-bold text-foreground">
               Fila limpa
             </p>
 
-            <p className="mt-1 max-w-48 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1 max-w-48 text-sm leading-relaxed text-muted-foreground">
               Nenhuma análise pendente aguardando decisão.
             </p>
           </div>
@@ -187,16 +187,16 @@ interface MetricBoxProps {
 
 function MetricBox({ label, value, icon: Icon }: MetricBoxProps) {
   return (
-    <div className="rounded-xl bg-muted/50 p-3">
-      <div className="mb-3 flex items-center justify-between gap-2">
-        <span className="truncate text-xs font-extrabold uppercase tracking-wide text-zinc-500 dark:text-zinc-400">
+    <div className="rounded-lg border border-border/70 bg-muted/35 p-2.5">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <span className="truncate text-[10px] font-extrabold uppercase text-muted-foreground">
           {label}
         </span>
 
-        <Icon size={15} className="shrink-0 text-zinc-400" />
+        <Icon size={14} className="shrink-0 text-muted-foreground" />
       </div>
 
-      <p className="text-xl font-black text-zinc-900 dark:text-zinc-100">
+      <p className="truncate text-lg font-black text-foreground">
         {value}
       </p>
     </div>

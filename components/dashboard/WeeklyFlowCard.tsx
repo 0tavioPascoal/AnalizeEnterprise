@@ -46,24 +46,24 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
   const hasData = total > 0;
 
   return (
-    <Card className="flex min-h-80 flex-col overflow-hidden border border-border bg-card shadow-sm xl:min-h-0 xl:flex-[0.45]">
-      <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border px-5 py-4">
+    <Card className="flex min-h-64 flex-col overflow-hidden border border-border/70 bg-card/95 py-0 shadow-sm xl:min-h-0 xl:flex-[0.48]">
+      <CardHeader className="flex shrink-0 flex-row items-center justify-between border-b border-border/70 px-4 py-3 md:px-5">
         <div>
-          <CardTitle className="text-sm font-extrabold uppercase tracking-wide text-muted-foreground">
+          <CardTitle className="text-xs font-extrabold uppercase text-muted-foreground">
             Fluxo Semanal
           </CardTitle>
 
-          <p className="mt-1 text-sm text-muted-foreground">
+          <p className="mt-1 text-sm font-medium text-foreground">
             {total} análises nos últimos 7 dias
           </p>
         </div>
 
-        <div className="flex h-11 w-11 items-center justify-center rounded-xl border border-indigo-500/20 bg-indigo-500/10 text-indigo-600 dark:text-indigo-300">
-          <TrendingUp size={20} />
+        <div className="flex h-9 w-9 items-center justify-center rounded-lg border border-primary/15 bg-primary/10 text-primary">
+          <TrendingUp size={18} />
         </div>
       </CardHeader>
 
-      <CardContent className="min-h-0 flex-1 p-5">
+      <CardContent className="min-h-0 flex-1 p-4 md:p-5">
         {hasData ? (
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
@@ -103,10 +103,10 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
                   strokeWidth: 1,
                 }}
                 contentStyle={{
-                  borderRadius: 12,
-                  border: "1px solid hsl(var(--border))",
-                  background: "hsl(var(--card))",
-                  color: "hsl(var(--foreground))",
+                  borderRadius: 10,
+                  border: "1px solid var(--border)",
+                  background: "var(--card)",
+                  color: "var(--card-foreground)",
                   boxShadow: "0 10px 30px rgba(0,0,0,0.08)",
                   fontSize: 13,
                   fontWeight: 600,
@@ -124,25 +124,25 @@ export function WeeklyFlowCard({ data }: WeeklyFlowCardProps) {
                 dot={{
                   r: 4,
                   strokeWidth: 2,
-                  fill: "hsl(var(--card))",
+                  fill: "var(--card)",
                   stroke: "#6366f1",
                 }}
                 activeDot={{
                   r: 6,
                   strokeWidth: 2,
                   fill: "#6366f1",
-                  stroke: "hsl(var(--card))",
+                  stroke: "var(--card)",
                 }}
               />
             </AreaChart>
           </ResponsiveContainer>
         ) : (
-          <div className="flex h-full min-h-40 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-6 text-center">
-            <p className="text-base font-bold text-foreground">
+          <div className="flex h-full min-h-36 flex-col items-center justify-center rounded-lg border border-dashed border-border bg-muted/30 px-5 text-center">
+            <p className="text-sm font-bold text-foreground">
               Sem análises nesta semana
             </p>
 
-            <p className="mt-1 text-sm leading-relaxed text-muted-foreground">
+            <p className="mt-1 max-w-sm text-sm leading-relaxed text-muted-foreground">
               O fluxo será exibido conforme novas análises forem criadas.
             </p>
           </div>

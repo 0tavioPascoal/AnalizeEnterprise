@@ -1,7 +1,9 @@
 import { PipelineClient } from "@/components/pipeline/pipelineClient";
 import {
   getPipelineAnalyses,
+  getPipelineKanban,
   type PipelineStage,
+  type PipelineView,
 } from "@/actions/pipeline/pipeline";
 
 interface PipelinePageProps {
@@ -10,6 +12,7 @@ interface PipelinePageProps {
     search?: string;
     job?: string;
     stage?: string;
+    view?: string;
   }>;
 }
 
@@ -19,6 +22,7 @@ const stageFilters: PipelineStage[] = [
   "approved",
   "rejected",
 ];
+const viewOptions: PipelineView[] = ["list", "kanban"];
 
 export default async function PipelinePage({
   searchParams,
@@ -28,13 +32,22 @@ export default async function PipelinePage({
   const stage = stageFilters.includes(params.stage as PipelineStage)
     ? (params.stage as PipelineStage)
     : "screening";
+  const view = viewOptions.includes(params.view as PipelineView)
+    ? (params.view as PipelineView)
+    : "list";
 
-  const pipeline = await getPipelineAnalyses({
-    page: Number.isFinite(page) ? page : 1,
-    search: params.search ?? "",
-    jobId: params.job ?? "all",
-    stage,
-  });
+  const pipeline =
+    view === "kanban"
+      ? await getPipelineKanban({
+          search: params.search ?? "",
+          jobId: params.job ?? "all",
+        })
+      : await getPipelineAnalyses({
+          page: Number.isFinite(page) ? page : 1,
+          search: params.search ?? "",
+          jobId: params.job ?? "all",
+          stage,
+        });
 
-  return <PipelineClient pipeline={pipeline} />;
+  return <PipelineClient pipeline={pipeline} view={view} />;
 }

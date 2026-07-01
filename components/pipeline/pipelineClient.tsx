@@ -5,6 +5,8 @@ import {
   ArrowLeft,
   CheckCircle2,
   CircleDot,
+  LayoutGrid,
+  List,
   MessageCircle,
   SearchCheck,
   XCircle,
@@ -23,14 +25,18 @@ import { FilterSelect } from "@/components/layout/filters/FilterSelect";
 import { Button } from "@/components/ui/button";
 
 import { PipelineRow } from "@/components/pipeline/pipelineRow";
+import { PipelineKanbanCard } from "@/components/pipeline/PipelineKanbanCard";
 
 import type {
+  PipelineKanbanResult,
   PipelineResult,
   PipelineStage,
+  PipelineView,
 } from "@/actions/pipeline/pipeline";
 
 interface PipelineClientProps {
-  pipeline: PipelineResult;
+  pipeline: PipelineResult | PipelineKanbanResult;
+  view: PipelineView;
 }
 
 const baseStageOptions: Array<{ label: string; value: PipelineStage }> = [
@@ -75,11 +81,16 @@ const emptyStateByStage: Record<
   },
 };
 
-export function PipelineClient({ pipeline }: PipelineClientProps) {
+export function PipelineClient({ pipeline, view }: PipelineClientProps) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
   const [isPending, startTransition] = useTransition();
+  const isKanbanView = view === "kanban";
+  const listPipeline = !isKanbanView ? (pipeline as PipelineResult) : null;
+  const kanbanPipeline = isKanbanView
+    ? (pipeline as PipelineKanbanResult)
+    : null;
 
   const stageOptions = baseStageOptions.map((option) => {
     const total =
@@ -92,7 +103,9 @@ export function PipelineClient({ pipeline }: PipelineClientProps) {
     };
   });
 
-  const emptyState = emptyStateByStage[pipeline.filters.stage];
+  const emptyState = listPipeline
+    ? emptyStateByStage[listPipeline.filters.stage]
+    : null;
 
   function updateFilter(key: string, value: string, resetPage = true): void {
     const params = new URLSearchParams(searchParams.toString());
@@ -112,21 +125,40 @@ export function PipelineClient({ pipeline }: PipelineClientProps) {
     });
   }
 
+  function updateView(nextView: PipelineView): void {
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (nextView === "list") {
+      params.delete("view");
+    } else {
+      params.set("view", nextView);
+    }
+
+    params.delete("page");
+
+    startTransition(() => {
+      router.replace(`${pathname}?${params.toString()}`);
+    });
+  }
+
   return (
     <PageLayout
+      contentClassName={isKanbanView ? "h-full" : undefined}
       header={
         <PageHeader
           title="Pipeline de Talentos"
           description="Acompanhe candidatos por etapa do processo seletivo."
           action={
             <FilterBar className="xl:flex-nowrap">
-              <StatusFilterTabs
-                value={pipeline.filters.stage}
-                options={stageOptions}
-                onChange={(value) => {
-                  updateFilter("stage", value);
-                }}
-              />
+              {!isKanbanView && listPipeline && (
+                <StatusFilterTabs
+                  value={listPipeline.filters.stage}
+                  options={stageOptions}
+                  onChange={(value) => {
+                    updateFilter("stage", value);
+                  }}
+                />
+              )}
 
               <SearchInput
                 value={pipeline.filters.search}
@@ -145,6 +177,30 @@ export function PipelineClient({ pipeline }: PipelineClientProps) {
                 ariaLabel="Filtrar por vaga"
               />
 
+              <div className="flex h-10 shrink-0 rounded-xl border border-border bg-background p-1 shadow-sm">
+                <Button
+                  type="button"
+                  variant={view === "list" ? "default" : "ghost"}
+                  onClick={() => updateView("list")}
+                  className="h-8 gap-2 rounded-lg px-3 text-[10px] font-bold uppercase tracking-widest"
+                  aria-pressed={view === "list"}
+                >
+                  <List size={15} />
+                  Lista
+                </Button>
+
+                <Button
+                  type="button"
+                  variant={view === "kanban" ? "default" : "ghost"}
+                  onClick={() => updateView("kanban")}
+                  className="h-8 gap-2 rounded-lg px-3 text-[10px] font-bold uppercase tracking-widest"
+                  aria-pressed={view === "kanban"}
+                >
+                  <LayoutGrid size={15} />
+                  Kanban
+                </Button>
+              </div>
+
               <Button
                 variant="outline"
                 onClick={() => router.back()}
@@ -158,36 +214,104 @@ export function PipelineClient({ pipeline }: PipelineClientProps) {
         />
       }
       pagination={
-        pipeline.total > pipeline.pageSize && (
+        listPipeline &&
+        listPipeline.total > listPipeline.pageSize && (
           <TablePagination
-            page={pipeline.page}
-            totalPages={pipeline.totalPages}
+            page={listPipeline.page}
+            totalPages={listPipeline.totalPages}
             setPage={(nextPage) =>
               updateFilter("page", String(nextPage), false)
             }
-            totalItems={pipeline.total}
-            pageSize={pipeline.pageSize}
+            totalItems={listPipeline.total}
+            pageSize={listPipeline.pageSize}
             itemLabel="candidatos"
           />
         )
       }
     >
-      <div
-        className="flex flex-col gap-3 pb-4 opacity-100 transition-opacity data-[pending=true]:opacity-60"
-        data-pending={isPending}
-      >
-        {pipeline.items.length > 0 ? (
-          pipeline.items.map((item) => (
-            <PipelineRow key={item.id} item={item} />
+      {isKanbanView && kanbanPipeline ? (
+        <div
+          className="custom-scrollbar flex h-full min-h-[620px] gap-4 overflow-x-auto pb-4 opacity-100 transition-opacity data-[pending=true]:opacity-60"
+          data-pending={isPending}
+        >
+          {kanbanPipeline.columns.map((column) => (
+            <KanbanColumn key={column.stage} column={column} />
+          ))}
+        </div>
+      ) : (
+        <div
+          className="flex flex-col gap-3 pb-4 opacity-100 transition-opacity data-[pending=true]:opacity-60"
+          data-pending={isPending}
+        >
+          {listPipeline && listPipeline.items.length > 0 ? (
+            listPipeline.items.map((item) => (
+              <PipelineRow key={item.id} item={item} />
+            ))
+          ) : (
+            emptyState && (
+              <EmptyState
+                icon={emptyState.icon}
+                title={emptyState.title}
+                description={emptyState.description}
+              />
+            )
+          )}
+        </div>
+      )}
+    </PageLayout>
+  );
+}
+
+interface KanbanColumnProps {
+  column: PipelineKanbanResult["columns"][number];
+}
+
+function KanbanColumn({ column }: KanbanColumnProps) {
+  const config = emptyStateByStage[column.stage];
+  const Icon = config.icon;
+
+  return (
+    <section className="flex min-h-0 w-[min(82vw,21rem)] shrink-0 flex-col rounded-2xl border border-border/70 bg-background/70 shadow-sm backdrop-blur-sm xl:w-auto xl:min-w-0 xl:flex-1">
+      <div className="flex shrink-0 items-center justify-between gap-3 border-b border-border/70 p-4">
+        <div className="flex min-w-0 items-center gap-3">
+          <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl border border-primary/10 bg-primary/10 text-primary">
+            <Icon size={19} />
+          </div>
+
+          <div className="min-w-0">
+            <h2 className="truncate text-sm font-black text-foreground">
+              {baseStageOptions.find((option) => option.value === column.stage)
+                ?.label ?? "Etapa"}
+            </h2>
+
+            <p className="truncate text-xs font-medium text-muted-foreground">
+              {column.total} candidato(s)
+            </p>
+          </div>
+        </div>
+
+        <span className="rounded-full border border-border bg-card px-2.5 py-1 text-xs font-black text-muted-foreground">
+          {column.total}
+        </span>
+      </div>
+
+      <div className="custom-scrollbar min-h-0 flex-1 space-y-3 overflow-y-auto p-3">
+        {column.items.length > 0 ? (
+          column.items.map((item) => (
+            <PipelineKanbanCard key={item.id} item={item} />
           ))
         ) : (
-          <EmptyState
-            icon={emptyState.icon}
-            title={emptyState.title}
-            description={emptyState.description}
-          />
+          <div className="flex min-h-44 flex-col items-center justify-center rounded-xl border border-dashed border-border bg-muted/30 px-4 text-center">
+            <Icon className="mb-3 h-8 w-8 text-muted-foreground" />
+
+            <p className="text-sm font-bold text-foreground">{config.title}</p>
+
+            <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+              {config.description}
+            </p>
+          </div>
         )}
       </div>
-    </PageLayout>
+    </section>
   );
 }

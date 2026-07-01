@@ -11,6 +11,8 @@ export type PipelineStage =
   | "approved"
   | "rejected";
 
+export type PipelineView = "list" | "kanban";
+
 export interface PipelineAnalysis {
   id: string;
   candidate_name: string | null;
@@ -43,6 +45,12 @@ export interface GetPipelineAnalysesParams {
   jobId?: string;
 }
 
+export interface GetPipelineKanbanParams {
+  search?: string;
+  jobId?: string;
+  columnLimit?: number;
+}
+
 export interface PipelineResult {
   items: PipelineAnalysis[];
   total: number;
@@ -58,7 +66,24 @@ export interface PipelineResult {
   };
 }
 
+export interface PipelineKanbanColumn {
+  stage: PipelineStage;
+  total: number;
+  items: PipelineAnalysis[];
+}
+
+export interface PipelineKanbanResult {
+  columns: PipelineKanbanColumn[];
+  stageCounts: PipelineStageCount[];
+  jobOptions: PipelineJobOption[];
+  filters: {
+    search: string;
+    jobId: string;
+  };
+}
+
 const DEFAULT_PAGE_SIZE = 8;
+const DEFAULT_KANBAN_COLUMN_LIMIT = 12;
 const DEFAULT_STAGE: PipelineStage = "screening";
 const STAGE_OPTIONS: PipelineStage[] = [
   "screening",
@@ -202,6 +227,164 @@ export async function getPipelineAnalyses({
       jobId,
     },
   };
+}
+
+export async function getPipelineKanban({
+  search = "",
+  jobId = "all",
+  columnLimit = DEFAULT_KANBAN_COLUMN_LIMIT,
+}: GetPipelineKanbanParams = {}): Promise<PipelineKanbanResult> {
+  const supabase = await createServerClient();
+  const normalizedSearch = search.trim();
+  const safeLimit = Math.max(1, columnLimit);
+
+  const [jobsResult, stageCounts, columnResults] = await Promise.all([
+    supabase
+      .from("jobs")
+      .select("id, title")
+      .order("title", { ascending: true }),
+    getPipelineStageCounts({
+      stage: DEFAULT_STAGE,
+      search: normalizedSearch,
+      jobId,
+    }),
+    Promise.all(
+      STAGE_OPTIONS.map(async (stage) => {
+        let query = supabase
+          .from("candidate_analysis")
+          .select(
+            `
+            id,
+            candidate_name,
+            candidate_email,
+            score,
+            status,
+            pipeline_stage,
+            recommendation,
+            match,
+            created_at,
+            job_id
+          `,
+            { count: "exact" },
+          );
+
+        query = applyPipelineFilters(query, {
+          stage,
+          search: normalizedSearch,
+          jobId,
+        });
+
+        const { data, error, count } = await query
+          .order("created_at", { ascending: false })
+          .limit(safeLimit);
+
+        if (error || !data) {
+          logger.error("pipeline.kanban_column.failed", error, { stage });
+          return {
+            stage,
+            total: 0,
+            rows: [],
+          };
+        }
+
+        return {
+          stage,
+          total: count ?? 0,
+          rows: data,
+        };
+      }),
+    ),
+  ]);
+
+  const rowsById = new Map<string, (typeof columnResults)[number]["rows"][number]>();
+
+  columnResults.forEach((column) => {
+    column.rows.forEach((row) => {
+      rowsById.set(row.id, row);
+    });
+  });
+
+  const hydratedItems = await hydratePipelineAnalyses(
+    supabase,
+    Array.from(rowsById.values()),
+  );
+  const itemById = new Map(hydratedItems.map((item) => [item.id, item]));
+
+  return {
+    columns: columnResults.map((column) => ({
+      stage: column.stage,
+      total: column.total,
+      items: column.rows
+        .map((row) => itemById.get(row.id))
+        .filter((item): item is PipelineAnalysis => Boolean(item)),
+    })),
+    stageCounts,
+    jobOptions: toPipelineJobOptions(jobsResult.data ?? []),
+    filters: {
+      search: normalizedSearch,
+      jobId,
+    },
+  };
+}
+
+async function hydratePipelineAnalyses(
+  supabase: Awaited<ReturnType<typeof createServerClient>>,
+  analyses: Array<{
+    id: string;
+    candidate_name: string | null;
+    candidate_email: string | null;
+    score: number | null;
+    status: AnalysisStatus | null;
+    pipeline_stage: PipelineStage | null;
+    recommendation: string | null;
+    match: boolean | null;
+    created_at: string | null;
+    job_id: string | null;
+  }>,
+): Promise<PipelineAnalysis[]> {
+  const jobIds = analyses
+    .map((analysis) => analysis.job_id)
+    .filter((id): id is string => Boolean(id));
+
+  const analysisIds = analyses.map((analysis) => analysis.id);
+
+  const [pageJobsResult, interviewsResult] = await Promise.all([
+    jobIds.length
+      ? supabase.from("jobs").select("id, title").in("id", jobIds)
+      : Promise.resolve({ data: [] }),
+    analysisIds.length
+      ? supabase
+          .from("interview_guides")
+          .select("id, analysis_id")
+          .in("analysis_id", analysisIds)
+      : Promise.resolve({ data: [] }),
+  ]);
+
+  const jobs = pageJobsResult.data ?? [];
+  const interviews = interviewsResult.data ?? [];
+
+  return analyses.map((analysis) => {
+    const job = jobs.find((item) => item.id === analysis.job_id);
+    const interview = interviews.find(
+      (item) => item.analysis_id === analysis.id,
+    );
+
+    return {
+      id: analysis.id,
+      candidate_name: analysis.candidate_name,
+      candidate_email: analysis.candidate_email,
+      score: analysis.score ?? 0,
+      status: analysis.status ?? "pending",
+      pipeline_stage:
+        (analysis.pipeline_stage as PipelineStage | null) ??
+        getDefaultStageByStatus(analysis.status),
+      recommendation: analysis.recommendation,
+      match: analysis.match,
+      created_at: analysis.created_at,
+      job_title: job?.title ?? null,
+      interview_id: interview?.id ?? null,
+    };
+  });
 }
 
 function getDefaultStageByStatus(
