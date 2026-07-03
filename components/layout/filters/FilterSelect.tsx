@@ -14,7 +14,7 @@ export function FilterSelect({
       onChange={(event) => onChange(event.target.value)}
       aria-label={ariaLabel}
       className="
-        h-11 rounded-xl
+        h-10 w-full min-w-0 rounded-xl sm:h-11
         border border-border
 
         bg-card
@@ -33,6 +33,8 @@ export function FilterSelect({
         focus:border-primary/40
         focus:ring-2
         focus:ring-primary/20
+
+        sm:w-auto sm:min-w-40 xl:min-w-44
       "
     >
       {options.map((option) => (

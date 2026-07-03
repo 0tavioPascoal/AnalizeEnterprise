@@ -1,37 +1,47 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# AnalizeEnterprise
 
-## Getting Started
+Aplicação Next.js para análise de candidatos, gestão de vagas, pipeline e guias
+de entrevista integrados ao Supabase e webhooks externos.
 
-First, run the development server:
+## Desenvolvimento
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
+pnpm install
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+A aplicação roda em `http://localhost:3000`.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Qualidade
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```bash
+pnpm lint
+pnpm typecheck
+pnpm build
+```
 
-## Learn More
+## Ambiente
 
-To learn more about Next.js, take a look at the following resources:
+Copie as chaves de `.env.example` para `.env.local` e preencha os valores do
+projeto. A service role deve ficar apenas em variável privada:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```bash
+SUPABASE_SERVICE_ROLE_KEY=
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+Nunca use prefixo `NEXT_PUBLIC_` para a service role.
 
-## Deploy on Vercel
+## Supabase
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+O projeto remoto atual está configurado em `supabase/config.toml`.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# AnalizeEnterprise
+```bash
+pnpm supabase:link
+pnpm supabase:types
+pnpm supabase:pull
+pnpm supabase:diff
+```
+
+Para gerar tipos a partir do projeto remoto, defina `SUPABASE_ACCESS_TOKEN` no
+ambiente. Sem esse token, `types/supabase/database.ts` fica como baseline local
+conservador alinhado ao uso atual da aplicação.

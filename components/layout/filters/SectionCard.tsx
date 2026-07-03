@@ -5,7 +5,7 @@ export function SectionCard({ children, className }: SectionCardProps) {
   return (
     <div
       className={cn(
-        "rounded-2xl border border-border bg-card p-7 shadow-sm",
+        "rounded-xl border border-border bg-card p-5 shadow-sm sm:p-7",
         className,
       )}
     >

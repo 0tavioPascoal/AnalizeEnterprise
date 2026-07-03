@@ -12,24 +12,30 @@ export function SidebarBrand({ collapsed }: SidebarBrandProps) {
   return (
     <div
       className={cn(
-        "flex h-20 shrink-0 items-center border-b border-zinc-200/80 px-6 dark:border-zinc-800",
+        "flex h-18 shrink-0 items-center border-b border-sidebar-border/80 px-4",
         collapsed ? "justify-center" : "justify-start",
       )}
     >
       <div className="flex items-center gap-3">
-        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-indigo-600 shadow-lg shadow-indigo-500/20">
-          <Sparkles className="h-5 w-5 text-white" />
+        <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-sidebar-primary text-sidebar-primary-foreground shadow-lg shadow-primary/20 ring-1 ring-sidebar-primary/20">
+          <Sparkles className="h-5 w-5" />
         </div>
 
         {!collapsed && (
-          <span
+          <div
             className={cn(
-              "bg-linear-to-r from-zinc-900 to-zinc-500 bg-clip-text text-2xl font-black tracking-tight text-transparent transition-opacity duration-200 dark:from-white dark:to-zinc-400",
+              "min-w-0 transition-opacity duration-200",
               collapsed ? "pointer-events-none opacity-0" : "opacity-100",
             )}
           >
-            Analyzer
-          </span>
+            <span className="block truncate text-xl font-black tracking-tight text-sidebar-foreground">
+              Analyzer
+            </span>
+
+            <span className="block truncate text-[11px] font-bold uppercase tracking-[0.2em] text-sidebar-primary">
+              Enterprise AI
+            </span>
+          </div>
         )}
       </div>
     </div>

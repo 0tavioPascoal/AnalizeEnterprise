@@ -1,10 +1,10 @@
 import { notFound } from "next/navigation";
 
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { JobForm } from "@/components/jobs/JobForm";
-import { JobTips } from "@/components/jobs/JobTips";
-import { getJobById } from "@/actions/jobs/getJobById";
+import { JobForm } from "@/features/jobs/components/JobForm";
+import { JobTips } from "@/features/jobs/components/JobTips";
+import { getJobById } from "@/features/jobs/server/get-job-by-id";
 
 export default async function EditJobPage({
   params,
@@ -32,7 +32,7 @@ export default async function EditJobPage({
         />
       }
     >
-      <div className="grid gap-6 lg:grid-cols-3 items-stretch h-full">
+      <div className="grid min-h-full items-stretch gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <JobForm initialData={{ ...job, id }} isEdit />
         </div>

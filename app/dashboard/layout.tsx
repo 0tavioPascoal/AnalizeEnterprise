@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 
 import { Sidebar } from "@/components/layout/sidebar/sidebar";
-import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { getCurrentProfile } from "@/features/auth/server/current-profile";
 
 export default async function DashboardLayout({
   children,
@@ -15,7 +15,7 @@ export default async function DashboardLayout({
   }
 
   return (
-    <div className="flex h-screen w-full overflow-hidden bg-background">
+    <div className="flex h-dvh w-full overflow-hidden bg-background">
       <Sidebar
         user={{
           name: currentProfile.name,
@@ -25,7 +25,7 @@ export default async function DashboardLayout({
         }}
       />
 
-      <main className="relative h-full flex-1 overflow-hidden bg-muted/40">
+      <main className="relative h-full min-w-0 flex-1 overflow-hidden bg-muted/40">
         {children}
       </main>
     </div>

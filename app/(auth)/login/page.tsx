@@ -1,182 +1,162 @@
 "use client";
 
 import { useState } from "react";
-
 import {
+  ArrowRight,
+  CheckCircle2,
+  Loader2,
   LockKeyhole,
   Mail,
-  Loader2,
-  ArrowRight,
+  ShieldCheck,
+  Sparkles,
 } from "lucide-react";
-
 import { toast } from "sonner";
 
-import { login, LoginError } from "@/actions/auth/login";
-
+import { login, LoginError } from "@/features/auth/server/login";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 export default function LoginPage() {
-  const [loading, setLoading] =
-    useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
-  async function handleLogin(
-    e: React.FormEvent<HTMLFormElement>,
-  ) {
+  async function handleLogin(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
 
     setLoading(true);
 
-    const formData = new FormData(
-      e.currentTarget,
-    );
-
+    const formData = new FormData(e.currentTarget);
     const payload = {
-      email: String(
-        formData.get("email") ?? "",
-      ),
-      password: String(
-        formData.get("password") ?? "",
-      ),
+      email: String(formData.get("email") ?? ""),
+      password: String(formData.get("password") ?? ""),
     };
 
     try {
       await login(payload);
-
-      toast.success(
-        "Login realizado com sucesso",
-      );
-
+      toast.success("Login realizado com sucesso");
       window.location.href = "/dashboard";
     } catch (err: unknown) {
       const error = err as LoginError;
-
-      toast.error(
-        error.message ||
-          "Erro ao fazer login",
-      );
+      toast.error(error.message || "Erro ao fazer login");
     } finally {
       setLoading(false);
     }
   }
 
   return (
-    <div className="relative overflow-hidden rounded-3xl border border-zinc-200/80 bg-white shadow-2xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900/90">
-      
-      {/* GLOW */}
-      <div className="absolute inset-x-0 top-0 h-32 bg-linear-to-b from-indigo-500/10 via-indigo-500/5 to-transparent" />
-
-      <div className="relative z-10 p-8 sm:p-10">
-        
-        {/* HEADER */}
-        <div className="mb-10 text-center">
-          <div className="mb-4 inline-flex items-center rounded-full border border-indigo-500/20 bg-indigo-500/10 px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.2em] text-indigo-600 dark:text-indigo-300">
-            RH Analyzer Enterprise
+    <div className="w-full overflow-hidden rounded-2xl border border-border bg-card shadow-xl shadow-foreground/5">
+      <div className="border-b border-border bg-muted/35 px-6 py-5 sm:px-7">
+        <div className="mb-5 flex items-center justify-between gap-4">
+          <div className="inline-flex items-center gap-2 rounded-full border border-primary/15 bg-primary/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.18em] text-primary">
+            <Sparkles className="h-3.5 w-3.5" />
+            Enterprise AI
           </div>
 
-          <h1 className="text-3xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
-            Bem-vindo de volta
-          </h1>
-
-          <p className="mt-3 text-sm leading-relaxed text-zinc-500 dark:text-zinc-400">
-            Entre com suas credenciais para acessar
-            sua central inteligente de recrutamento.
-          </p>
+          <div className="inline-flex h-9 w-9 items-center justify-center rounded-lg border border-emerald-500/15 bg-emerald-500/10 text-emerald-600 dark:text-emerald-300">
+            <ShieldCheck className="h-4 w-4" />
+          </div>
         </div>
 
-        {/* FORM */}
-        <form
-          onSubmit={handleLogin}
-          className="space-y-5"
-        >
-          {/* EMAIL */}
+        <h1 className="text-2xl font-black tracking-tight text-foreground sm:text-3xl">
+          Acesse sua operação
+        </h1>
+
+        <p className="mt-2 max-w-sm text-sm leading-relaxed text-muted-foreground">
+          Entre para acompanhar triagens, entrevistas e decisões do seu pipeline
+          de talentos.
+        </p>
+      </div>
+
+      <div className="px-6 py-6 sm:px-7">
+        <form onSubmit={handleLogin} className="space-y-4">
           <div className="space-y-2">
             <Label
               htmlFor="email"
-              className="ml-1 text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400"
+              className="text-[11px] font-black uppercase tracking-[0.16em] text-muted-foreground"
             >
               E-mail corporativo
             </Label>
 
             <div className="group relative">
-              <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-indigo-500" />
+              <Mail className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
 
               <Input
                 id="email"
                 name="email"
                 type="email"
+                autoComplete="email"
                 placeholder="nome@empresa.com"
                 required
-                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 pl-10 text-sm shadow-sm transition-all placeholder:text-zinc-400 focus-visible:ring-2 focus-visible:ring-indigo-500/20 dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-11 rounded-xl border-border bg-background pl-10 text-sm shadow-sm transition focus-visible:ring-3 focus-visible:ring-primary/15"
               />
             </div>
           </div>
 
-          {/* PASSWORD */}
           <div className="space-y-2">
-            <div className="ml-1 flex items-center justify-between">
+            <div className="flex items-center justify-between gap-3">
               <Label
                 htmlFor="password"
-                className="text-[10px] font-bold uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400"
+                className="text-[11px] font-black uppercase tracking-[0.16em] text-muted-foreground"
               >
                 Senha
               </Label>
 
-              <button
-                type="button"
-                className="text-[10px] font-bold uppercase tracking-wider text-indigo-600 transition-colors hover:text-indigo-500 dark:text-indigo-400"
-              >
-                Recuperar acesso
-              </button>
+              <span className="inline-flex items-center gap-1.5 text-[11px] font-bold text-muted-foreground">
+                <CheckCircle2 className="h-3.5 w-3.5 text-emerald-500" />
+                Acesso seguro
+              </span>
             </div>
 
             <div className="group relative">
-              <LockKeyhole className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-zinc-400 transition-colors group-focus-within:text-indigo-500" />
+              <LockKeyhole className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground transition-colors group-focus-within:text-primary" />
 
               <Input
                 id="password"
                 name="password"
                 type="password"
-                placeholder="••••••••"
+                autoComplete="current-password"
+                placeholder="Digite sua senha"
                 required
-                className="h-12 rounded-2xl border-zinc-200 bg-zinc-50 pl-10 text-sm shadow-sm transition-all focus-visible:ring-2 focus-visible:ring-indigo-500/20 dark:border-zinc-800 dark:bg-zinc-950"
+                className="h-11 rounded-xl border-border bg-background pl-10 text-sm shadow-sm transition focus-visible:ring-3 focus-visible:ring-primary/15"
               />
             </div>
           </div>
 
-          {/* BUTTON */}
           <Button
+            type="submit"
             disabled={loading}
-            className="mt-2 h-12 w-full rounded-2xl bg-zinc-900 text-[11px] font-black uppercase tracking-[0.2em] text-white shadow-xl shadow-zinc-900/10 transition-all hover:bg-zinc-800 active:scale-[0.99] dark:bg-indigo-600 dark:shadow-indigo-500/20 dark:hover:bg-indigo-700"
+            className="h-11 w-full rounded-xl text-sm font-black shadow-lg shadow-primary/15 transition active:scale-[0.99]"
           >
             {loading ? (
-              <div className="flex items-center gap-2">
+              <>
                 <Loader2 className="h-4 w-4 animate-spin" />
                 Validando acesso
-              </div>
+              </>
             ) : (
-              <div className="flex items-center gap-2">
-                Acessar plataforma
+              <>
+                Entrar no dashboard
                 <ArrowRight className="h-4 w-4" />
-              </div>
+              </>
             )}
           </Button>
-
-          {/* FOOTER */}
-          <div className="relative pt-6">
-            <div className="absolute inset-0 flex items-center">
-              <span className="w-full border-t border-zinc-200 dark:border-zinc-800" />
-            </div>
-
-            <div className="relative flex justify-center">
-              <span className="bg-white px-4 text-[10px] font-black uppercase tracking-[0.25em] text-zinc-400 dark:bg-zinc-900 dark:text-zinc-600">
-                RH Analyzer
-              </span>
-            </div>
-          </div>
         </form>
+
+        <div className="mt-5 grid grid-cols-2 gap-3 border-t border-border pt-5">
+          <TrustItem label="Multiempresa" />
+          <TrustItem label="IA Scanner" />
+        </div>
       </div>
+    </div>
+  );
+}
+
+function TrustItem({ label }: { label: string }) {
+  return (
+    <div className="flex items-center gap-2 rounded-xl border border-border bg-muted/30 px-3 py-2">
+      <CheckCircle2 className="h-4 w-4 shrink-0 text-emerald-500" />
+      <span className="truncate text-xs font-bold text-muted-foreground">
+        {label}
+      </span>
     </div>
   );
 }

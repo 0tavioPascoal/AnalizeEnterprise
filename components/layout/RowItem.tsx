@@ -20,9 +20,9 @@ export function RowItem({
     <Comp
       onClick={onClick}
       className={cn(
-        "group flex w-full items-center justify-between gap-4 rounded-2xl border border-border bg-card p-5 shadow-sm transition-all",
-        "hover:border-primary/20 hover:bg-muted/40",
-        isClickable && "cursor-pointer active:scale-[0.995]",
+        "group flex w-full flex-col gap-4 rounded-2xl border border-border/50 bg-card/85 p-4 shadow-xs transition-all duration-300 sm:flex-row sm:items-center sm:justify-between sm:p-5",
+        "hover:-translate-y-0.5 hover:border-primary/20 hover:bg-card hover:shadow-sm",
+        isClickable && "cursor-pointer active:scale-[0.997]",
         className,
       )}
     >
@@ -33,7 +33,7 @@ export function RowItem({
           <div className={cn("min-w-0 flex-1", contentClassName)}>{left}</div>
 
           {right && (
-            <div className="flex shrink-0 items-center justify-end">
+            <div className="flex w-full shrink-0 items-center justify-between border-t border-border/50 pt-3 sm:w-auto sm:justify-end sm:border-t-0 sm:pt-0">
               {right}
             </div>
           )}

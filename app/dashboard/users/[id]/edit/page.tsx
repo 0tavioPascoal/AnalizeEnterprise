@@ -1,12 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { UserForm } from "@/components/user/UserForm";
-import { UserTips } from "@/components/user/UserTips";
+import { UserForm } from "@/features/users/components/UserForm";
+import { UserTips } from "@/features/users/components/UserTips";
 
 import { createServerClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { getCurrentProfile } from "@/features/auth/server/current-profile";
 
 interface EditUserPageProps {
   params: Promise<{
@@ -49,10 +49,14 @@ export default async function EditUserPage({ params }: EditUserPageProps) {
         />
       }
     >
-      <div className="grid h-full gap-6 lg:grid-cols-3">
+      <div className="grid min-h-full gap-6 lg:grid-cols-3">
         <div className="lg:col-span-2">
           <UserForm
-            initialData={user}
+            initialData={{
+              ...user,
+              name: user.name ?? "",
+              email: user.email ?? "",
+            }}
             isEdit
             currentUserId={currentProfile.id}
             currentUserRole={currentProfile.role}

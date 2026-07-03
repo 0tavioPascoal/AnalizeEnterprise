@@ -12,22 +12,24 @@ export function PageLayout({
   return (
     <div
       className={cn(
-        "box-border flex h-full w-full flex-col gap-6 overflow-hidden bg-transparent p-6",
+        "box-border flex h-full w-full flex-col gap-4 overflow-hidden bg-transparent p-4 pt-18 sm:gap-5 md:gap-6 md:p-6 md:pt-6",
         className,
       )}
     >
-      <div className="shrink-0">{header}</div>
+      <div className="glass-panel shrink-0 rounded-2xl p-4 md:p-5">
+        {header}
+      </div>
 
       {filters && (
-        <div className="shrink-0 border-b border-border pb-4">
+        <div className="shrink-0 border-b border-border/50 pb-4">
           <div className="w-full">{filters}</div>
         </div>
       )}
 
-      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden">
+      <div className="custom-scrollbar min-h-0 flex-1 overflow-y-auto overflow-x-hidden pr-0 md:pr-1">
         <div
           className={cn(
-            "h-full w-full animate-in fade-in slide-in-from-bottom-2 duration-500",
+            "min-h-full w-full animate-in fade-in slide-in-from-bottom-2 duration-500",
             contentClassName,
           )}
         >
@@ -36,7 +38,9 @@ export function PageLayout({
       </div>
 
       {pagination && (
-        <div className="shrink-0 border-t border-border pt-4">{pagination}</div>
+        <div className="glass-panel shrink-0 rounded-2xl p-3">
+          {pagination}
+        </div>
       )}
     </div>
   );

@@ -1,20 +1,20 @@
 import { Clock, FileText, Target, XCircle } from "lucide-react";
 
-import { getDashboardOverview } from "@/actions/dashboard/getDashboadOverview";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { WeeklyFlowCard } from "@/components/dashboard/WeeklyFlowCard";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
-import { DecisionQueueCard } from "@/components/dashboard/EliteRankingCard";
+import { getDashboardOverview } from "@/features/dashboard/server/get-dashboard-overview";
+import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
+import { StatCard } from "@/features/dashboard/components/StatCard";
+import { WeeklyFlowCard } from "@/features/dashboard/components/WeeklyFlowCard";
+import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
+import { DecisionQueueCard } from "@/features/dashboard/components/DecisionQueueCard";
 
 export default async function DashboardPage() {
   const overview = await getDashboardOverview();
 
   return (
-    <div className="flex h-full w-full flex-col gap-6 overflow-hidden bg-zinc-50/50 p-6 dark:bg-zinc-950/50">
+    <div className="custom-scrollbar flex h-full min-h-0 w-full flex-col gap-3 overflow-y-auto bg-muted/35 p-4 pt-18 sm:gap-4 md:p-5 md:pt-5 xl:overflow-hidden">
       <DashboardHeader />
 
-      <section className="grid shrink-0 grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-4">
+      <section className="grid shrink-0 grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-4">
         <StatCard
           title="Total Analisado"
           value={overview.totalAnalyzed}
@@ -48,8 +48,8 @@ export default async function DashboardPage() {
         />
       </section>
 
-      <main className="grid min-h-0 flex-1 grid-cols-12 gap-6 overflow-hidden">
-        <div className="col-span-12 flex min-h-0 flex-col gap-6 overflow-hidden xl:col-span-8">
+      <main className="grid min-h-[620px] flex-1 grid-cols-12 gap-3 md:gap-4 xl:min-h-0">
+        <div className="col-span-12 flex min-h-0 flex-col gap-3 md:gap-4 xl:col-span-8">
           <WeeklyFlowCard data={overview.weeklyFlow} />
           <RecentActivityCard analyses={overview.recentAnalyses} />
         </div>

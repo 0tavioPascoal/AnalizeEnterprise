@@ -1,5 +1,7 @@
-export type UserRole = "admin" | "recruiter";
-export type UserStatus = "active" | "inactive";
+import type { Enums, Tables } from "@/types/supabase/database";
+
+export type UserRole = Enums<"user_role">;
+export type UserStatus = Enums<"user_status">;
 
 export interface UserFormData {
   name: string;
@@ -8,14 +10,10 @@ export interface UserFormData {
   role: UserRole;
 }
 
-export interface UserProfile {
-  id: string;
-  name: string | null;
-  email: string | null;
-  role: UserRole;
-  company_id: string;
-  status: UserStatus;
-}
+export type UserProfile = Pick<
+  Tables<"profiles">,
+  "id" | "name" | "email" | "role" | "company_id" | "status"
+>;
 
 export interface ActionResponse {
   success: boolean;
