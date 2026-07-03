@@ -6,6 +6,7 @@ import { interviewGenerateSchema } from "@/lib/validations";
 import { apiError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 import { postWebhook } from "@/lib/webhook";
+import { checkRateLimit, getRequestIp } from "@/lib/rate-limit";
 
 export async function POST(req: NextRequest) {
   try {
@@ -24,6 +25,20 @@ export async function POST(req: NextRequest) {
 
     if (userError || !user) {
       return apiError("Usuário não autenticado.", 401);
+    }
+
+    const rateLimit = checkRateLimit({
+      key: `interview:generate:${user.id}:${getRequestIp(req)}`,
+      limit: 20,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rateLimit.success) {
+      logger.warn("interview.generate.rate_limited", {
+        userId: user.id,
+      });
+
+      return apiError("Muitas solicitações em sequência. Tente novamente mais tarde.", 429);
     }
 
     const body = await req.json().catch(() => null);
@@ -112,11 +127,18 @@ export async function POST(req: NextRequest) {
         .eq("id", analysis.id)
         .eq("company_id", profile.company_id);
 
-      return NextResponse.json({
-        success: true,
-        interview_id: existingInterview.id,
-        already_exists: true,
-      });
+      return NextResponse.json(
+        {
+          success: true,
+          interview_id: existingInterview.id,
+          already_exists: true,
+        },
+        {
+          headers: {
+            "Cache-Control": "no-store",
+          },
+        },
+      );
     }
 
     const { data: interview, error: interviewError } = await supabase
@@ -157,7 +179,8 @@ export async function POST(req: NextRequest) {
         .update({
           status: "failed",
         })
-        .eq("id", interview.id);
+        .eq("id", interview.id)
+        .eq("company_id", profile.company_id);
 
       logger.error("interview.generate.pipeline_update_failed", pipelineError, {
         companyId: profile.company_id,
@@ -178,8 +201,42 @@ export async function POST(req: NextRequest) {
       payload: {
         interview_id: interview.id,
         company_id: profile.company_id,
-        analysis,
-        job,
+        analysis: {
+          id: analysis.id,
+          candidate_name: analysis.candidate_name,
+          candidate_email: analysis.candidate_email,
+          score: analysis.score,
+          passed_minimum_score: analysis.passed_minimum_score,
+          match: analysis.match,
+          recommendation: analysis.recommendation,
+          summary: analysis.summary,
+          status: analysis.status,
+          strengths: analysis.strengths,
+          weaknesses: analysis.weaknesses,
+          matched_skills: analysis.matched_skills,
+          missing_skills: analysis.missing_skills,
+          risks: analysis.risks,
+          interview_questions: analysis.interview_questions,
+          seniority_assessment: analysis.seniority_assessment,
+          contract_fit: analysis.contract_fit,
+          final_opinion: analysis.final_opinion,
+          technical_score: analysis.technical_score,
+          experience_score: analysis.experience_score,
+          seniority_score: analysis.seniority_score,
+          context_fit_score: analysis.context_fit_score,
+          communication_score: analysis.communication_score,
+        },
+        job: job
+          ? {
+              id: job.id,
+              title: job.title,
+              context: job.context,
+              score_min: job.score_min,
+              contract_type: job.contract_type,
+              seniority: job.seniority,
+              skills: job.skills,
+            }
+          : null,
         generated_by: {
           id: user.id,
           name: profile.name,
@@ -199,16 +256,24 @@ export async function POST(req: NextRequest) {
         .update({
           status: "failed",
         })
-        .eq("id", interview.id);
+        .eq("id", interview.id)
+        .eq("company_id", profile.company_id);
 
       return apiError("Serviço de entrevista indisponível. Tente novamente.", 500);
     }
 
-    return NextResponse.json({
-      success: true,
-      interview_id: interview.id,
-      already_exists: false,
-    });
+    return NextResponse.json(
+      {
+        success: true,
+        interview_id: interview.id,
+        already_exists: false,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   } catch (error) {
     logger.error("interview.generate.unhandled", error);
 

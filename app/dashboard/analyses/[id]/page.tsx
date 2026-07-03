@@ -3,21 +3,21 @@ import { notFound } from "next/navigation";
 
 import { ArrowLeft, Sparkles } from "lucide-react";
 
-import { getAnalysisById } from "@/actions/analyzes/getAnalysisById";
-import { getInterviewByAnalysisId } from "@/actions/interviews/getInterviewByAnalysisId";
+import { getAnalysisById } from "@/features/analyses/server/get-analysis-by-id";
+import { getInterviewByAnalysisId } from "@/features/interviews/server/get-interview-by-analysis-id";
 
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PageLayout } from "@/components/layout/PageLayout";
 
 import { Button } from "@/components/ui/button";
 
-import { AnalysisListCard } from "@/components/analyses/AnalysisListCard";
-import { AnalysisProfileCard } from "@/components/analyses/AnalysisProfileCard";
-import { AnalysisResultCard } from "@/components/analyses/AnalysisResultCard";
-import { AnalysisScoreCard } from "@/components/analyses/AnalysisScoreCard";
+import { AnalysisListCard } from "@/features/analyses/components/AnalysisListCard";
+import { AnalysisProfileCard } from "@/features/analyses/components/AnalysisProfileCard";
+import { AnalysisResultCard } from "@/features/analyses/components/AnalysisResultCard";
+import { AnalysisScoreCard } from "@/features/analyses/components/AnalysisScoreCard";
 
-import { DownloadResumeButton } from "@/components/analyses/downloadCv";
-import { GenerateInterviewButton } from "@/components/analyses/generateInterviewButton";
+import { DownloadResumeButton } from "@/features/analyses/components/DownloadResumeButton";
+import { GenerateInterviewButton } from "@/features/analyses/components/GenerateInterviewButton";
 
 interface Props {
   params: Promise<{ id: string }>;
@@ -160,23 +160,23 @@ function FinalOpinionCard({ text }: { text?: string | null }) {
   const formattedText = text?.trim();
 
   return (
-    <section className="overflow-hidden rounded-[28px] border border-zinc-200/80 bg-white shadow-xl shadow-zinc-900/5 dark:border-zinc-800 dark:bg-zinc-900/90">
-      <div className="border-b border-zinc-200/80 bg-zinc-50/80 p-6 dark:border-zinc-800 dark:bg-zinc-950/40">
+    <section className="overflow-hidden rounded-3xl border border-border/60 bg-card/80 shadow-md transition-all duration-300 hover:border-primary/20 hover:shadow-lg">
+      <div className="border-b border-border/50 bg-muted/15 p-6">
         <div className="flex items-start gap-4">
           <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-2xl bg-violet-500/[0.08] text-violet-600 dark:bg-violet-500/[0.12] dark:text-violet-300">
             <Sparkles size={21} />
           </div>
 
           <div className="min-w-0">
-            <p className="text-xs font-black uppercase tracking-[0.18em] text-zinc-500 dark:text-zinc-400">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-muted-foreground/80">
               Parecer da IA
             </p>
 
-            <h2 className="mt-1 text-2xl font-black tracking-tight text-zinc-900 dark:text-zinc-100">
+            <h2 className="mt-1 text-2xl font-black tracking-tight text-foreground">
               Parecer final
             </h2>
 
-            <p className="mt-1.5 text-[15px] leading-7 text-zinc-500 dark:text-zinc-400">
+            <p className="mt-1.5 text-xs font-semibold leading-relaxed text-muted-foreground">
               Conclusão consolidada da triagem sobre aderência, senioridade,
               riscos e próximos passos.
             </p>
@@ -185,8 +185,8 @@ function FinalOpinionCard({ text }: { text?: string | null }) {
       </div>
 
       <div className="p-6">
-        <div className="rounded-2xl border border-zinc-200/70 bg-zinc-50/70 p-5 dark:border-zinc-800 dark:bg-zinc-950/40">
-          <p className="text-[16px] font-medium leading-8 text-zinc-700 dark:text-zinc-300">
+        <div className="rounded-2xl border border-border/50 bg-muted/10 p-5">
+          <p className="text-sm font-medium leading-7 text-foreground/90">
             {formattedText || "Parecer final não disponível."}
           </p>
         </div>

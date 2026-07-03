@@ -3,8 +3,8 @@ import {
   getAnalysisJobOptions,
   type MatchFilter,
   type ScoreFilter,
-} from "@/actions/analyzes/getAnalyzes";
-import { AnalysesClient } from "@/components/analyses/listing/AnalysesClient";
+} from "@/features/analyses/server/get-analyses";
+import { AnalysesClient } from "@/features/analyses/components/listing/AnalysesClient";
 
 export const dynamic = "force-dynamic";
 

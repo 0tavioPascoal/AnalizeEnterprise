@@ -7,7 +7,6 @@ import { getRequiredEnv } from "@/lib/env";
 
 const publicRoutes: string[] = [
   "/login",
-  "/register",
 ];
 
 export async function proxy(

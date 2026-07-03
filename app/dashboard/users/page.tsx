@@ -1,5 +1,5 @@
-import { getUsers } from "@/actions/user/getUser";
-import { UsersClient } from "@/components/user/UsersClient";
+import { getUsers } from "@/features/users/server/get-users";
+import { UsersClient } from "@/features/users/components/UsersClient";
 
 export default async function UsersPage() {
   const users = await getUsers();

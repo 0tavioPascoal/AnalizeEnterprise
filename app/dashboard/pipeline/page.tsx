@@ -1,10 +1,10 @@
-import { PipelineClient } from "@/components/pipeline/pipelineClient";
+import { PipelineClient } from "@/features/pipeline/components/PipelineClient";
 import {
   getPipelineAnalyses,
   getPipelineKanban,
   type PipelineStage,
   type PipelineView,
-} from "@/actions/pipeline/pipeline";
+} from "@/features/pipeline/server/pipeline";
 
 interface PipelinePageProps {
   searchParams: Promise<{
@@ -34,7 +34,7 @@ export default async function PipelinePage({
     : "screening";
   const view = viewOptions.includes(params.view as PipelineView)
     ? (params.view as PipelineView)
-    : "list";
+    : "kanban";
 
   const pipeline =
     view === "kanban"

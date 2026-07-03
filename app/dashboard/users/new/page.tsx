@@ -2,10 +2,10 @@ import { redirect } from "next/navigation";
 import { UserPlus } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/Pageheader";
-import { UserForm } from "@/components/user/UserForm";
-import { UserTips } from "@/components/user/UserTips";
-import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { UserForm } from "@/features/users/components/UserForm";
+import { UserTips } from "@/features/users/components/UserTips";
+import { getCurrentProfile } from "@/features/auth/server/current-profile";
 
 export default async function NewUserPage() {
   const currentProfile = await getCurrentProfile();

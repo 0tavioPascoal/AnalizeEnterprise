@@ -6,6 +6,7 @@ import { analysisRequestSchema } from "@/lib/validations";
 import { apiError } from "@/lib/api-response";
 import { logger } from "@/lib/logger";
 import { postWebhook } from "@/lib/webhook";
+import { checkRateLimit, getRequestIp } from "@/lib/rate-limit";
 
 const RESUME_BUCKET = "candidate-cvs";
 const MAX_RESUME_SIZE_BYTES = 10 * 1024 * 1024;
@@ -26,6 +27,20 @@ export async function POST(req: NextRequest) {
 
     if (!user) {
       return apiError("Usuário não autenticado.", 401);
+    }
+
+    const rateLimit = checkRateLimit({
+      key: `analysis:create:${user.id}:${getRequestIp(req)}`,
+      limit: 12,
+      windowMs: 60 * 60 * 1000,
+    });
+
+    if (!rateLimit.success) {
+      logger.warn("analysis.create.rate_limited", {
+        userId: user.id,
+      });
+
+      return apiError("Muitas análises em sequência. Tente novamente mais tarde.", 429);
     }
 
     const { data: profile } = await supabase
@@ -60,6 +75,14 @@ export async function POST(req: NextRequest) {
 
     if (file.size > MAX_RESUME_SIZE_BYTES) {
       return apiError("O arquivo deve ter no máximo 10MB.", 400);
+    }
+
+    const fileHeader = new TextDecoder().decode(
+      await file.slice(0, 4).arrayBuffer(),
+    );
+
+    if (fileHeader !== "%PDF") {
+      return apiError("O arquivo enviado não parece ser um PDF válido.", 400);
     }
 
     if (!parsedBody.success) {
@@ -141,17 +164,17 @@ export async function POST(req: NextRequest) {
       return apiError("Serviço de análise indisponível. Tente novamente.", 500);
     }
 
-    return NextResponse.json({
-      success: true,
-      data: webhookResult.data,
-      resume: {
+    return NextResponse.json(
+      {
+        success: true,
         analysis_id: analysisId,
-        file_path: filePath,
-        file_name: file.name,
-        file_size: file.size,
-        mime_type: file.type,
       },
-    });
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
   } catch (error) {
     logger.error("analysis.create.unhandled", error);
 

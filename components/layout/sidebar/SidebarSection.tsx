@@ -14,17 +14,17 @@ export function SidebarSection({
   children,
 }: SidebarSectionProps) {
   return (
-    <div className="space-y-2">
+    <div className="space-y-2.5">
       <p
         className={cn(
-          "px-3 text-[11px] font-black uppercase tracking-[0.18em] text-muted-foreground/70",
+          "px-3 text-[10px] font-black uppercase tracking-[0.2em] text-muted-foreground/65",
           collapsed && "text-center",
         )}
       >
         {collapsed ? "•••" : title}
       </p>
 
-      <div className="space-y-1">{children}</div>
+      <div className="space-y-1.5">{children}</div>
     </div>
   );
 }

@@ -4,13 +4,20 @@ type LogMetadata = Record<string, unknown>;
 const sensitiveKeys = [
   "authorization",
   "cookie",
+  "email",
   "password",
+  "path",
+  "payload",
   "token",
   "secret",
   "service_role",
   "serviceRole",
+  "signed",
+  "signedUrl",
+  "url",
   "body",
   "file",
+  "webhook",
 ];
 
 function sanitizeMetadata(metadata?: LogMetadata): LogMetadata | undefined {
@@ -29,11 +36,16 @@ function sanitizeMetadata(metadata?: LogMetadata): LogMetadata | undefined {
 
 function serializeError(error: unknown): LogMetadata {
   if (error instanceof Error) {
-    return {
+    const serialized: LogMetadata = {
       name: error.name,
       message: error.message,
-      stack: error.stack,
     };
+
+    if (process.env.NODE_ENV !== "production") {
+      serialized.stack = error.stack;
+    }
+
+    return serialized;
   }
 
   if (error && typeof error === "object") {
@@ -46,7 +58,7 @@ function serializeError(error: unknown): LogMetadata {
       details: record.details,
       hint: record.hint,
       status: record.status,
-      value: JSON.stringify(record),
+      value: "[object]",
     };
   }
 

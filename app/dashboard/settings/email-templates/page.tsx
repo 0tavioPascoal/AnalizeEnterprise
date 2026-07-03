@@ -1,9 +1,9 @@
 import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 
-import { EmailTemplateForm } from "@/components/settings/EmailTemplateForm";
+import { EmailTemplateForm } from "@/features/email/components/EmailTemplateForm";
 
-import { getEmailTemplates } from "@/actions/email/mail-templates";
+import { getEmailTemplates } from "@/features/email/server/mail-templates";
 
 export default async function EmailTemplatesPage() {
   const templates = await getEmailTemplates();

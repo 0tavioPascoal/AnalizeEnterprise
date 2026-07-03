@@ -1,12 +1,12 @@
 import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { StatusBadge } from "@/components/layout/filters/StatusBadge";
 
-import { AnalyzeForm } from "@/components/analyze/AnalyzeForm";
-import { AnalyzeTips } from "@/components/analyze/AnalyzeTips";
+import { AnalyzeForm } from "@/features/analyze/components/AnalyzeForm";
+import { AnalyzeTips } from "@/features/analyze/components/AnalyzeTips";
 
 import { Sparkles } from "lucide-react";
-import { getJobs } from "@/actions/jobs/getJobs";
+import { getJobs } from "@/features/jobs/server/get-jobs";
 
 export default async function AnalyzePage() {
   const jobs = await getJobs();

@@ -16,12 +16,12 @@ export function PageLayout({
         className,
       )}
     >
-      <div className="shrink-0 rounded-2xl border border-border/70 bg-background/70 p-4 shadow-sm backdrop-blur-sm md:p-5">
+      <div className="glass-panel shrink-0 rounded-2xl p-4 md:p-5">
         {header}
       </div>
 
       {filters && (
-        <div className="shrink-0 border-b border-border pb-4">
+        <div className="shrink-0 border-b border-border/50 pb-4">
           <div className="w-full">{filters}</div>
         </div>
       )}
@@ -38,7 +38,7 @@ export function PageLayout({
       </div>
 
       {pagination && (
-        <div className="shrink-0 rounded-2xl border border-border/70 bg-background/70 p-3 shadow-sm backdrop-blur-sm">
+        <div className="glass-panel shrink-0 rounded-2xl p-3">
           {pagination}
         </div>
       )}

@@ -1,9 +1,9 @@
 import { Plus } from "lucide-react";
 
 import { PageLayout } from "@/components/layout/PageLayout";
-import { PageHeader } from "@/components/layout/Pageheader";
-import { JobForm } from "@/components/jobs/JobForm";
-import { JobTips } from "@/components/jobs/JobTips";
+import { PageHeader } from "@/components/layout/PageHeader";
+import { JobForm } from "@/features/jobs/components/JobForm";
+import { JobTips } from "@/features/jobs/components/JobTips";
 
 export default function NewJobPage() {
   return (

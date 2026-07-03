@@ -1,12 +1,12 @@
 import { notFound, redirect } from "next/navigation";
 
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PageLayout } from "@/components/layout/PageLayout";
-import { UserForm } from "@/components/user/UserForm";
-import { UserTips } from "@/components/user/UserTips";
+import { UserForm } from "@/features/users/components/UserForm";
+import { UserTips } from "@/features/users/components/UserTips";
 
 import { createServerClient } from "@/lib/supabase/server";
-import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { getCurrentProfile } from "@/features/auth/server/current-profile";
 
 interface EditUserPageProps {
   params: Promise<{

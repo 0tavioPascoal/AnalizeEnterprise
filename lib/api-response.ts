@@ -16,7 +16,12 @@ export function apiSuccess<T>(data?: T, status = 200): NextResponse<ApiResult<T>
       success: true,
       data,
     },
-    { status },
+    {
+      status,
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    },
   );
 }
 
@@ -29,6 +34,11 @@ export function apiError(
       success: false,
       message,
     },
-    { status },
+    {
+      status,
+      headers: {
+        "Cache-Control": "no-store",
+      },
+    },
   );
 }

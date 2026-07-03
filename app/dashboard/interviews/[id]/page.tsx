@@ -3,19 +3,19 @@ import { notFound } from "next/navigation";
 
 import { ArrowLeft, BrainCircuit } from "lucide-react";
 
-import { getInterviewById } from "@/actions/interviews/getInterviewById";
+import { getInterviewById } from "@/features/interviews/server/get-interview-by-id";
 
-import { PageHeader } from "@/components/layout/Pageheader";
+import { PageHeader } from "@/components/layout/PageHeader";
 import { PageLayout } from "@/components/layout/PageLayout";
 
 import { Button } from "@/components/ui/button";
 
-import { ExportInterviewPdfButton } from "@/components/interviews/ExportInterviewPdfButton";
-import { InterviewFinalCriteriaCard } from "@/components/interviews/InterviewFinalCriteriaCard";
-import { InterviewHeroCard } from "@/components/interviews/InterviewHeroCard";
-import { InterviewInsightsGrid } from "@/components/interviews/InterviewInsightsGrid";
-import { InterviewObjectiveCard } from "@/components/interviews/InterviewObjectiveCard";
-import { InterviewQuestionTabs } from "@/components/interviews/InterviewQuestionTabs";
+import { ExportInterviewPdfButton } from "@/features/interviews/components/ExportInterviewPdfButton";
+import { InterviewFinalCriteriaCard } from "@/features/interviews/components/InterviewFinalCriteriaCard";
+import { InterviewHeroCard } from "@/features/interviews/components/InterviewHeroCard";
+import { InterviewInsightsGrid } from "@/features/interviews/components/InterviewInsightsGrid";
+import { InterviewObjectiveCard } from "@/features/interviews/components/InterviewObjectiveCard";
+import { InterviewQuestionTabs } from "@/features/interviews/components/InterviewQuestionTabs";
 
 interface Props {
   params: Promise<{ id: string }>;

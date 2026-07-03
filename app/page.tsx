@@ -1,6 +1,6 @@
 import { redirect } from "next/navigation";
 
-import { getCurrentProfile } from "@/actions/auth/getCurrentProfile";
+import { getCurrentProfile } from "@/features/auth/server/current-profile";
 
 export default async function HomePage() {
   const profile = await getCurrentProfile();

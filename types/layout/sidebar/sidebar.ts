@@ -11,5 +11,8 @@ export interface SidebarNavItem {
   href: string;
   label: string;
   icon: ReactNode;
+  description?: string;
+  badge?: string;
+  featured?: boolean;
   active: (pathname: string) => boolean;
 }

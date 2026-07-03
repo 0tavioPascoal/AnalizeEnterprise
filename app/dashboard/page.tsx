@@ -1,11 +1,11 @@
 import { Clock, FileText, Target, XCircle } from "lucide-react";
 
-import { getDashboardOverview } from "@/actions/dashboard/getDashboadOverview";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { StatCard } from "@/components/dashboard/StatCard";
-import { WeeklyFlowCard } from "@/components/dashboard/WeeklyFlowCard";
-import { RecentActivityCard } from "@/components/dashboard/RecentActivityCard";
-import { DecisionQueueCard } from "@/components/dashboard/EliteRankingCard";
+import { getDashboardOverview } from "@/features/dashboard/server/get-dashboard-overview";
+import { DashboardHeader } from "@/features/dashboard/components/DashboardHeader";
+import { StatCard } from "@/features/dashboard/components/StatCard";
+import { WeeklyFlowCard } from "@/features/dashboard/components/WeeklyFlowCard";
+import { RecentActivityCard } from "@/features/dashboard/components/RecentActivityCard";
+import { DecisionQueueCard } from "@/features/dashboard/components/DecisionQueueCard";
 
 export default async function DashboardPage() {
   const overview = await getDashboardOverview();
